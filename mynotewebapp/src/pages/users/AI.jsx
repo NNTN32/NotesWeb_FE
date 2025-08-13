@@ -1,4 +1,4 @@
-import AIInsights from '../components/AIInsights';
+import AIInsights from '../../components/AIInsights';
 
 export default function AI() {
   return (
@@ -7,3 +7,4 @@ export default function AI() {
     </div>
   );
 }
+  

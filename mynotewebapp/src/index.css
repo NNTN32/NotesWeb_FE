@@ -78,6 +78,36 @@
   }
 }
 
+@keyframes write {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(5deg);
+  }
+  50% {
+    transform: rotate(0deg);
+  }
+  75% {
+    transform: rotate(-5deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes tear {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.1) rotate(2deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
 .animate-fall {
   animation: fall linear infinite;
 }
@@ -100,6 +130,14 @@
 
 .animate-bounce-in {
   animation: bounceIn 0.8s ease-out forwards;
+}
+
+.animate-write {
+  animation: write 2s ease-in-out infinite;
+}
+
+.animate-tear {
+  animation: tear 0.5s ease-in-out infinite;
 }
 
 .delay-700 {

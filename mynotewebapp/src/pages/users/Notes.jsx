@@ -54,16 +54,16 @@ function NotesList() {
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Tất cả ghi chú</h2>
-          <p className="text-gray-600">Quản lý và tổ chức ghi chú của bạn</p>
+          <p className="text-gray-700">Quản lý và tổ chức ghi chú của bạn</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="text-right">
-            <div className="text-2xl font-bold text-blue-600">{totalNotes}</div>
+            <div className="text-2xl font-bold text-terracotta">{totalNotes}</div>
             <div className="text-sm text-gray-500">Tổng ghi chú</div>
           </div>
           <Link
             to="/create"
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 transition-colors"
+            className="bg-gradient-to-r from-terracotta to-brass text-white px-4 py-2 rounded-lg hover:opacity-95 flex items-center gap-2 transition-colors"
           >
             <FaPlus />
             Ghi chú mới
@@ -81,13 +81,13 @@ function NotesList() {
               placeholder="Tìm kiếm ghi chú..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 py-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="pl-10 pr-4 py-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-brass focus:border-transparent"
             />
           </div>
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brass focus:border-transparent"
           >
             {categories.map(category => (
               <option key={category} value={category}>
@@ -98,7 +98,7 @@ function NotesList() {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brass focus:border-transparent"
           >
             <option value="recent">Gần đây nhất</option>
             <option value="title">Theo tên</option>
@@ -110,7 +110,7 @@ function NotesList() {
       {/* Quick Stats */}
       <div className="grid md:grid-cols-4 gap-4">
         <div className="bg-white rounded-xl border border-gray-200 p-6 text-center">
-          <div className="text-3xl font-bold text-blue-600 mb-2">{totalNotes}</div>
+          <div className="text-3xl font-bold text-terracotta mb-2">{totalNotes}</div>
           <div className="text-sm text-gray-600">Tổng cộng</div>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-6 text-center">
@@ -118,11 +118,11 @@ function NotesList() {
           <div className="text-sm text-gray-600">Đã đánh dấu sao</div>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-6 text-center">
-          <div className="text-3xl font-bold text-green-600 mb-2">{notes.filter(n => n.category === "Technology").length}</div>
+          <div className="text-3xl font-bold text-olive mb-2">{notes.filter(n => n.category === "Technology").length}</div>
           <div className="text-sm text-gray-600">Công nghệ</div>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-6 text-center">
-          <div className="text-3xl font-bold text-purple-600 mb-2">{notes.filter(n => n.category === "Learning").length}</div>
+          <div className="text-3xl font-bold text-plum mb-2">{notes.filter(n => n.category === "Learning").length}</div>
           <div className="text-sm text-gray-600">Học tập</div>
         </div>
       </div>
@@ -152,7 +152,7 @@ function NotesList() {
             {!searchQuery && (
               <Link 
                 to="/create"
-                className="inline-flex items-center gap-3 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-terracotta to-brass text-white rounded-lg hover:opacity-95 transition-colors"
               >
                 <FaPlus />
                 Tạo ghi chú đầu tiên
@@ -171,7 +171,7 @@ function NotesList() {
                     <div className="flex items-center gap-3 mb-3">
                       <h4 className="text-xl font-semibold text-gray-900 truncate">{note.title}</h4>
                       {note.isStarred && <FaStar className="text-yellow-400 flex-shrink-0" />}
-                      <span className="text-xs px-2 py-1 bg-blue-100 text-blue-600 rounded-full">
+                      <span className="text-xs px-2 py-1 bg-sand text-terracotta rounded-full">
                         {note.category}
                       </span>
                     </div>
@@ -193,7 +193,7 @@ function NotesList() {
                     </button>
                     <Link
                       to={`/note/${note.id}`}
-                      className="p-2 hover:bg-blue-50 rounded-lg text-gray-400 hover:text-blue-600 transition-colors"
+                      className="p-2 hover:bg-sand rounded-lg text-gray-400 hover:text-terracotta transition-colors"
                       title="Xem chi tiết"
                     >
                       <FaSyncAlt />
@@ -218,7 +218,7 @@ function NotesList() {
 
 export default function Notes() {
   return (
-    <div className="min-h-screen bg-gray-50 px-8 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-paper via-sand to-latte px-8 py-12">
       <NotesList />
     </div>
   );

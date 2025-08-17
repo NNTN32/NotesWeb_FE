@@ -15,7 +15,7 @@ export default function NoteDetail() {
 
   return (
     <section className="max-w-xl mx-auto py-10 px-2">
-      <Link to="/" className="flex items-center gap-2 text-blue-600 hover:underline mb-6 text-sm">
+      <Link to="/" className="flex items-center gap-2 text-terracotta hover:underline mb-6 text-sm">
         <FaArrowLeft /> Quay lại
       </Link>
       <div className="bg-white border border-gray-200 rounded-md p-6 shadow-sm">

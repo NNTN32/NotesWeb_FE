@@ -67,15 +67,16 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-paper via-sand to-latte px-4">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mb-4">
+          <div className="mx-auto w-16 h-16 bg-gradient-to-r from-terracotta to-brass rounded-full flex items-center justify-center mb-3">
             <FaUserPlus className="text-white text-2xl" />
           </div>
+          <div className="mx-auto h-1 w-12 bg-gradient-to-r from-terracotta to-brass rounded-full mb-4" />
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Đăng ký</h1>
-          <p className="text-gray-600">Tạo tài khoản mới</p>
+          <p className="text-gray-700">Tạo tài khoản mới</p>
         </div>
 
         {/* Form */}
@@ -98,7 +99,7 @@ export default function Register() {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-lg"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brass focus:border-transparent transition-all duration-200 text-lg"
                 placeholder="Nhập họ và tên của bạn"
                 required
                 autoComplete="name"
@@ -116,7 +117,7 @@ export default function Register() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-lg"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brass focus:border-transparent transition-all duration-200 text-lg"
                 placeholder="Nhập email của bạn"
                 required
                 autoComplete="email"
@@ -135,7 +136,7 @@ export default function Register() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-lg"
+                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brass focus:border-transparent transition-all duration-200 text-lg"
                   placeholder="Nhập mật khẩu (ít nhất 6 ký tự)"
                   required
                   autoComplete="new-password"
@@ -162,7 +163,7 @@ export default function Register() {
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-lg"
+                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brass focus:border-transparent transition-all duration-200 text-lg"
                   placeholder="Nhập lại mật khẩu"
                   required
                   autoComplete="new-password"
@@ -181,7 +182,7 @@ export default function Register() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-lg font-semibold text-lg hover:from-blue-700 hover:to-purple-700 focus:ring-4 focus:ring-blue-300 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-terracotta to-brass text-white py-3 px-6 rounded-lg font-semibold text-lg hover:opacity-95 focus:ring-4 focus:ring-brass/40 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? "Đang đăng ký..." : "Đăng ký"}
             </button>
@@ -200,7 +201,7 @@ export default function Register() {
               Đã có tài khoản?{" "}
               <Link 
                 to="/login" 
-                className="text-blue-600 hover:text-blue-700 font-semibold underline decoration-2 underline-offset-2"
+                className="text-terracotta hover:text-brass font-semibold underline decoration-2 underline-offset-2"
               >
                 Đăng nhập ngay
               </Link>

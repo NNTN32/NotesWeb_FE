@@ -2,9 +2,9 @@ import { useState } from "react";
 import { FaPlus, FaCheckCircle, FaCalendarAlt, FaTrash, FaEdit } from "react-icons/fa";
 
 const priorityColors = {
-  high: "bg-red-100 text-red-600 border-red-200",
-  medium: "bg-yellow-100 text-yellow-600 border-yellow-200",
-  low: "bg-gray-100 text-gray-600 border-gray-200"
+  high: "bg-rose text-ink border-rose",
+  medium: "bg-sand text-terracotta border-sand",
+  low: "bg-latte text-ink border-latte"
 };
 
 const priorityLabels = {
@@ -59,10 +59,10 @@ function TodoList() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Todo List</h2>
-          <p className="text-gray-600">Quản lý công việc và dự án của bạn</p>
+          <p className="text-gray-700">Quản lý công việc và dự án của bạn</p>
         </div>
         <div className="text-right">
-          <div className="text-2xl font-bold text-blue-600">{completedTodos}/{totalTodos}</div>
+          <div className="text-2xl font-bold text-terracotta">{completedTodos}/{totalTodos}</div>
           <div className="text-sm text-gray-500">Hoàn thành</div>
         </div>
       </div>
@@ -75,7 +75,7 @@ function TodoList() {
         </div>
         <div className="w-full bg-gray-200 rounded-full h-3">
           <div 
-            className="bg-gradient-to-r from-blue-500 to-green-500 h-3 rounded-full transition-all duration-500"
+            className="bg-gradient-to-r from-terracotta to-brass h-3 rounded-full transition-all duration-500"
             style={{ width: `${totalTodos > 0 ? (completedTodos / totalTodos) * 100 : 0}%` }}
           ></div>
         </div>
@@ -90,13 +90,13 @@ function TodoList() {
             placeholder="Nhập công việc cần làm..."
             value={newTodo}
             onChange={(e) => setNewTodo(e.target.value)}
-            className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brass focus:border-transparent"
             onKeyPress={(e) => e.key === 'Enter' && handleAddTodo()}
           />
           <select
             value={newPriority}
             onChange={(e) => setNewPriority(e.target.value)}
-            className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brass focus:border-transparent"
           >
             <option value="low">Ưu tiên thấp</option>
             <option value="medium">Ưu tiên trung bình</option>
@@ -106,11 +106,11 @@ function TodoList() {
             type="date"
             value={newDueDate}
             onChange={(e) => setNewDueDate(e.target.value)}
-            className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brass focus:border-transparent"
           />
           <button
             onClick={handleAddTodo}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 font-medium"
+            className="px-6 py-3 bg-gradient-to-r from-terracotta to-brass text-white rounded-lg hover:opacity-95 transition-colors flex items-center gap-2 font-medium"
           >
             <FaPlus />
             Thêm
@@ -133,7 +133,7 @@ function TodoList() {
                 key={todo.id} 
                 className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-md ${
                   todo.completed 
-                    ? 'bg-green-50 border-green-200' 
+                    ? 'bg-sand border-sand' 
                     : 'bg-white border-gray-200'
                 }`}
               >
@@ -142,8 +142,8 @@ function TodoList() {
                     onClick={() => handleToggleTodo(todo.id)}
                     className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
                       todo.completed 
-                        ? 'bg-green-500 border-green-500 text-white' 
-                        : 'border-gray-300 hover:border-blue-400'
+                        ? 'bg-olive border-olive text-white' 
+                        : 'border-gray-300 hover:border-terracotta'
                     }`}
                   >
                     {todo.completed && <FaCheckCircle className="text-sm" />}
@@ -170,7 +170,7 @@ function TodoList() {
                   </div>
                   
                   <div className="flex items-center gap-2">
-                    <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                    <button className="p-2 text-gray-400 hover:text-terracotta hover:bg-sand rounded-lg transition-colors">
                       <FaEdit />
                     </button>
                     <button 
@@ -190,15 +190,15 @@ function TodoList() {
       {/* Quick Stats */}
       <div className="grid md:grid-cols-3 gap-4">
         <div className="bg-white rounded-xl border border-gray-200 p-6 text-center">
-          <div className="text-3xl font-bold text-blue-600 mb-2">{totalTodos}</div>
+          <div className="text-3xl font-bold text-terracotta mb-2">{totalTodos}</div>
           <div className="text-sm text-gray-600">Tổng cộng</div>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-6 text-center">
-          <div className="text-3xl font-bold text-green-600 mb-2">{completedTodos}</div>
+          <div className="text-3xl font-bold text-olive mb-2">{completedTodos}</div>
           <div className="text-sm text-gray-600">Đã hoàn thành</div>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-6 text-center">
-          <div className="text-3xl font-bold text-yellow-600 mb-2">{todos.filter(t => t.priority === 'high').length}</div>
+          <div className="text-3xl font-bold text-rose mb-2">{todos.filter(t => t.priority === 'high').length}</div>
           <div className="text-sm text-gray-600">Ưu tiên cao</div>
         </div>
       </div>
@@ -208,7 +208,7 @@ function TodoList() {
 
 export default function Todo() {
   return (
-    <div className="min-h-screen bg-gray-50 px-8 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-paper via-sand to-latte px-8 py-12">
       <TodoList />
     </div>
   );

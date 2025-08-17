@@ -5,7 +5,7 @@ const aiFeatures = [
     icon: <FaBrain className="text-4xl" />,
     title: "Phân tích thông minh",
     description: "AI phân tích thói quen ghi chú của bạn",
-    color: "from-purple-500 to-pink-500",
+    color: "from-plum to-rose",
     features: [
       "Đề xuất thời gian ghi chú tối ưu",
       "Phân loại ghi chú tự động",
@@ -16,7 +16,7 @@ const aiFeatures = [
     icon: <FaMagic className="text-4xl" />,
     title: "Tự động hóa",
     description: "Tự động hóa các tác vụ lặp đi lặp lại",
-    color: "from-blue-500 to-cyan-500",
+    color: "from-terracotta to-brass",
     features: [
       "Tạo template ghi chú tự động",
       "Nhắc nhở thông minh",
@@ -31,21 +31,21 @@ const aiInsights = [
     title: "Tăng hiệu suất 25%",
     description: "Dựa trên thói quen ghi chú của bạn",
     icon: <FaChartLine className="text-2xl" />,
-    color: "from-green-400 to-green-600"
+    color: "from-olive to-brass"
   },
   {
     type: "suggestion",
     title: "Đề xuất ghi chú",
     description: "Dựa trên lịch sử tìm kiếm",
     icon: <FaLightbulb className="text-2xl" />,
-    color: "from-blue-400 to-blue-600"
+    color: "from-terracotta to-brass"
   },
   {
     type: "reminder",
     title: "Nhắc nhở",
     description: "3 ghi chú cần cập nhật",
     icon: <FaBell className="text-2xl" />,
-    color: "from-purple-400 to-purple-600"
+    color: "from-plum to-rose"
   }
 ];
 
@@ -54,11 +54,12 @@ function AIInsights() {
     <div className="space-y-8">
       {/* Header */}
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-gray-900 mb-4 flex items-center justify-center gap-3">
-          <FaRobot className="text-purple-500 text-4xl" />
+        <h2 className="text-3xl font-bold text-gray-900 mb-2 flex items-center justify-center gap-3">
+          <FaRobot className="text-terracotta text-4xl" />
           AI Insights & Đề xuất
         </h2>
-        <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+        <div className="mx-auto h-1 w-12 bg-gradient-to-r from-terracotta to-brass rounded-full mb-4" />
+        <p className="text-gray-700 text-lg max-w-2xl mx-auto">
           Khám phá cách AI có thể giúp bạn làm việc hiệu quả hơn với ghi chú và quản lý công việc
         </p>
       </div>
@@ -117,7 +118,7 @@ function AIInsights() {
       </div>
 
       {/* AI Stats */}
-      <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-8 text-white">
+      <div className="bg-gradient-to-r from-ink to-coffee rounded-2xl p-8 text-white">
         <div className="text-center mb-8">
           <h3 className="text-2xl font-bold mb-2">Thống kê AI</h3>
           <p className="text-gray-300">Hiệu suất AI trong việc hỗ trợ bạn</p>
@@ -130,9 +131,9 @@ function AIInsights() {
             { label: "Người dùng hài lòng", value: "98%", icon: <FaRobot /> }
           ].map((stat, index) => (
             <div key={index} className="text-center">
-              <div className="text-3xl font-bold text-blue-400 mb-2">{stat.value}</div>
+              <div className="text-3xl font-bold text-brass mb-2">{stat.value}</div>
               <div className="text-sm text-gray-300 mb-2">{stat.label}</div>
-              <div className="flex justify-center text-blue-400">{stat.icon}</div>
+              <div className="flex justify-center text-rose">{stat.icon}</div>
             </div>
           ))}
         </div>
@@ -143,7 +144,7 @@ function AIInsights() {
 
 export default function AI() {
   return (
-    <div className="min-h-screen bg-gray-50 px-8 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-paper via-sand to-latte px-8 py-12">
       <AIInsights />
     </div>
   );

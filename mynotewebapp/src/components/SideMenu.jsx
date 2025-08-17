@@ -53,7 +53,7 @@ export default function SideMenu() {
       {/* Mobile Menu Button */}
       <button
         onClick={toggleMobileMenu}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-purple-700 text-white rounded-lg shadow-lg"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-terracotta text-white rounded-lg shadow-lg hover:bg-brass transition-colors"
       >
         {isMobileOpen ? <FaTimes /> : <FaBars />}
       </button>
@@ -68,19 +68,19 @@ export default function SideMenu() {
 
       {/* Side Menu */}
       <aside className={`
-        fixed left-0 top-0 h-full bg-gradient-to-b from-purple-800 via-pink-700 to-blue-800 
+        fixed left-0 top-0 h-full bg-gradient-to-b from-ink via-coffee to-terracotta 
         shadow-2xl z-30 transition-all duration-300 ease-in-out
         ${isOpen ? 'w-64' : 'w-16'} 
         ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-      `}>
+     `}>
         {/* Logo Section */}
         <div className="p-3 sm:p-4 border-b border-white/20">
           <Link to="/" className="flex items-center gap-2 sm:gap-3 text-white">
             <span className="p-1.5 sm:p-2 rounded-full bg-white/10 shadow-lg">
-              <FaRegStickyNote className="text-pink-200 text-lg sm:text-xl" />
+              <FaRegStickyNote className="text-rose text-lg sm:text-xl" />
             </span>
             {isOpen && (
-              <span className="bg-gradient-to-r from-pink-200 via-blue-200 to-purple-200 bg-clip-text text-transparent font-bold text-base sm:text-lg">
+              <span className="bg-gradient-to-r from-brass via-rose to-terracotta bg-clip-text text-transparent font-bold text-base sm:text-lg">
                 MyNoteWeb3
               </span>
             )}
@@ -97,7 +97,7 @@ export default function SideMenu() {
                 placeholder="Tìm kiếm..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:ring-2 focus:ring-pink-300 focus:border-transparent text-xs sm:text-sm"
+                className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:ring-2 focus:ring-brass focus:border-transparent text-xs sm:text-sm"
               />
             </div>
           </div>
@@ -106,7 +106,7 @@ export default function SideMenu() {
         {/* Toggle Button */}
         <button
           onClick={toggleMenu}
-          className="hidden lg:block absolute -right-3 top-16 sm:top-20 bg-purple-700 text-white p-1 rounded-full shadow-lg hover:bg-purple-600 transition-colors"
+          className="hidden lg:block absolute -right-3 top-16 sm:top-20 bg-terracotta text-white p-1 rounded-full shadow-lg hover:bg-brass transition-colors"
         >
           {isOpen ? <FaTimes size={12} /> : <FaBars size={12} />}
         </button>
@@ -121,7 +121,7 @@ export default function SideMenu() {
               className={`
                 flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-300 
                 hover:bg-white/20 hover:scale-105 text-white font-semibold shadow-md text-sm sm:text-base
-                ${location.pathname === item.to ? "bg-white/20 border-l-4 border-pink-200" : ""}
+                ${location.pathname === item.to ? "bg-white/20 border-l-4 border-terracotta" : ""}
               `}
             >
               <span className="text-base sm:text-lg min-w-[16px] sm:min-w-[20px]">{item.icon}</span>
@@ -136,7 +136,7 @@ export default function SideMenu() {
             <div className="space-y-2">
               {/* User Profile */}
               <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 bg-white/10 rounded-lg">
-                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-pink-200 rounded-full flex items-center justify-center text-purple-800 font-semibold text-xs sm:text-sm">
+                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-rose rounded-full flex items-center justify-center text-ink font-semibold text-xs sm:text-sm">
                   {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
                 </div>
                 {isOpen && (

@@ -29,7 +29,7 @@ export default function LoadingAnimation({ onLoadingComplete }) {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-gradient-to-br from-ink via-coffee to-terracotta flex items-center justify-center z-50">
       {/* Main Content */}
       <div className="text-center">
         {/* App Icons - Appear with bounce */}
@@ -67,10 +67,10 @@ export default function LoadingAnimation({ onLoadingComplete }) {
             ? 'opacity-100' 
             : 'opacity-0'
         }`}>
-          <FaPencilAlt className="text-3xl text-yellow-400 animate-write" />
+          <FaPencilAlt className="text-3xl text-brass animate-write" />
           <div className="flex space-x-2">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className={`w-2 h-2 bg-white rounded-full transition-all duration-300 ${
+              <div key={i} className={`w-2 h-2 bg-brass rounded-full transition-all duration-300 ${
                 animationPhase >= 2 ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
               }`} style={{
                 transitionDelay: `${i * 200}ms`
@@ -83,7 +83,7 @@ export default function LoadingAnimation({ onLoadingComplete }) {
         <div className={`w-96 h-3 bg-white/20 rounded-full overflow-hidden transition-all duration-800 ease-out delay-600 ${
           animationPhase >= 1 ? 'opacity-100' : 'opacity-0'
         }`}>
-          <div className="h-full bg-white rounded-full transition-all duration-1500 ease-out" style={{
+          <div className="h-full bg-brass rounded-full transition-all duration-1500 ease-out" style={{
             width: animationPhase >= 2 ? '100%' : '0%'
           }}></div>
         </div>
@@ -105,7 +105,7 @@ export default function LoadingAnimation({ onLoadingComplete }) {
         {[...Array(20)].map((_, i) => (
           <div
             key={i}
-            className={`absolute w-2 h-2 bg-white/30 rounded-full animate-pulse ${
+            className={`absolute w-2 h-2 bg-brass/30 rounded-full animate-pulse ${
               animationPhase >= 1 ? 'opacity-100' : 'opacity-0'
             }`}
             style={{

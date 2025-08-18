@@ -21,6 +21,7 @@ import {
   FaDownload
 } from "react-icons/fa";
 import { toast } from 'react-toastify';
+import { useInView } from '../utils/useInView';
 
 const features = [
   {
@@ -88,32 +89,19 @@ const aiInsights = [
 ];
 
 export default function Home() {
-  const [currentFeature, setCurrentFeature] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
   const [animatedElements, setAnimatedElements] = useState({
-    hero: false,
-    features: false,
-    aiInsights: false,
-    demo: false
+    hero: false
   });
 
+  const [featuresRef, featuresInView] = useInView({ threshold: 0.15, once: false });
+  const [aiRef, aiInView] = useInView({ threshold: 0.15, once: false });
+  const [demoRef, demoInView] = useInView({ threshold: 0.15, once: false });
+  const [ctaRef, ctaInView] = useInView({ threshold: 0.1, once: false });
+
   useEffect(() => {
-    // Smooth entrance animations
     const timer1 = setTimeout(() => setAnimatedElements(prev => ({ ...prev, hero: true })), 100);
-    const timer2 = setTimeout(() => setAnimatedElements(prev => ({ ...prev, features: true })), 300);
-    const timer3 = setTimeout(() => setAnimatedElements(prev => ({ ...prev, aiInsights: true })), 500);
-    const timer4 = setTimeout(() => setAnimatedElements(prev => ({ ...prev, demo: true })), 700);
-
-    const interval = setInterval(() => {
-      setCurrentFeature((prev) => (prev + 1) % features.length);
-    }, 5000); // Increased to 5 seconds for smoother transition
-
     return () => {
       clearTimeout(timer1);
-      clearTimeout(timer2);
-      clearTimeout(timer3);
-      clearTimeout(timer4);
-      clearInterval(interval);
     };
   }, []);
 
@@ -172,9 +160,9 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      <section ref={featuresRef} className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className={`text-center mb-16 transition-all duration-1000 ease-out ${animatedElements.features ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <div className={`text-center mb-16 transition-all duration-1000 ease-out ${featuresInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
               Key Features
             </h2>
@@ -187,7 +175,8 @@ export default function Home() {
             {features.map((feature, index) => (
               <div
                 key={index}
-                className={`group ${feature.bgColor} p-8 rounded-3xl transition-all duration-500 ease-out hover:shadow-2xl hover:scale-[1.02]`}
+                className={`group ${feature.bgColor} p-8 rounded-3xl transition-all duration-700 ease-out hover:shadow-2xl hover:-translate-y-1 hover:scale-[1.02] ${featuresInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+                style={{ transitionDelay: `${index * 100}ms` }}
               >
                 <div className={`${feature.iconColor} mb-6 transition-transform duration-500 ease-out group-hover:scale-105`}>
                   {feature.icon}
@@ -210,9 +199,9 @@ export default function Home() {
       </section>
 
       {/* AI-Powered Personal Features Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-paper to-sand">
+      <section ref={aiRef} className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-paper to-sand">
         <div className="max-w-7xl mx-auto">
-          <div className={`text-center mb-16 transition-all duration-1000 ease-out ${animatedElements.aiInsights ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <div className={`text-center mb-16 transition-all duration-1000 ease-out ${aiInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
               AI-Powered Personalization
             </h2>
@@ -225,7 +214,8 @@ export default function Home() {
             {aiInsights.map((insight, index) => (
               <div
                 key={index}
-                className={`group bg-white p-8 rounded-3xl shadow-lg transition-all duration-500 ease-out hover:shadow-2xl hover:scale-[1.02] border border-gray-100`}
+                className={`group bg-white p-8 rounded-3xl shadow-lg transition-all duration-700 ease-out hover:shadow-2xl hover:-translate-y-1 hover:scale-[1.02] border border-gray-100 ${aiInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+                style={{ transitionDelay: `${index * 120}ms` }}
               >
                 <div className={`${insight.iconColor} mb-6 transition-transform duration-500 ease-out group-hover:scale-105`}>
                   {insight.icon}
@@ -254,9 +244,9 @@ export default function Home() {
       </section>
 
       {/* Interactive Demo Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+      <section ref={demoRef} className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
-          <div className={`text-center mb-16 transition-all duration-1000 ease-out ${animatedElements.demo ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <div className={`text-center mb-16 transition-all duration-1000 ease-out ${demoInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
               Try It Now
             </h2>
@@ -314,15 +304,15 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-ink to-coffee">
+      <section ref={ctaRef} className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-ink to-coffee">
         <div className="max-w-4xl mx-auto text-center text-white">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
+          <h2 className={`text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 transition-all duration-1000 ease-out ${ctaInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
             Ready to Start?
           </h2>
-          <p className="text-xl mb-8 opacity-90">
+          <p className={`text-xl mb-8 opacity-90 transition-all duration-1000 ease-out ${ctaInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`} style={{ transitionDelay: '120ms' }}>
             Join thousands of users who are enjoying a better organized life
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className={`flex flex-col sm:flex-row gap-4 justify-center transition-all duration-1000 ease-out ${ctaInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`} style={{ transitionDelay: '200ms' }}>
             <Link
               to="/register"
               className="bg-white text-terracotta px-8 py-4 rounded-full text-lg font-semibold hover:shadow-2xl hover:scale-105 transition-all duration-500 ease-out flex items-center justify-center gap-2"

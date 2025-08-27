@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaPlus, FaCheckCircle, FaCalendarAlt, FaTrash, FaEdit, FaStar, FaFire, FaLightbulb, FaClock, FaCalendarWeek } from "react-icons/fa";
+import { FaPlus, FaCheckCircle, FaCalendarAlt, FaTrash, FaEdit, FaStar, FaLightbulb, FaClock } from "react-icons/fa";
 
 const priorityColors = {
   high: "bg-gradient-to-r from-rose to-red-500 text-white border-rose",
@@ -34,7 +34,6 @@ function TodoList() {
   const [newTodo, setNewTodo] = useState("");
   const [newPriority, setNewPriority] = useState("medium");
   const [newDueDate, setNewDueDate] = useState("");
-  const [viewMode, setViewMode] = useState("todo"); // "todo" or "weekly"
 
   const handleToggleTodo = (id) => {
     setTodos(todos.map(todo => 
@@ -75,10 +74,6 @@ function TodoList() {
     day: 'numeric' 
   });
 
-  const getTodosByWeekDay = (day) => {
-    return todos.filter(todo => todo.weekDay === day);
-  };
-
   return (
     <div className="max-w-7xl mx-auto space-y-8">
       {/* Header with Daily Motivation */}
@@ -92,36 +87,6 @@ function TodoList() {
             <FaLightbulb className="text-brass" />
             {motivationalMessages[Math.floor(Math.random() * motivationalMessages.length)]}
           </p>
-        </div>
-      </div>
-
-      {/* View Mode Toggle */}
-      <div className="flex justify-center">
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-2">
-          <div className="flex">
-            <button
-              onClick={() => setViewMode("todo")}
-              className={`px-6 py-3 rounded-xl font-medium transition-all ${
-                viewMode === "todo" 
-                  ? "bg-gradient-to-r from-terracotta to-brass text-white shadow-lg" 
-                  : "text-ink hover:bg-gray-50"
-              }`}
-            >
-              <FaCheckCircle className="inline mr-2" />
-              Todo List
-            </button>
-            <button
-              onClick={() => setViewMode("weekly")}
-              className={`px-6 py-3 rounded-xl font-medium transition-all ${
-                viewMode === "weekly" 
-                  ? "bg-gradient-to-r from-terracotta to-brass text-white shadow-lg" 
-                  : "text-ink hover:bg-gray-50"
-              }`}
-            >
-              <FaCalendarWeek className="inline mr-2" />
-              Weekly Plan
-            </button>
-          </div>
         </div>
       </div>
 
@@ -196,187 +161,84 @@ function TodoList() {
         </div>
       </div>
 
-      {/* Content based on view mode */}
-      {viewMode === "todo" ? (
-        /* Todo List View */
-        <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6">
-          <h3 className="text-xl font-bold text-ink mb-6 flex items-center gap-2">
-            <FaStar className="text-brass" />
-            Danh sách công việc của bạn
-          </h3>
-          
-          {todos.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-r from-terracotta/20 to-brass/20 rounded-full flex items-center justify-center">
-                <FaCheckCircle className="text-4xl text-terracotta" />
-              </div>
-              <p className="text-lg">Chưa có công việc nào! Hãy bắt đầu với todo đầu tiên của bạn</p>
-              <p className="text-sm mt-2">Mỗi bước nhỏ đều đưa bạn đến gần mục tiêu hơn ✨</p>
+      {/* Todo List View */}
+      <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6">
+        <h3 className="text-xl font-bold text-ink mb-6 flex items-center gap-2">
+          <FaStar className="text-brass" />
+          Danh sách công việc của bạn
+        </h3>
+        
+        {todos.length === 0 ? (
+          <div className="text-center py-12 text-gray-500">
+            <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-r from-terracotta/20 to-brass/20 rounded-full flex items-center justify-center">
+              <FaCheckCircle className="text-4xl text-terracotta" />
             </div>
-          ) : (
-            <div className="space-y-4">
-              {todos.map((todo) => (
-                <div 
-                  key={todo.id} 
-                  className={`p-6 rounded-2xl border-2 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 ${
-                    todo.completed 
-                      ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200' 
-                      : 'bg-white border-gray-200 hover:border-terracotta'
-                  }`}
-                >
-                  <div className="flex items-start gap-4">
-                    <button
-                      onClick={() => handleToggleTodo(todo.id)}
-                      className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all mt-1 ${
-                        todo.completed 
-                          ? 'bg-gradient-to-r from-green-400 to-emerald-500 border-green-400 text-white shadow-lg' 
-                          : 'border-gray-300 hover:border-terracotta hover:bg-terracotta/10'
-                      }`}
-                    >
-                      {todo.completed && <FaCheckCircle className="text-lg" />}
-                    </button>
-                    
-                    <div className="flex-1 min-w-0">
-                      <span className={`font-semibold text-lg leading-relaxed ${
-                        todo.completed 
-                          ? 'line-through text-gray-500' 
-                          : 'text-ink'
-                      }`}>
-                        {todo.text}
-                      </span>
-                      
-                      <div className="flex items-center gap-3 mt-3">
-                        <span className={`text-sm px-3 py-1 rounded-full border ${priorityColors[todo.priority]}`}>
-                          {priorityLabels[todo.priority]}
-                        </span>
-                        <span className="text-sm text-ink/70 flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full">
-                          <FaCalendarAlt className="text-terracotta" />
-                          {todo.dueDate}
-                        </span>
-                        <span className="text-sm text-ink/70 flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full">
-                          <FaClock className="text-brass" />
-                          {todo.weekDay}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <button className="p-3 text-gray-400 hover:text-terracotta hover:bg-terracotta/10 rounded-xl transition-all">
-                        <FaEdit />
-                      </button>
-                      <button 
-                        onClick={() => handleDeleteTodo(todo.id)}
-                        className="p-3 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
-                      >
-                        <FaTrash />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      ) : (
-        /* Weekly Plan View */
-        <div className="space-y-6">
-          <h3 className="text-xl font-bold text-ink flex items-center gap-2">
-            <FaCalendarWeek className="text-rose" />
-            Kế hoạch tuần của bạn
-          </h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-4">
-            {weekDays.map((day, index) => {
-              const dayTodos = getTodosByWeekDay(day);
-              const isToday = day === weekDays[new Date().getDay()];
-              
-              return (
-                <div 
-                  key={day}
-                  className={`bg-white rounded-2xl shadow-lg border-2 p-4 transition-all hover:shadow-xl ${
-                    isToday ? 'border-terracotta bg-gradient-to-br from-terracotta/5 to-brass/5' : 'border-gray-100'
-                  }`}
-                >
-                  <div className="text-center mb-4">
-                    <h4 className={`font-bold text-lg ${
-                      isToday ? 'text-terracotta' : 'text-ink'
+            <p className="text-lg">Chưa có công việc nào! Hãy bắt đầu với todo đầu tiên của bạn</p>
+            <p className="text-sm mt-2">Mỗi bước nhỏ đều đưa bạn đến gần mục tiêu hơn ✨</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {todos.map((todo) => (
+              <div 
+                key={todo.id} 
+                className={`p-6 rounded-2xl border-2 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 ${
+                  todo.completed 
+                    ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200' 
+                    : 'bg-white border-gray-200 hover:border-terracotta'
+                }`}
+              >
+                <div className="flex items-start gap-4">
+                  <button
+                    onClick={() => handleToggleTodo(todo.id)}
+                    className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all mt-1 ${
+                      todo.completed 
+                        ? 'bg-gradient-to-r from-green-400 to-emerald-500 border-green-400 text-white shadow-lg' 
+                        : 'border-gray-300 hover:border-terracotta hover:bg-terracotta/10'
+                    }`}
+                  >
+                    {todo.completed && <FaCheckCircle className="text-lg" />}
+                  </button>
+                  
+                  <div className="flex-1 min-w-0">
+                    <span className={`font-semibold text-lg leading-relaxed ${
+                      todo.completed 
+                        ? 'line-through text-gray-500' 
+                        : 'text-ink'
                     }`}>
-                      {day}
-                    </h4>
-                    <p className="text-sm text-ink/60">
-                      {dayTodos.length} công việc
-                    </p>
+                      {todo.text}
+                    </span>
+                    
+                    <div className="flex items-center gap-3 mt-3">
+                      <span className={`text-sm px-3 py-1 rounded-full border ${priorityColors[todo.priority]}`}>
+                        {priorityLabels[todo.priority]}
+                      </span>
+                      <span className="text-sm text-ink/70 flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full">
+                        <FaCalendarAlt className="text-terracotta" />
+                        {todo.dueDate}
+                      </span>
+                      <span className="text-sm text-ink/70 flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full">
+                        <FaClock className="text-brass" />
+                        {todo.weekDay}
+                      </span>
+                    </div>
                   </div>
                   
-                  <div className="space-y-2">
-                    {dayTodos.length === 0 ? (
-                      <div className="text-center py-4 text-ink/40">
-                        <FaCalendarAlt className="text-2xl mx-auto mb-2" />
-                        <p className="text-xs">Không có công việc</p>
-                      </div>
-                    ) : (
-                      dayTodos.map((todo) => (
-                        <div 
-                          key={todo.id}
-                          className={`p-3 rounded-xl border transition-all ${
-                            todo.completed 
-                              ? 'bg-green-50 border-green-200' 
-                              : 'bg-gray-50 border-gray-200'
-                          }`}
-                        >
-                          <div className="flex items-start gap-2">
-                            <button
-                              onClick={() => handleToggleTodo(todo.id)}
-                              className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all mt-0.5 ${
-                                todo.completed 
-                                  ? 'bg-green-400 border-green-400 text-white' 
-                                  : 'border-gray-300 hover:border-terracotta'
-                              }`}
-                            >
-                              {todo.completed && <FaCheckCircle className="text-xs" />}
-                            </button>
-                            
-                            <div className="flex-1 min-w-0">
-                              <span className={`text-sm font-medium ${
-                                todo.completed 
-                                  ? 'line-through text-gray-500' 
-                                  : 'text-ink'
-                              }`}>
-                                {todo.text}
-                              </span>
-                              
-                              <div className="mt-1">
-                                <span className={`text-xs px-2 py-1 rounded-full ${priorityColors[todo.priority]}`}>
-                                  {priorityLabels[todo.priority].split(' ')[1]}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))
-                    )}
+                  <div className="flex items-center gap-2">
+                    <button className="p-3 text-gray-400 hover:text-terracotta hover:bg-terracotta/10 rounded-xl transition-all">
+                      <FaEdit />
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteTodo(todo.id)}
+                      className="p-3 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                    >
+                      <FaTrash />
+                    </button>
                   </div>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
-        </div>
-      )}
-
-      {/* Quick Stats */}
-      <div className="grid md:grid-cols-3 gap-6">
-        <div className="bg-gradient-to-br from-terracotta to-brass rounded-3xl shadow-lg p-6 text-center text-white">
-          <div className="text-4xl font-bold mb-2">{totalTodos}</div>
-          <div className="text-white/90">Tổng công việc</div>
-        </div>
-        <div className="bg-gradient-to-br from-rose to-pink-500 rounded-3xl shadow-lg p-6 text-center text-white">
-          <div className="text-4xl font-bold mb-2">{completedTodos}</div>
-          <div className="text-white/90">Đã hoàn thành</div>
-        </div>
-        <div className="bg-gradient-to-br from-brass to-amber-500 rounded-3xl shadow-lg p-6 text-center text-white">
-          <div className="text-4xl font-bold mb-2">{todos.filter(t => t.priority === 'high').length}</div>
-          <div className="text-white/90">Ưu tiên cao</div>
-        </div>
+        )}
       </div>
     </div>
   );

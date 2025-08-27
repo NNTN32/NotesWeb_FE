@@ -28,7 +28,7 @@ const navItems = [
   { to: "/create", label: "Tạo ghi chú", icon: <FaPlusCircle /> },
   { to: "/notes", label: "Ghi chú", icon: <FaBookOpen /> },
   { to: "/todo", label: "Todo", icon: <FaTasks /> },
-  { to: "/ai", label: "AI Insights", icon: <FaRobot /> },
+  { to: "/weekly-plan", label: "Weekly Plan", icon: <FaCalendarAlt /> },
 ];
 
 const quickActions = [

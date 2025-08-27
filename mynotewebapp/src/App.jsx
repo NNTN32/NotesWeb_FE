@@ -10,7 +10,7 @@ import NoteDetail from './pages/users/NoteDetail';
 import NoteForm from './pages/users/NoteForm';
 import Notes from './pages/users/Notes';
 import Todo from './pages/users/Todo';
-import AI from './pages/users/AI';
+import WeeklyPlan from './pages/users/WeeklyPlan';
 import { AuthProvider } from "./context/AuthContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -47,7 +47,7 @@ function App() {
                 <Route path="/create" element={<NoteForm />} />
                 <Route path="/notes" element={<Notes />} />
                 <Route path="/todo" element={<Todo />} />
-                <Route path="/ai" element={<AI />} />
+                <Route path="/weekly-plan" element={<WeeklyPlan />} />
               </Routes>
             </main>
             <Footer />

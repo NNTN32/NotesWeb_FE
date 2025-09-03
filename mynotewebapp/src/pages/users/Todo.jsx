@@ -1,39 +1,66 @@
-import { useState } from "react";
-import { FaPlus, FaCheckCircle, FaCalendarAlt, FaTrash, FaEdit, FaStar, FaLightbulb, FaClock } from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { FaPlus, FaCheckCircle, FaTrash, FaEdit, FaSun, FaMoon, FaRegClock } from "react-icons/fa";
 
 const priorityColors = {
-  high: "bg-gradient-to-r from-rose to-red-500 text-white border-rose",
-  medium: "bg-gradient-to-r from-brass to-amber-500 text-white border-brass",
-  low: "bg-gradient-to-r from-coffee to-amber-600 text-white border-coffee"
+  high: "bg-red-500 text-white",
+  medium: "bg-amber-500 text-white", 
+  low: "bg-green-500 text-white"
 };
 
 const priorityLabels = {
-  high: "🔥 Ưu tiên cao",
-  medium: "⭐ Trung bình", 
+  high: "🔥 Cao",
+  medium: "⭐ TB", 
   low: "🌱 Thấp"
 };
 
-const weekDays = [
-  "Chủ nhật", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"
-];
-
-const motivationalMessages = [
-  "Hôm nay là ngày tuyệt vời để hoàn thành mục tiêu! 💪",
-  "Mỗi bước nhỏ đều đưa bạn đến gần ước mơ hơn ✨",
-  "Bạn đang làm rất tốt! Hãy tiếp tục phát huy 🚀",
-  "Thành công đến từ những thói quen nhỏ mỗi ngày 🌟"
+const timeSlots = [
+  "Sáng sớm (6h-9h)",
+  "Sáng (9h-12h)", 
+  "Trưa (12h-14h)",
+  "Chiều (14h-17h)",
+  "Tối (17h-21h)",
+  "Đêm (21h-24h)"
 ];
 
 function TodoList() {
   const [todos, setTodos] = useState([
-    { id: 1, text: "Hoàn thành bài viết về Web3", completed: false, priority: "high", dueDate: "2024-01-15", weekDay: "Thứ 2" },
-    { id: 2, text: "Ôn tập React hooks", completed: true, priority: "medium", dueDate: "2024-01-10", weekDay: "Thứ 4" },
-    { id: 3, text: "Lên kế hoạch cho dự án mới", completed: false, priority: "high", dueDate: "2024-01-20", weekDay: "Thứ 6" },
-    { id: 4, text: "Đọc sách về AI", completed: false, priority: "low", dueDate: "2024-01-25", weekDay: "Chủ nhật" },
+    { 
+      id: 1, 
+      text: "Tập thể dục buổi sáng", 
+      completed: false, 
+      priority: "high", 
+      timeSlot: "Sáng sớm (6h-9h)",
+      createdAt: new Date()
+    },
+    { 
+      id: 2, 
+      text: "Đọc sách 30 phút", 
+      completed: true, 
+      priority: "medium", 
+      timeSlot: "Sáng (9h-12h)",
+      createdAt: new Date()
+    },
+    { 
+      id: 3, 
+      text: "Làm việc nhà", 
+      completed: false, 
+      priority: "low", 
+      timeSlot: "Chiều (14h-17h)",
+      createdAt: new Date()
+    },
   ]);
+  
   const [newTodo, setNewTodo] = useState("");
   const [newPriority, setNewPriority] = useState("medium");
-  const [newDueDate, setNewDueDate] = useState("");
+  const [newTimeSlot, setNewTimeSlot] = useState("Sáng (9h-12h)");
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Update current time every minute
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 60000);
+    return () => clearInterval(timer);
+  }, []);
 
   const handleToggleTodo = (id) => {
     setTodos(todos.map(todo => 
@@ -47,26 +74,25 @@ function TodoList() {
 
   const handleAddTodo = () => {
     if (newTodo.trim()) {
-      const selectedDate = new Date(newDueDate);
-      const weekDay = weekDays[selectedDate.getDay()];
-      
       const todo = {
         id: Date.now(),
         text: newTodo.trim(),
         completed: false,
         priority: newPriority,
-        dueDate: newDueDate || new Date().toISOString().split('T')[0],
-        weekDay: weekDay
+        timeSlot: newTimeSlot,
+        createdAt: new Date()
       };
       setTodos([...todos, todo]);
       setNewTodo("");
       setNewPriority("medium");
-      setNewDueDate("");
+      setNewTimeSlot("Sáng (9h-12h)");
+      setShowAddForm(false);
     }
   };
 
   const completedTodos = todos.filter(todo => todo.completed).length;
   const totalTodos = todos.length;
+  
   const today = new Date().toLocaleDateString('vi-VN', { 
     weekday: 'long', 
     year: 'numeric', 
@@ -74,179 +100,220 @@ function TodoList() {
     day: 'numeric' 
   });
 
+  const currentHour = currentTime.getHours();
+  const getGreeting = () => {
+    if (currentHour < 12) return "Chào buổi sáng! ☀️";
+    if (currentHour < 17) return "Chào buổi chiều! 🌤️";
+    return "Chào buổi tối! 🌙";
+  };
+
+  const getCurrentTimeSlot = () => {
+    if (currentHour < 9) return "Sáng sớm (6h-9h)";
+    if (currentHour < 12) return "Sáng (9h-12h)";
+    if (currentHour < 14) return "Trưa (12h-14h)";
+    if (currentHour < 17) return "Chiều (14h-17h)";
+    if (currentHour < 21) return "Tối (17h-21h)";
+    return "Đêm (21h-24h)";
+  };
+
+  const currentTimeSlot = getCurrentTimeSlot();
+
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
-      {/* Header with Daily Motivation */}
-      <div className="text-center space-y-4">
-        <div className="bg-gradient-to-r from-brass via-rose to-terracotta bg-clip-text">
-          <h1 className="text-4xl font-bold text-transparent">My Daily Planner</h1>
+    <div className="max-w-4xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="text-center space-y-4 animate-fade-in">
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text">
+          <h1 className="text-3xl font-bold text-transparent">Todo Hôm Nay</h1>
         </div>
-        <p className="text-xl text-ink font-medium">{today}</p>
-        <div className="bg-gradient-to-r from-brass/20 to-rose/20 rounded-2xl p-4 border border-brass/30">
-          <p className="text-ink font-medium flex items-center justify-center gap-2">
-            <FaLightbulb className="text-brass" />
-            {motivationalMessages[Math.floor(Math.random() * motivationalMessages.length)]}
+        <p className="text-lg text-gray-600">{today}</p>
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-4 border border-blue-200">
+          <p className="text-gray-700 font-medium flex items-center justify-center gap-2">
+            {currentHour < 12 ? <FaSun className="text-yellow-500" /> : <FaMoon className="text-blue-500" />}
+            {getGreeting()}
           </p>
         </div>
       </div>
 
-      {/* Progress Overview */}
-      <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6">
-        <div className="text-center space-y-4">
-          <h3 className="text-2xl font-bold text-ink">Tiến độ hôm nay</h3>
-          <div className="flex items-center justify-center gap-8">
-            <div className="text-center">
-              <div className="text-4xl font-bold text-terracotta">{completedTodos}</div>
-              <div className="text-sm text-ink/70">Đã hoàn thành</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-brass">{totalTodos}</div>
-              <div className="text-sm text-ink/70">Tổng cộng</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-rose">{Math.round((completedTodos / totalTodos) * 100) || 0}%</div>
-              <div className="text-sm text-ink/70">Hoàn thành</div>
-            </div>
-          </div>
-          
-          {/* Progress Bar */}
-          <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
-            <div 
-              className="bg-gradient-to-r from-terracotta to-brass h-4 rounded-full transition-all duration-1000 ease-out"
-              style={{ width: `${totalTodos > 0 ? (completedTodos / totalTodos) * 100 : 0}%` }}
-            ></div>
-          </div>
+      {/* Quick Stats */}
+      <div className="grid grid-cols-3 gap-4 animate-slide-up">
+        <div className="bg-white rounded-2xl p-4 text-center shadow-sm border border-gray-100">
+          <div className="text-2xl font-bold text-blue-600">{totalTodos}</div>
+          <div className="text-sm text-gray-600">Tổng cộng</div>
+        </div>
+        <div className="bg-white rounded-2xl p-4 text-center shadow-sm border border-gray-100">
+          <div className="text-2xl font-bold text-green-600">{completedTodos}</div>
+          <div className="text-sm text-gray-600">Hoàn thành</div>
+        </div>
+        <div className="bg-white rounded-2xl p-4 text-center shadow-sm border border-gray-100">
+          <div className="text-2xl font-bold text-purple-600">{totalTodos - completedTodos}</div>
+          <div className="text-sm text-gray-600">Còn lại</div>
         </div>
       </div>
 
-      {/* Add New Todo */}
-      <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6">
-        <h3 className="text-xl font-bold text-ink mb-4 flex items-center gap-2">
-          <FaPlus className="text-terracotta" />
+      {/* Add Todo Button */}
+      <div className="text-center animate-bounce">
+        <button
+          onClick={() => setShowAddForm(!showAddForm)}
+          className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-8 py-4 rounded-2xl hover:from-purple-500 hover:to-blue-500 transition-all transform hover:scale-105 font-semibold text-lg flex items-center gap-2 mx-auto shadow-lg"
+        >
+          <FaPlus />
           Thêm công việc mới
-        </h3>
-        <div className="space-y-4">
-          <input
-            type="text"
-            placeholder="Bạn muốn hoàn thành gì hôm nay? ✨"
-            value={newTodo}
-            onChange={(e) => setNewTodo(e.target.value)}
-            className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-terracotta/20 focus:border-terracotta text-lg transition-all"
-            onKeyPress={(e) => e.key === 'Enter' && handleAddTodo()}
-          />
-          <div className="flex flex-col sm:flex-row gap-4">
-            <select
-              value={newPriority}
-              onChange={(e) => setNewPriority(e.target.value)}
-              className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-terracotta/20 focus:border-terracotta transition-all"
-            >
-              <option value="low">🌱 Ưu tiên thấp</option>
-              <option value="medium">⭐ Trung bình</option>
-              <option value="high">🔥 Ưu tiên cao</option>
-            </select>
-            <input
-              type="date"
-              value={newDueDate}
-              onChange={(e) => setNewDueDate(e.target.value)}
-              className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-terracotta/20 focus:border-terracotta transition-all"
-            />
-            <button
-              onClick={handleAddTodo}
-              className="px-8 py-3 bg-gradient-to-r from-terracotta to-brass text-white rounded-xl hover:from-brass hover:to-terracotta transition-all transform hover:scale-105 font-semibold text-lg flex items-center gap-2"
-            >
-              <FaPlus />
-              Thêm
-            </button>
-          </div>
-        </div>
+        </button>
       </div>
 
-      {/* Todo List View */}
-      <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6">
-        <h3 className="text-xl font-bold text-ink mb-6 flex items-center gap-2">
-          <FaStar className="text-brass" />
-          Danh sách công việc của bạn
-        </h3>
-        
-        {todos.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
-            <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-r from-terracotta/20 to-brass/20 rounded-full flex items-center justify-center">
-              <FaCheckCircle className="text-4xl text-terracotta" />
-            </div>
-            <p className="text-lg">Chưa có công việc nào! Hãy bắt đầu với todo đầu tiên của bạn</p>
-            <p className="text-sm mt-2">Mỗi bước nhỏ đều đưa bạn đến gần mục tiêu hơn ✨</p>
-          </div>
-        ) : (
+      {/* Add Todo Form */}
+      {showAddForm && (
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 animate-slide-down">
           <div className="space-y-4">
-            {todos.map((todo) => (
-              <div 
-                key={todo.id} 
-                className={`p-6 rounded-2xl border-2 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 ${
-                  todo.completed 
-                    ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200' 
-                    : 'bg-white border-gray-200 hover:border-terracotta'
-                }`}
+            <input
+              type="text"
+              placeholder="Bạn muốn làm gì hôm nay? ✨"
+              value={newTodo}
+              onChange={(e) => setNewTodo(e.target.value)}
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-200 focus:border-blue-500 text-lg transition-all"
+              onKeyPress={(e) => e.key === 'Enter' && handleAddTodo()}
+              autoFocus
+            />
+            <div className="flex gap-4">
+              <select
+                value={newPriority}
+                onChange={(e) => setNewPriority(e.target.value)}
+                className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition-all"
               >
-                <div className="flex items-start gap-4">
-                  <button
-                    onClick={() => handleToggleTodo(todo.id)}
-                    className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all mt-1 ${
+                <option value="low">🌱 Thấp</option>
+                <option value="medium">⭐ Trung bình</option>
+                <option value="high">🔥 Cao</option>
+              </select>
+              <select
+                value={newTimeSlot}
+                onChange={(e) => setNewTimeSlot(e.target.value)}
+                className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition-all"
+              >
+                {timeSlots.map(slot => (
+                  <option key={slot} value={slot}>{slot}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={handleAddTodo}
+                className="flex-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white py-3 rounded-xl hover:from-purple-500 hover:to-blue-500 transition-all font-semibold"
+              >
+                Thêm
+              </button>
+              <button
+                onClick={() => setShowAddForm(false)}
+                className="px-6 py-3 border-2 border-gray-300 text-gray-600 rounded-xl hover:border-gray-400 transition-all"
+              >
+                Hủy
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Current Time Slot Highlight */}
+      <div className="bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-2xl p-4 text-center animate-pulse">
+        <p className="text-lg font-medium flex items-center justify-center gap-2">
+          <FaRegClock />
+          Khung giờ hiện tại: {currentTimeSlot}
+        </p>
+      </div>
+
+      {/* Todo List by Time Slots */}
+      <div className="space-y-6">
+        {timeSlots.map((timeSlot, index) => {
+          const slotTodos = todos.filter(todo => todo.timeSlot === timeSlot);
+          const isCurrentSlot = timeSlot === currentTimeSlot;
+          
+          if (slotTodos.length === 0) return null;
+          
+          return (
+            <div 
+              key={timeSlot}
+              className={`bg-white rounded-2xl shadow-lg border-2 p-6 transition-all duration-300 hover:shadow-xl ${
+                isCurrentSlot ? 'border-blue-300 bg-blue-50' : 'border-gray-100'
+              }`}
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
+              <h3 className={`text-xl font-bold mb-4 flex items-center gap-2 ${
+                isCurrentSlot ? 'text-blue-700' : 'text-gray-700'
+              }`}>
+                {isCurrentSlot && <div className="w-3 h-3 bg-blue-500 rounded-full animate-ping"></div>}
+                {timeSlot}
+                {isCurrentSlot && <span className="text-sm bg-blue-500 text-white px-2 py-1 rounded-full ml-2">Hiện tại</span>}
+              </h3>
+              
+              <div className="space-y-3">
+                {slotTodos.map((todo) => (
+                  <div 
+                    key={todo.id} 
+                    className={`p-4 rounded-xl border-2 transition-all duration-300 hover:shadow-md transform hover:-translate-y-1 ${
                       todo.completed 
-                        ? 'bg-gradient-to-r from-green-400 to-emerald-500 border-green-400 text-white shadow-lg' 
-                        : 'border-gray-300 hover:border-terracotta hover:bg-terracotta/10'
+                        ? 'bg-green-50 border-green-200' 
+                        : 'bg-white border-gray-200 hover:border-blue-300'
                     }`}
                   >
-                    {todo.completed && <FaCheckCircle className="text-lg" />}
-                  </button>
-                  
-                  <div className="flex-1 min-w-0">
-                    <span className={`font-semibold text-lg leading-relaxed ${
-                      todo.completed 
-                        ? 'line-through text-gray-500' 
-                        : 'text-ink'
-                    }`}>
-                      {todo.text}
-                    </span>
-                    
-                    <div className="flex items-center gap-3 mt-3">
-                      <span className={`text-sm px-3 py-1 rounded-full border ${priorityColors[todo.priority]}`}>
-                        {priorityLabels[todo.priority]}
-                      </span>
-                      <span className="text-sm text-ink/70 flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full">
-                        <FaCalendarAlt className="text-terracotta" />
-                        {todo.dueDate}
-                      </span>
-                      <span className="text-sm text-ink/70 flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full">
-                        <FaClock className="text-brass" />
-                        {todo.weekDay}
-                      </span>
+                    <div className="flex items-start gap-3">
+                      <button
+                        onClick={() => handleToggleTodo(todo.id)}
+                        className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all mt-1 flex-shrink-0 ${
+                          todo.completed 
+                            ? 'bg-green-500 border-green-500 text-white' 
+                            : 'border-gray-300 hover:border-blue-500 hover:bg-blue-50'
+                        }`}
+                      >
+                        {todo.completed && <FaCheckCircle className="text-sm" />}
+                      </button>
+                      
+                      <div className="flex-1 min-w-0">
+                        <span className={`font-medium text-lg leading-relaxed ${
+                          todo.completed 
+                            ? 'line-through text-gray-500' 
+                            : 'text-gray-800'
+                        }`}>
+                          {todo.text}
+                        </span>
+                        
+                        <div className="flex items-center gap-2 mt-2">
+                          <span className={`text-xs px-2 py-1 rounded-full ${priorityColors[todo.priority]}`}>
+                            {priorityLabels[todo.priority]}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <button 
+                        onClick={() => handleDeleteTodo(todo.id)}
+                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all flex-shrink-0"
+                      >
+                        <FaTrash />
+                      </button>
                     </div>
                   </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <button className="p-3 text-gray-400 hover:text-terracotta hover:bg-terracotta/10 rounded-xl transition-all">
-                      <FaEdit />
-                    </button>
-                    <button 
-                      onClick={() => handleDeleteTodo(todo.id)}
-                      className="p-3 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
-                    >
-                      <FaTrash />
-                    </button>
-                  </div>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
-        )}
+            </div>
+          );
+        })}
       </div>
+
+      {/* Empty State */}
+      {todos.length === 0 && (
+        <div className="text-center py-16 text-gray-500 animate-fade-in">
+          <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center">
+            <FaCheckCircle className="text-3xl text-blue-500" />
+          </div>
+          <p className="text-xl font-medium mb-2">Chưa có công việc nào!</p>
+          <p className="text-gray-400">Hãy bắt đầu với todo đầu tiên của bạn hôm nay ✨</p>
+        </div>
+      )}
     </div>
   );
 }
 
 export default function Todo() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-paper via-sand to-latte px-6 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 px-6 py-8">
       <TodoList />
     </div>
   );

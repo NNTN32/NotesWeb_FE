@@ -110,7 +110,8 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-paper via-sand to-latte">
+    <div className="min-h-screen patterncraft-bg">
+      <div className="patterncraft-content">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-terracotta/20 to-plum/20"></div>
@@ -349,6 +350,7 @@ export default function Home() {
           </div>
         </div>
       </footer>
+      </div>
     </div>
   );
 }

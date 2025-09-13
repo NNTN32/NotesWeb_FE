@@ -313,8 +313,10 @@ function TodoList() {
 
 export default function Todo() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 px-6 py-8">
-      <TodoList />
+    <div className="min-h-screen patterncraft-bg px-6 py-8">
+      <div className="patterncraft-content">
+        <TodoList />
+      </div>
     </div>
   );
 }

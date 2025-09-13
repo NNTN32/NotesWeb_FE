@@ -101,8 +101,9 @@ function WeeklyPlan() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-paper via-sand to-latte px-6 py-8">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen patterncraft-bg px-6 py-8">
+      <div className="patterncraft-content">
+        <div className="max-w-7xl mx-auto space-y-8">
         {/* Floating droplet button */}
         <style>{`
           @keyframes floatUpDown { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
@@ -422,6 +423,7 @@ function WeeklyPlan() {
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   );

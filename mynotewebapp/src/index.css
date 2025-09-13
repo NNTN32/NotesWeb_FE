@@ -387,6 +387,43 @@ body {
   min-height: 100vh;
 }
 
+/* Notes-specific background with PatternCraft-inspired grid pattern */
+.notes-bg {
+  position: relative;
+  background: #ffffff;
+  min-height: 100vh;
+}
+
+.notes-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.notes-bg::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 25% 25%, rgba(162, 123, 92, 0.02) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(176, 141, 87, 0.02) 0%, transparent 50%),
+    linear-gradient(135deg, rgba(254, 250, 247, 0.4) 0%, rgba(253, 247, 240, 0.2) 100%);
+  pointer-events: none;
+  z-index: 2;
+}
+
 /* Ensure content is above the pattern */
 .patterncraft-content {
   position: relative;

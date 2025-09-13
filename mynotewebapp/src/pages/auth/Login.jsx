@@ -56,8 +56,14 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-paper via-sand to-latte px-4">
-      <div className="w-full max-w-md">
+    <div className="auth-pattern-bg flex items-center justify-center px-4">
+      {/* Floating geometric shapes */}
+      <div className="floating-shape"></div>
+      <div className="floating-shape"></div>
+      <div className="floating-shape"></div>
+      <div className="floating-shape"></div>
+      
+      <div className="w-full max-w-md relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="mx-auto w-16 h-16 bg-gradient-to-r from-terracotta to-brass rounded-full flex items-center justify-center mb-3">

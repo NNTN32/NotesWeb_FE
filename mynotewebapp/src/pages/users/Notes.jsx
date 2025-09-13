@@ -235,8 +235,10 @@ function NotesList() {
 
 export default function Notes() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-paper via-sand to-latte px-4 py-8">
-      <NotesList />
+    <div className="min-h-screen patterncraft-bg px-4 py-8">
+      <div className="patterncraft-content">
+        <NotesList />
+      </div>
     </div>
   );
 }

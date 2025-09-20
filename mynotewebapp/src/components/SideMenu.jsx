@@ -41,7 +41,7 @@ const quickActions = [
 export default function SideMenu() {
   const { user, logout } = useContext(AuthContext) || {};
   const location = useLocation();
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -70,7 +70,7 @@ export default function SideMenu() {
       <aside className={`
         fixed left-0 top-0 h-full bg-gradient-to-b from-ink via-coffee to-terracotta 
         shadow-2xl z-30 transition-all duration-300 ease-in-out
-        ${isOpen ? 'w-64' : 'w-16'} 
+        ${isOpen ? 'w-64' : 'w-20'} 
         ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
      `}>
         {/* Logo Section */}
@@ -106,7 +106,7 @@ export default function SideMenu() {
         {/* Toggle Button */}
         <button
           onClick={toggleMenu}
-          className="hidden lg:block absolute -right-3 top-16 sm:top-20 bg-terracotta text-white p-1 rounded-full shadow-lg hover:bg-brass transition-colors"
+          className="hidden lg:block absolute -right-3 top-16 sm:top-20 bg-terracotta text-white p-1.5 rounded-full shadow-lg hover:bg-brass transition-colors"
         >
           {isOpen ? <FaTimes size={12} /> : <FaBars size={12} />}
         </button>
@@ -119,9 +119,10 @@ export default function SideMenu() {
               to={item.to}
               onClick={() => setIsMobileOpen(false)}
               className={`
-                flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-300 
+                flex items-center justify-center sm:justify-start gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-300 
                 hover:bg-white/20 hover:scale-105 text-white font-semibold shadow-md text-sm sm:text-base
                 ${location.pathname === item.to ? "bg-white/20 border-l-4 border-terracotta" : ""}
+                ${!isOpen ? "px-2" : ""}
               `}
             >
               <span className="text-base sm:text-lg min-w-[16px] sm:min-w-[20px]">{item.icon}</span>
@@ -135,7 +136,7 @@ export default function SideMenu() {
           {user ? (
             <div className="space-y-2">
               {/* User Profile */}
-              <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 bg-white/10 rounded-lg">
+              <div className={`flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 bg-white/10 rounded-lg ${!isOpen ? "justify-center px-2" : ""}`}>
                 <div className="w-6 h-6 sm:w-8 sm:h-8 bg-rose rounded-full flex items-center justify-center text-ink font-semibold text-xs sm:text-sm">
                   {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
                 </div>
@@ -152,7 +153,7 @@ export default function SideMenu() {
               </div>
               
               {/* User Actions */}
-              <div className="flex items-center gap-1 sm:gap-2">
+              <div className={`flex items-center gap-1 sm:gap-2 ${!isOpen ? "justify-center" : ""}`}>
                 <button className="flex-1 p-1.5 sm:p-2 hover:bg-white/20 rounded-lg text-white/80 hover:text-white transition-colors">
                   <FaBell className="text-xs sm:text-sm mx-auto" />
                 </button>
@@ -176,8 +177,9 @@ export default function SideMenu() {
                 to="/login"
                 onClick={() => setIsMobileOpen(false)}
                 className={`
-                  w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl hover:bg-white/20 
+                  w-full flex items-center justify-center sm:justify-start gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl hover:bg-white/20 
                   text-white transition-all duration-300 hover:scale-105 font-semibold shadow-md text-sm sm:text-base
+                  ${!isOpen ? "px-2" : ""}
                 `}
               >
                 <FaSignInAlt className="min-w-[16px] sm:min-w-[20px]" />
@@ -187,8 +189,9 @@ export default function SideMenu() {
                 to="/register"
                 onClick={() => setIsMobileOpen(false)}
                 className={`
-                  w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl hover:bg-white/20 
+                  w-full flex items-center justify-center sm:justify-start gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl hover:bg-white/20 
                   text-white transition-all duration-300 hover:scale-105 font-semibold shadow-md text-sm sm:text-base
+                  ${!isOpen ? "px-2" : ""}
                 `}
               >
                 <FaUserPlus className="min-w-[16px] sm:min-w-[20px]" />
@@ -200,7 +203,7 @@ export default function SideMenu() {
       </aside>
 
       {/* Main Content Spacer */}
-      <div className={`${isOpen ? 'lg:ml-64' : 'lg:ml-16'} transition-all duration-300`} />
+      <div className={`${isOpen ? 'lg:ml-64' : 'lg:ml-20'} transition-all duration-300`} />
     </>
   );
 }

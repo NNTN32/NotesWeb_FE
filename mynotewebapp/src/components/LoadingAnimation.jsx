@@ -1,9 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { FaPencilAlt, FaRegStickyNote, FaCheckCircle, FaCalendarAlt } from 'react-icons/fa';
 
-export default function LoadingAnimation({ onLoadingComplete }) {
+/**
+ * @param {{ onLoadingComplete?: () => void }} props
+ */
+export default function LoadingAnimation({ onLoadingComplete = () => {} }) {
   const [isVisible, setIsVisible] = useState(true);
   const [animationPhase, setAnimationPhase] = useState(0);
+
+  // Memoize particle layout so it is stable across renders but unique per mount
+  const particleStyles = useMemo(() => {
+    return Array.from({ length: 20 }).map(() => ({
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      animationDelay: `${Math.random() * 2}s`,
+      animationDuration: `${2 + Math.random() * 2}s`
+    }));
+  }, []);
 
   useEffect(() => {
     const timer1 = setTimeout(() => {
@@ -102,21 +115,18 @@ export default function LoadingAnimation({ onLoadingComplete }) {
 
       {/* Background Particles */}
       <div className="absolute inset-0 pointer-events-none">
-        {[...Array(20)].map((_, i) => (
+        {particleStyles.map((style, i) => (
           <div
             key={i}
             className={`absolute w-2 h-2 bg-brass/30 rounded-full animate-pulse ${
               animationPhase >= 1 ? 'opacity-100' : 'opacity-0'
             }`}
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 2}s`,
-              animationDuration: `${2 + Math.random() * 2}s`
-            }}
+            style={style}
           ></div>
         ))}
       </div>
     </div>
   );
 }
+
+// No runtime PropTypes to avoid extra dependency; documented via JSDoc above

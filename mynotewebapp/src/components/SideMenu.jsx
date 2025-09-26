@@ -20,7 +20,7 @@ import {
   FaStar,
   FaHome
 } from "react-icons/fa";
-import { useContext, useState } from "react";
+import { useContext, useState, useCallback, memo } from "react";
 import { AuthContext } from "../context/AuthContext";
 
 const navItems = [
@@ -38,15 +38,19 @@ const quickActions = [
   { icon: <FaUsers />, title: "Chia sẻ", link: "/share" },
 ];
 
-export default function SideMenu() {
+function SideMenu() {
   const { user, logout } = useContext(AuthContext) || {};
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const toggleMenu = () => setIsOpen(!isOpen);
-  const toggleMobileMenu = () => setIsMobileOpen(!isMobileOpen);
+  const toggleMenu = useCallback(() => {
+    setIsOpen(prev => !prev);
+  }, []);
+  const toggleMobileMenu = useCallback(() => {
+    setIsMobileOpen(prev => !prev);
+  }, []);
 
   return (
     <>
@@ -114,7 +118,7 @@ export default function SideMenu() {
         {/* Navigation Items */}
         <nav className="p-3 sm:p-4 space-y-1 sm:space-y-2">
           {navItems.map((item) => (
-            <Link
+              <Link
               key={item.to}
               to={item.to}
               onClick={() => setIsMobileOpen(false)}
@@ -207,3 +211,4 @@ export default function SideMenu() {
     </>
   );
 }
+export default memo(SideMenu);

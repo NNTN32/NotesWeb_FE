@@ -1,6 +1,7 @@
+import { memo } from "react";
 import { FaGithub, FaTwitter, FaDiscord } from "react-icons/fa";
 
-export default function Footer() {
+function Footer() {
   return (
     <footer className="bg-gradient-to-r from-ink via-coffee to-terracotta text-white py-4 px-6 flex flex-col md:flex-row items-center justify-between animate-in fade-in slide-in-from-bottom-8 shadow-lg">
       <div className="font-semibold tracking-wide">© 2024 MyNoteWeb3. All rights reserved.</div>
@@ -18,3 +19,5 @@ export default function Footer() {
     </footer>
   );
 }
+
+export default memo(Footer);

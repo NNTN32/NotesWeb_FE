@@ -1,355 +1,484 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { 
-  FaPlus, 
   FaRegStickyNote, 
-  FaCheckCircle, 
-  FaLightbulb, 
-  FaRobot, 
-  FaRocket, 
-  FaShieldAlt,
-  FaCalendarAlt,
   FaTasks,
-  FaBookOpen,
-  FaUsers,
-  FaCog,
-  FaBell,
+  FaCalendarAlt,
   FaHeart,
+  FaTwitter,
+  FaFacebook,
+  FaInstagram,
+  FaRocket,
+  FaLightbulb,
+  FaUsers,
   FaStar,
   FaArrowRight,
   FaPlay,
-  FaDownload
+  FaCheckCircle
 } from "react-icons/fa";
 import { toast } from 'react-toastify';
 import { useInView } from '../utils/useInView';
 
-const features = [
+// Enhanced features data with warm, user-friendly design
+const mainFeatures = [
   {
+    id: "smart-notes",
+    title: "Ghi chú thông minh",
+    description: "Viết ghi chú một cách dễ dàng, lưu trữ ý tưởng và truy cập mọi lúc mọi nơi với giao diện thân thiện.",
     icon: <FaRegStickyNote className="text-4xl" />,
-    title: "Smart Notes",
-    description: "Create, organize and search notes easily. Support tagging, categorization and multi-device sync.",
-    color: "from-terracotta to-brass",
-    bgColor: "bg-sand",
-    iconColor: "text-terracotta"
+    position: "left",
+    gradient: "from-rose to-terracotta",
+    bgGradient: "from-rose/10 to-terracotta/10",
+    iconBg: "bg-gradient-to-br from-rose to-terracotta"
   },
   {
+    id: "todo-lists", 
+    title: "Danh sách công việc",
+    description: "Tổ chức công việc hàng ngày với danh sách rõ ràng, nhắc nhở thông minh và theo dõi tiến độ.",
     icon: <FaTasks className="text-4xl" />,
-    title: "Todo Management",
-    description: "Track daily tasks with priorities, deadlines and reminders. Increase your work productivity.",
-    color: "from-olive to-terracotta",
-    bgColor: "bg-paper",
-    iconColor: "text-olive"
+    position: "right",
+    gradient: "from-brass to-coffee",
+    bgGradient: "from-brass/10 to-coffee/10",
+    iconBg: "bg-gradient-to-br from-brass to-coffee"
   },
   {
+    id: "weekly-planning",
+    title: "Lập kế hoạch tuần",
+    description: "Lên kế hoạch chi tiết cho tuần, đặt mục tiêu và theo dõi tiến độ một cách trực quan và hiệu quả.",
     icon: <FaCalendarAlt className="text-4xl" />,
-    title: "Smart Planning",
-    description: "Create detailed plans for projects, personal goals and work with visual timeline.",
-    color: "from-plum to-rose",
-    bgColor: "bg-latte",
-    iconColor: "text-plum"
-  },
-  {
-    icon: <FaRobot className="text-4xl" />,
-    title: "AI Assistant",
-    description: "Smart AI assistant helps optimize work, provide suggestions and automate repetitive tasks.",
-    color: "from-brass to-terracotta",
-    bgColor: "bg-sand",
-    iconColor: "text-brass"
+    position: "left",
+    gradient: "from-terracotta to-ink",
+    bgGradient: "from-terracotta/10 to-ink/10",
+    iconBg: "bg-gradient-to-br from-terracotta to-ink"
   }
 ];
 
-const aiInsights = [
+// Enhanced footer with Vietnamese content
+const footerSections = [
   {
-    type: "planning",
-    title: "Smart Planning",
-    description: "AI analyzes your habits and suggests planning strategies that fit your schedule perfectly",
-    icon: <FaCalendarAlt className="text-3xl" />,
-    color: "from-plum to-rose",
-    bgColor: "bg-latte",
-    iconColor: "text-plum"
+    title: "Sản phẩm",
+    links: ["Tính năng", "Giá cả", "Tải xuống"]
   },
   {
-    type: "todo",
-    title: "Personalized Todo Lists",
-    description: "Automatically prioritize tasks based on deadlines, importance and your work patterns",
-    icon: <FaTasks className="text-3xl" />,
-    color: "from-olive to-brass",
-    bgColor: "bg-paper",
-    iconColor: "text-olive"
+    title: "Công ty", 
+    links: ["Giới thiệu", "Tuyển dụng", "Liên hệ"]
   },
   {
-    type: "ai-assistant",
-    title: "Personal AI Assistant",
-    description: "Learns from your work style to provide suggestions for time optimization and productivity",
-    icon: <FaRobot className="text-3xl" />,
-    color: "from-terracotta to-brass",
-    bgColor: "bg-sand",
-    iconColor: "text-terracotta"
+    title: "Hỗ trợ",
+    links: ["Blog", "Trung tâm trợ giúp", "FAQ"]
+  },
+  {
+    title: "Pháp lý",
+    links: ["Điều khoản", "Bảo mật", "Chính sách"]
+  },
+  {
+    title: "Theo dõi chúng tôi",
+    links: ["Twitter", "Facebook", "Instagram"]
   }
 ];
+
+// User testimonials for social proof
+const testimonials = [
+  {
+    name: "Nguyễn Văn A",
+    role: "Sinh viên",
+    content: "Ứng dụng này giúp tôi tổ chức việc học tập rất hiệu quả!",
+    avatar: "A"
+  },
+  {
+    name: "Trần Thị B", 
+    role: "Nhân viên văn phòng",
+    content: "Giao diện thân thiện, dễ sử dụng. Tôi rất thích!",
+    avatar: "B"
+  },
+  {
+    name: "Lê Văn C",
+    role: "Freelancer", 
+    content: "Tính năng lập kế hoạch tuần rất hữu ích cho công việc của tôi.",
+    avatar: "C"
+  }
+];
+
+
+// Enhanced Hero Section with warm, welcoming design
+const HeroSection = ({ isVisible, onGetStarted }) => (
+  <section className="relative py-20 lg:py-32 overflow-hidden">
+    {/* Background gradient matching side menu */}
+    <div className="absolute inset-0 bg-gradient-to-br from-ink/5 via-coffee/5 to-terracotta/5"></div>
+    
+    {/* Floating decorative elements */}
+    <div className="absolute top-20 left-10 animate-pulse">
+      <div className="w-4 h-4 bg-rose/60 rounded-full"></div>
+    </div>
+    <div className="absolute top-40 right-20 animate-bounce">
+      <div className="w-6 h-6 bg-brass/60 rounded-full"></div>
+    </div>
+    <div className="absolute bottom-40 left-20 animate-pulse">
+      <div className="w-3 h-3 bg-terracotta/60 rounded-full"></div>
+    </div>
+    
+    <div className="relative max-w-6xl mx-auto text-center px-4">
+      <div className={`transition-all duration-1000 ease-out ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+      }`}>
+        {/* Welcome badge */}
+        <div className="inline-flex items-center gap-2 bg-gradient-to-r from-rose/10 to-terracotta/10 px-4 py-2 rounded-full border border-rose/20 mb-6">
+          <FaStar className="text-rose text-sm" />
+          <span className="text-sm font-medium text-ink">Chào mừng đến với MyNoteWebApp</span>
+        </div>
+        
+        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+          <span className="text-ink">Quản lý cuộc sống</span>
+          <br />
+          <span className="bg-gradient-to-r from-rose via-terracotta to-brass bg-clip-text text-transparent">
+            một cách thông minh
+          </span>
+        </h1>
+        
+        <p className="text-xl sm:text-2xl text-coffee/80 mb-8 max-w-3xl mx-auto leading-relaxed">
+          Ứng dụng ghi chú, quản lý công việc và lập kế hoạch được thiết kế đặc biệt cho người Việt. 
+          Đơn giản, hiệu quả và thân thiện.
+        </p>
+        
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <button 
+            onClick={onGetStarted}
+            className="group bg-gradient-to-r from-terracotta to-brass text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-2xl hover:scale-105 transition-all duration-500 ease-out flex items-center gap-2"
+          >
+            <FaRocket className="group-hover:translate-x-1 transition-transform duration-300" />
+            Bắt đầu ngay
+          </button>
+          <Link
+            to="/demo"
+            className="group bg-white text-ink px-8 py-4 rounded-full text-lg font-semibold border-2 border-terracotta/20 hover:border-terracotta hover:shadow-xl transition-all duration-500 ease-out flex items-center gap-2"
+          >
+            <FaPlay className="group-hover:scale-110 transition-transform duration-300" />
+            Xem demo
+          </Link>
+        </div>
+        
+        {/* User count for social proof */}
+        <div className="mt-8 flex items-center justify-center gap-2 text-coffee/60">
+          <FaUsers className="text-sm" />
+          <span className="text-sm">Hơn 10,000+ người dùng tin tưởng</span>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+// Enhanced Features Section with warm, interactive design
+const FeaturesSection = ({ isVisible }) => (
+  <section className="py-20 px-4 bg-gradient-to-b from-white to-rose/5">
+    <div className="max-w-7xl mx-auto">
+      {/* Section header */}
+      <div className={`text-center mb-16 transition-all duration-1000 ease-out ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+      }`}>
+        <div className="inline-flex items-center gap-2 bg-gradient-to-r from-rose/10 to-terracotta/10 px-4 py-2 rounded-full border border-rose/20 mb-4">
+          <FaLightbulb className="text-rose text-sm" />
+          <span className="text-sm font-medium text-ink">Tính năng nổi bật</span>
+        </div>
+        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-ink mb-4">
+          Tất cả những gì bạn cần
+        </h2>
+        <p className="text-lg text-coffee/80 max-w-2xl mx-auto">
+          Được thiết kế để giúp bạn tổ chức cuộc sống một cách hiệu quả và thú vị
+        </p>
+      </div>
+
+      <div className="space-y-20">
+        {mainFeatures.map((feature, index) => (
+          <div
+            key={feature.id}
+            className={`group grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${
+              feature.position === 'right' ? 'lg:grid-flow-col-dense' : ''
+            }`}
+          >
+            {/* Content */}
+            <div className={`${feature.position === 'right' ? 'lg:col-start-2' : ''} ${
+              isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
+            } transition-all duration-700 ease-out`}
+            style={{ transitionDelay: `${index * 200}ms` }}>
+              <div className="space-y-4">
+                <h3 className="text-3xl sm:text-4xl font-bold text-ink mb-4">
+                  {feature.title}
+                </h3>
+                <p className="text-lg text-coffee/80 leading-relaxed">
+                  {feature.description}
+                </p>
+                <div className="flex items-center gap-2 text-terracotta font-semibold group-hover:gap-3 transition-all duration-300">
+                  <span>Tìm hiểu thêm</span>
+                  <FaArrowRight className="group-hover:translate-x-1 transition-transform duration-300" />
+                </div>
+              </div>
+            </div>
+            
+            {/* Visual */}
+            <div className={`${feature.position === 'right' ? 'lg:col-start-1' : ''} flex justify-center ${
+              isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+            } transition-all duration-700 ease-out`}
+            style={{ transitionDelay: `${index * 200 + 100}ms` }}>
+              <div className="relative">
+                {/* Background gradient */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${feature.bgGradient} rounded-3xl blur-xl opacity-50 group-hover:opacity-70 transition-opacity duration-500`}></div>
+                
+                {/* Main card */}
+                <div className={`relative w-48 h-48 bg-gradient-to-br ${feature.bgGradient} rounded-3xl flex items-center justify-center border border-white/20 shadow-2xl group-hover:shadow-3xl group-hover:scale-105 transition-all duration-500`}>
+                  {/* Icon container */}
+                  <div className={`${feature.iconBg} p-6 rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-500`}>
+                    <div className="text-white">
+                      {feature.icon}
+                    </div>
+                  </div>
+                  
+                  {/* Decorative elements */}
+                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-rose/60 rounded-full animate-pulse"></div>
+                  <div className="absolute -bottom-2 -left-2 w-4 h-4 bg-brass/60 rounded-full animate-bounce"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
+// Testimonials Section Component
+const TestimonialsSection = ({ isVisible }) => (
+  <section className="py-20 px-4 bg-gradient-to-b from-rose/5 to-white">
+    <div className="max-w-6xl mx-auto">
+      <div className={`text-center mb-16 transition-all duration-1000 ease-out ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+      }`}>
+        <div className="inline-flex items-center gap-2 bg-gradient-to-r from-brass/10 to-coffee/10 px-4 py-2 rounded-full border border-brass/20 mb-4">
+          <FaStar className="text-brass text-sm" />
+          <span className="text-sm font-medium text-ink">Đánh giá từ người dùng</span>
+        </div>
+        <h2 className="text-3xl sm:text-4xl font-bold text-ink mb-4">
+          Người dùng nói gì về chúng tôi
+        </h2>
+        <p className="text-lg text-coffee/80 max-w-2xl mx-auto">
+          Hàng nghìn người dùng đã tin tưởng và sử dụng ứng dụng của chúng tôi
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {testimonials.map((testimonial, index) => (
+          <div
+            key={index}
+            className={`bg-white p-6 rounded-2xl shadow-lg border border-rose/10 hover:shadow-xl hover:scale-105 transition-all duration-500 ${
+              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
+            style={{ transitionDelay: `${index * 150}ms` }}
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-rose to-terracotta rounded-full flex items-center justify-center text-white font-bold">
+                {testimonial.avatar}
+              </div>
+              <div>
+                <h4 className="font-semibold text-ink">{testimonial.name}</h4>
+                <p className="text-sm text-coffee/60">{testimonial.role}</p>
+              </div>
+            </div>
+            <p className="text-coffee/80 italic">"{testimonial.content}"</p>
+            <div className="flex gap-1 mt-4">
+              {[...Array(5)].map((_, i) => (
+                <FaStar key={i} className="text-brass text-sm" />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
+// Enhanced CTA Section Component
+const CTASection = ({ isVisible }) => (
+  <section className="py-20 px-4 bg-gradient-to-br from-ink via-coffee to-terracotta relative overflow-hidden">
+    {/* Background decorative elements */}
+    <div className="absolute inset-0 opacity-10">
+      <div className="absolute top-10 left-10 w-20 h-20 bg-white rounded-full animate-pulse"></div>
+      <div className="absolute bottom-10 right-10 w-16 h-16 bg-white rounded-full animate-bounce"></div>
+      <div className="absolute top-1/2 left-1/4 w-12 h-12 bg-white rounded-full animate-pulse"></div>
+    </div>
+    
+    <div className="relative max-w-4xl mx-auto text-center text-white">
+      <div className={`transition-all duration-1000 ease-out ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+      }`}>
+        <div className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full border border-white/20 mb-6">
+          <FaHeart className="text-rose text-sm" />
+          <span className="text-sm font-medium">Miễn phí hoàn toàn</span>
+        </div>
+        
+        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
+          Sẵn sàng bắt đầu?
+        </h2>
+        <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
+          Tham gia cùng hàng nghìn người dùng đang tận hưởng cuộc sống được tổ chức tốt hơn
+        </p>
+        
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link
+            to="/register"
+            className="group bg-white text-terracotta px-8 py-4 rounded-full text-lg font-semibold hover:shadow-2xl hover:scale-105 transition-all duration-500 ease-out flex items-center justify-center gap-2"
+          >
+            <FaRocket className="group-hover:translate-x-1 transition-transform duration-300" />
+            Đăng ký miễn phí
+          </Link>
+          <Link
+            to="/login"
+            className="group border-2 border-white text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-white hover:text-terracotta transition-all duration-500 ease-out flex items-center justify-center gap-2"
+          >
+            <FaCheckCircle className="group-hover:scale-110 transition-transform duration-300" />
+            Đăng nhập
+          </Link>
+        </div>
+        
+        <p className="mt-6 text-sm opacity-75">
+          Không cần thẻ tín dụng • Dễ dàng hủy bất kỳ lúc nào
+        </p>
+      </div>
+    </div>
+  </section>
+);
+
+// Enhanced Footer Component
+const Footer = ({ isVisible }) => (
+  <footer className="py-16 px-4 bg-gradient-to-b from-ink/5 to-coffee/10">
+    <div className="max-w-6xl mx-auto">
+      {/* Logo and description */}
+      <div className={`text-center mb-12 transition-all duration-1000 ease-out ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+      }`}>
+        <div className="flex justify-center items-center gap-3 mb-4">
+          <div className="p-3 rounded-full bg-gradient-to-br from-rose to-terracotta shadow-lg">
+            <FaRegStickyNote className="text-white text-2xl" />
+          </div>
+          <span className="bg-gradient-to-r from-rose via-terracotta to-brass bg-clip-text text-transparent font-bold text-2xl">
+            MyNoteWebApp
+          </span>
+        </div>
+        <p className="text-coffee/80 max-w-md mx-auto">
+          Đơn giản hóa cuộc sống của bạn với công nghệ hiện đại
+        </p>
+      </div>
+
+      {/* Navigation links */}
+      <div className={`grid grid-cols-2 md:grid-cols-5 gap-8 transition-all duration-1000 ease-out ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+      }`} style={{ transitionDelay: '200ms' }}>
+        {footerSections.map((section, index) => (
+          <div key={section.title} className="space-y-4">
+            <h3 className="font-bold text-ink text-sm uppercase tracking-wide">
+              {section.title}
+            </h3>
+            <ul className="space-y-2">
+              {section.links.map((link) => (
+                <li key={link}>
+                  <Link 
+                    to={`/${link.toLowerCase().replace(/\s+/g, '-')}`}
+                    className="text-coffee/70 hover:text-terracotta transition-colors duration-200 text-sm"
+                  >
+                    {link}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      {/* Bottom border */}
+      <div className={`mt-12 pt-8 border-t border-rose/20 text-center transition-all duration-1000 ease-out ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+      }`} style={{ transitionDelay: '400ms' }}>
+        <p className="text-coffee/60 text-sm">
+          © 2024 MyNoteWebApp. Tất cả quyền được bảo lưu.
+        </p>
+      </div>
+    </div>
+  </footer>
+);
 
 export default function Home() {
   const [animatedElements, setAnimatedElements] = useState({
-    hero: false
+    hero: false,
+    features: false,
+    testimonials: false,
+    cta: false,
+    footer: false
   });
 
-  const [featuresRef, featuresInView] = useInView({ threshold: 0.15, once: false });
-  const [aiRef, aiInView] = useInView({ threshold: 0.15, once: false });
-  const [demoRef, demoInView] = useInView({ threshold: 0.15, once: false });
-  const [ctaRef, ctaInView] = useInView({ threshold: 0.1, once: false });
+  const [heroRef, heroInView] = useInView({ threshold: 0.1, once: true });
+  const [featuresRef, featuresInView] = useInView({ threshold: 0.1, once: true });
+  const [testimonialsRef, testimonialsInView] = useInView({ threshold: 0.1, once: true });
+  const [ctaRef, ctaInView] = useInView({ threshold: 0.1, once: true });
+  const [footerRef, footerInView] = useInView({ threshold: 0.1, once: true });
 
   useEffect(() => {
-    const timer1 = setTimeout(() => setAnimatedElements(prev => ({ ...prev, hero: true })), 100);
-    return () => {
-      clearTimeout(timer1);
-    };
+    const timer = setTimeout(() => {
+      setAnimatedElements(prev => ({ ...prev, hero: true }));
+    }, 100);
+    return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (featuresInView) {
+      setAnimatedElements(prev => ({ ...prev, features: true }));
+    }
+  }, [featuresInView]);
+
+  useEffect(() => {
+    if (testimonialsInView) {
+      setAnimatedElements(prev => ({ ...prev, testimonials: true }));
+    }
+  }, [testimonialsInView]);
+
+  useEffect(() => {
+    if (ctaInView) {
+      setAnimatedElements(prev => ({ ...prev, cta: true }));
+    }
+  }, [ctaInView]);
+
+  useEffect(() => {
+    if (footerInView) {
+      setAnimatedElements(prev => ({ ...prev, footer: true }));
+    }
+  }, [footerInView]);
 
   const handleGetStarted = () => {
     toast.success("Welcome to MyNoteWebApp! 🎉");
   };
 
   return (
-    <div className="min-h-screen patterncraft-bg">
-      <div className="patterncraft-content">
+    <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-terracotta/20 to-plum/20"></div>
-        <div className="relative px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
-          <div className="max-w-7xl mx-auto text-center">
-            <div className={`transition-all duration-1000 ease-out ${animatedElements.hero ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
-                Manage Your Life
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-terracotta to-brass">
-                  Intelligently
-                </span>
-              </h1>
-              <p className="text-xl sm:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-                A note-taking, task management and planning app designed specifically for you. 
-                Simple, effective and intelligent.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <button
-                  onClick={handleGetStarted}
-                  className="group bg-gradient-to-r from-terracotta to-brass text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-2xl hover:scale-105 transition-all duration-500 ease-out flex items-center gap-2"
-                >
-                  Get Started Now
-                  <FaRocket className="group-hover:translate-x-1 transition-transform duration-300 ease-out" />
-                </button>
-                <Link
-                  to="/demo"
-                  className="group bg-white text-gray-700 px-8 py-4 rounded-full text-lg font-semibold border-2 border-gray-200 hover:border-terracotta hover:shadow-xl transition-all duration-500 ease-out flex items-center gap-2"
-                >
-                  <FaPlay className="group-hover:scale-110 transition-transform duration-300 ease-out" />
-                  Watch Demo
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Floating Elements Animation - Smoother */}
-        <div className="absolute top-20 left-10 animate-pulse">
-          <div className="w-4 h-4 bg-terracotta/60 rounded-full"></div>
-        </div>
-        <div className="absolute top-40 right-20 animate-bounce">
-          <div className="w-6 h-6 bg-plum/60 rounded-full"></div>
-        </div>
-        <div className="absolute bottom-40 left-20 animate-pulse">
-          <div className="w-3 h-3 bg-olive/60 rounded-full"></div>
-        </div>
-      </section>
+      <div ref={heroRef}>
+        <HeroSection isVisible={animatedElements.hero} onGetStarted={handleGetStarted} />
+      </div>
 
       {/* Features Section */}
-      <section ref={featuresRef} className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className={`text-center mb-16 transition-all duration-1000 ease-out ${featuresInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-              Key Features
-            </h2>
-            <p className="text-xl text-gray-700 max-w-2xl mx-auto">
-              Discover powerful tools that make your life easier and more efficient
-            </p>
-          </div>
+      <div ref={featuresRef}>
+        <FeaturesSection isVisible={animatedElements.features} />
+      </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-            {features.map((feature, index) => (
-              <div
-                key={index}
-                className={`group ${feature.bgColor} p-8 rounded-3xl transition-all duration-700 ease-out hover:shadow-2xl hover:-translate-y-1 hover:scale-[1.02] ${featuresInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
-                style={{ transitionDelay: `${index * 100}ms` }}
-              >
-                <div className={`${feature.iconColor} mb-6 transition-transform duration-500 ease-out group-hover:scale-105`}>
-                  {feature.icon}
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">{feature.title}</h3>
-                <p className="text-gray-600 text-lg leading-relaxed">{feature.description}</p>
-                <div className="mt-6">
-                  <Link
-                    to={`/${feature.title.toLowerCase().replace(/\s+/g, '-')}`}
-                    className="inline-flex items-center gap-2 text-terracotta hover:text-brass font-semibold transition-all duration-300 ease-out group-hover:gap-3"
-                  >
-                    Learn More
-                    <FaArrowRight className="transition-transform duration-300 ease-out group-hover:translate-x-1" />
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* AI-Powered Personal Features Section */}
-      <section ref={aiRef} className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-paper to-sand">
-        <div className="max-w-7xl mx-auto">
-          <div className={`text-center mb-16 transition-all duration-1000 ease-out ${aiInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-              AI-Powered Personalization
-            </h2>
-            <p className="text-xl text-gray-700 max-w-3xl mx-auto">
-              Discover how AI can help you plan smarter and manage tasks more efficiently
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {aiInsights.map((insight, index) => (
-              <div
-                key={index}
-                className={`group bg-white p-8 rounded-3xl shadow-lg transition-all duration-700 ease-out hover:shadow-2xl hover:-translate-y-1 hover:scale-[1.02] border border-gray-100 ${aiInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
-                style={{ transitionDelay: `${index * 120}ms` }}
-              >
-                <div className={`${insight.iconColor} mb-6 transition-transform duration-500 ease-out group-hover:scale-105`}>
-                  {insight.icon}
-                </div>
-                <div className="mb-4">
-                  <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${insight.color} text-white`}>
-                    {insight.type === "planning" ? "Planning" : 
-                     insight.type === "todo" ? "Todo List" : "AI Assistant"}
-                  </span>
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">{insight.title}</h3>
-                <p className="text-gray-600 leading-relaxed">{insight.description}</p>
-                <div className="mt-6">
-                  <Link
-                    to="/ai-features"
-                    className="inline-flex items-center gap-2 text-terracotta hover:text-brass font-semibold transition-all duration-300 ease-out group-hover:gap-3"
-                  >
-                    Explore AI
-                    <FaArrowRight className="transition-transform duration-300 ease-out group-hover:translate-x-1" />
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Interactive Demo Section */}
-      <section ref={demoRef} className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className={`text-center mb-16 transition-all duration-1000 ease-out ${demoInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-              Try It Now
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              No registration required, you can try the main features right now
-            </p>
-          </div>
-
-          <div className="bg-gradient-to-r from-paper to-sand rounded-3xl p-8 lg:p-12">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-              <div>
-                <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-6">
-                  Create Your First Note
-                </h3>
-                <p className="text-gray-600 text-lg mb-6">
-                  Start with a simple note. You'll see the difference immediately!
-                </p>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <FaCheckCircle className="text-olive text-xl" />
-                    <span className="text-gray-700">Intuitive, easy-to-use interface</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <FaCheckCircle className="text-olive text-xl" />
-                    <span className="text-gray-700">Multi-device sync</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <FaCheckCircle className="text-olive text-xl" />
-                    <span className="text-gray-700">High data security</span>
-                  </div>
-                </div>
-                <button className="mt-8 bg-gradient-to-r from-terracotta to-brass text-white px-6 py-3 rounded-full font-semibold hover:shadow-xl hover:scale-105 transition-all duration-500 ease-out">
-                  Try Now
-                </button>
-              </div>
-              
-              <div className="relative">
-                <div className="bg-white rounded-2xl p-6 shadow-2xl transform rotate-1 transition-transform duration-700 ease-out hover:rotate-0">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-3 h-3 bg-rose rounded-full"></div>
-                    <div className="w-3 h-3 bg-brass rounded-full"></div>
-                    <div className="w-3 h-3 bg-olive rounded-full"></div>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                    <div className="h-3 bg-gray-200 rounded w-full"></div>
-                    <div className="h-3 bg-gray-200 rounded w-5/6"></div>
-                    <div className="h-3 bg-gray-200 rounded w-2/3"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Testimonials Section */}
+      <div ref={testimonialsRef}>
+        <TestimonialsSection isVisible={animatedElements.testimonials} />
+      </div>
 
       {/* CTA Section */}
-      <section ref={ctaRef} className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-ink to-coffee">
-        <div className="max-w-4xl mx-auto text-center text-white">
-          <h2 className={`text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 transition-all duration-1000 ease-out ${ctaInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
-            Ready to Start?
-          </h2>
-          <p className={`text-xl mb-8 opacity-90 transition-all duration-1000 ease-out ${ctaInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`} style={{ transitionDelay: '120ms' }}>
-            Join thousands of users who are enjoying a better organized life
-          </p>
-          <div className={`flex flex-col sm:flex-row gap-4 justify-center transition-all duration-1000 ease-out ${ctaInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`} style={{ transitionDelay: '200ms' }}>
-            <Link
-              to="/register"
-              className="bg-white text-terracotta px-8 py-4 rounded-full text-lg font-semibold hover:shadow-2xl hover:scale-105 transition-all duration-500 ease-out flex items-center justify-center gap-2"
-            >
-              <FaHeart className="text-red-500" />
-              Free Registration
-            </Link>
-            <Link
-              to="/login"
-              className="border-2 border-white text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-white hover:text-terracotta transition-all duration-500 ease-out flex items-center justify-center gap-2"
-            >
-              <FaDownload />
-              Login
-            </Link>
-          </div>
-        </div>
-      </section>
+      <div ref={ctaRef}>
+        <CTASection isVisible={animatedElements.cta} />
+      </div>
 
       {/* Footer */}
-      <footer className="py-12 px-4 sm:px-6 lg:px-8 bg-ink text-white">
-        <div className="max-w-7xl mx-auto text-center">
-          <div className="flex justify-center items-center gap-2 mb-4">
-            <FaRegStickyNote className="text-2xl text-terracotta" />
-            <span className="text-xl font-bold">MyNoteWebApp</span>
-          </div>
-          <p className="text-gray-400 mb-6">
-            Simplify your life with modern technology
-          </p>
-          <div className="flex justify-center gap-6 text-gray-400">
-            <Link to="/about" className="hover:text-white transition-colors duration-300">About Us</Link>
-            <Link to="/privacy" className="hover:text-white transition-colors duration-300">Privacy</Link>
-            <Link to="/terms" className="hover:text-white transition-colors duration-300">Terms</Link>
-            <Link to="/contact" className="hover:text-white transition-colors duration-300">Contact</Link>
-          </div>
-        </div>
-      </footer>
+      <div ref={footerRef}>
+        <Footer isVisible={animatedElements.footer} />
       </div>
     </div>
   );

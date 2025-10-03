@@ -1,34 +1,139 @@
-import { useState } from "react";
-import { FaCheckCircle, FaCalendarAlt, FaTrash, FaEdit, FaStar, FaFire, FaLightbulb, FaClock, FaCalendarWeek, FaBullseye, FaFilter, FaChevronRight, FaTachometerAlt, FaPlusCircle, FaTimes, FaPlus } from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { 
+  FaCheckCircle, 
+  FaCalendarAlt, 
+  FaTrash, 
+  FaEdit, 
+  FaStar, 
+  FaFire, 
+  FaLightbulb, 
+  FaClock, 
+  FaCalendarWeek, 
+  FaBullseye, 
+  FaFilter, 
+  FaChevronRight, 
+  FaTachometerAlt, 
+  FaPlusCircle, 
+  FaTimes, 
+  FaPlus,
+  FaChevronDown,
+  FaChevronUp,
+  FaRocket,
+  FaHeart,
+  FaArrowRight,
+  FaPlay,
+  FaUsers,
+  FaTrophy,
+  FaChartLine,
+  FaCalendarCheck,
+  FaExpand,
+  FaCompress
+} from "react-icons/fa";
+import { useInView } from '../../utils/useInView';
 
-const priorityColors = {
-  high: "bg-gradient-to-r from-rose to-red-500 text-white border-rose",
-  medium: "bg-gradient-to-r from-brass to-amber-500 text-white border-brass",
-  low: "bg-gradient-to-r from-coffee to-amber-600 text-white border-coffee"
+// Constants and configuration
+const CONSTANTS = {
+  PRIORITY: {
+    COLORS: {
+      high: "bg-gradient-to-r from-red-500 via-rose-500 to-pink-500 text-white shadow-lg",
+      medium: "bg-gradient-to-r from-amber-500 via-brass-500 to-yellow-500 text-white shadow-lg",
+      low: "bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500 text-white shadow-lg"
+    },
+    LABELS: {
+      high: "🔥 Cao",
+      medium: "⭐ TB", 
+      low: "🌱 Thấp"
+    },
+    ORDER: {
+      high: 0,
+      medium: 1,
+      low: 2
+    }
+  },
+  
+  WEEK_DAYS: [
+    "Chủ nhật", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"
+  ],
+  
+  DAY_COLORS: {
+    "Chủ nhật": "from-purple-500 to-indigo-500",
+    "Thứ 2": "from-blue-500 to-cyan-500", 
+    "Thứ 3": "from-green-500 to-emerald-500",
+    "Thứ 4": "from-yellow-500 to-amber-500",
+    "Thứ 5": "from-orange-500 to-red-500",
+    "Thứ 6": "from-pink-500 to-rose-500",
+    "Thứ 7": "from-violet-500 to-purple-500"
+  },
+  
+  MOTIVATIONAL_MESSAGES: [
+    "Tuần này sẽ là tuần tuyệt vời nhất! 🌟",
+    "Mỗi ngày là cơ hội để tiến gần hơn đến mục tiêu! 🎯",
+    "Bạn đang xây dựng tương lai tuyệt vời! 🚀",
+    "Thành công tuần này sẽ tạo động lực cho tuần sau! 💪",
+    "Hãy biến kế hoạch thành hành động! ⚡",
+    "Tuần này bạn sẽ làm được nhiều hơn mong đợi! ✨"
+  ],
+  
+  ACHIEVEMENT_LEVELS: {
+    beginner: { min: 0, max: 25, label: "Khởi đầu", color: "from-gray-400 to-gray-500", icon: "🌱" },
+    progress: { min: 26, max: 50, label: "Tiến bộ", color: "from-blue-400 to-blue-500", icon: "📈" },
+    good: { min: 51, max: 75, label: "Tốt", color: "from-green-400 to-green-500", icon: "👍" },
+    excellent: { min: 76, max: 90, label: "Xuất sắc", color: "from-yellow-400 to-yellow-500", icon: "⭐" },
+    outstanding: { min: 91, max: 100, label: "Vượt trội", color: "from-purple-400 to-purple-500", icon: "🏆" }
+  }
 };
 
-const priorityLabels = {
-  high: "🔥 Ưu tiên cao",
-  medium: "⭐ Trung bình", 
-  low: "🌱 Thấp"
+// Helper functions for better code organization
+const getAchievementLevel = (percentage) => {
+  for (const [key, level] of Object.entries(CONSTANTS.ACHIEVEMENT_LEVELS)) {
+    if (percentage >= level.min && percentage <= level.max) {
+      return { key, ...level };
+    }
+  }
+  return CONSTANTS.ACHIEVEMENT_LEVELS.beginner;
 };
 
-const priorityOrder = {
-  high: 0,
-  medium: 1,
-  low: 2
+const getTodosByWeekDay = (todos, day) => {
+  return todos.filter(todo => todo.weekDay === day);
 };
 
-const weekDays = [
-  "Chủ nhật", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"
-];
+const getWeeklyFocusTodos = (todos) => {
+  const focusCandidates = todos
+    .filter(todo => !todo.completed)
+    .sort((a, b) => {
+      if (CONSTANTS.PRIORITY.ORDER[a.priority] !== CONSTANTS.PRIORITY.ORDER[b.priority]) {
+        return CONSTANTS.PRIORITY.ORDER[a.priority] - CONSTANTS.PRIORITY.ORDER[b.priority];
+      }
+      const aDate = new Date(a.dueDate || 0).getTime();
+      const bDate = new Date(b.dueDate || 0).getTime();
+      return aDate - bDate;
+    });
+  return focusCandidates.slice(0, 3);
+};
 
-const motivationalMessages = [
-  "Hôm nay là ngày tuyệt vời để hoàn thành mục tiêu! 💪",
-  "Mỗi bước nhỏ đều đưa bạn đến gần ước mơ hơn ✨",
-  "Bạn đang làm rất tốt! Hãy tiếp tục phát huy 🚀",
-  "Thành công đến từ những thói quen nhỏ mỗi ngày 🌟"
-];
+const filterTodos = (todos, filter) => {
+  switch (filter) {
+    case 'high':
+      return todos.filter(t => t.priority === 'high');
+    case 'incomplete':
+      return todos.filter(t => !t.completed);
+    case 'completed':
+      return todos.filter(t => t.completed);
+    default:
+      return todos;
+  }
+};
+
+const sortTodosByPriority = (todos) => {
+  return todos.sort((a, b) => {
+    if (CONSTANTS.PRIORITY.ORDER[a.priority] !== CONSTANTS.PRIORITY.ORDER[b.priority]) {
+      return CONSTANTS.PRIORITY.ORDER[a.priority] - CONSTANTS.PRIORITY.ORDER[b.priority];
+    }
+    const aDate = new Date(a.dueDate || 0).getTime();
+    const bDate = new Date(b.dueDate || 0).getTime();
+    return aDate - bDate;
+  });
+};
 
 function WeeklyPlan() {
   const [todos, setTodos] = useState([
@@ -40,8 +145,59 @@ function WeeklyPlan() {
   const [newTodo, setNewTodo] = useState("");
   const [newPriority, setNewPriority] = useState("medium");
   const [newDueDate, setNewDueDate] = useState("");
-  const [weeklyFilter, setWeeklyFilter] = useState("all"); // all | high | incomplete | completed
-  const [showSidePanel, setShowSidePanel] = useState(false); // combined progress + add form
+  const [weeklyFilter, setWeeklyFilter] = useState("all");
+  const [showSidePanel, setShowSidePanel] = useState(false);
+  
+  // New state for enhanced UI
+  const [collapsedDays, setCollapsedDays] = useState({});
+  const [showWeeklyStats, setShowWeeklyStats] = useState(true);
+  const [animatedElements, setAnimatedElements] = useState({
+    header: false,
+    stats: false,
+    focus: false,
+    weeklyGrid: false,
+    sidePanel: false
+  });
+
+  // Animation refs
+  const [headerRef, headerInView] = useInView({ threshold: 0.1, once: true });
+  const [statsRef, statsInView] = useInView({ threshold: 0.1, once: true });
+  const [focusRef, focusInView] = useInView({ threshold: 0.1, once: true });
+  const [weeklyGridRef, weeklyGridInView] = useInView({ threshold: 0.1, once: true });
+
+  // Animation effects
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAnimatedElements(prev => ({ ...prev, header: true }));
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (statsInView) {
+      setAnimatedElements(prev => ({ ...prev, stats: true }));
+    }
+  }, [statsInView]);
+
+  useEffect(() => {
+    if (focusInView) {
+      setAnimatedElements(prev => ({ ...prev, focus: true }));
+    }
+  }, [focusInView]);
+
+  useEffect(() => {
+    if (weeklyGridInView) {
+      setAnimatedElements(prev => ({ ...prev, weeklyGrid: true }));
+    }
+  }, [weeklyGridInView]);
+
+  // Helper functions
+  const toggleDayCollapse = (day) => {
+    setCollapsedDays(prev => ({
+      ...prev,
+      [day]: !prev[day]
+    }));
+  };
 
   const handleToggleTodo = (id) => {
     setTodos(todos.map(todo => 
@@ -56,7 +212,7 @@ function WeeklyPlan() {
   const handleAddTodo = () => {
     if (newTodo.trim()) {
       const selectedDate = new Date(newDueDate);
-      const weekDay = weekDays[selectedDate.getDay()];
+      const weekDay = CONSTANTS.WEEK_DAYS[selectedDate.getDay()];
       
       const todo = {
         id: Date.now(),
@@ -73,8 +229,12 @@ function WeeklyPlan() {
     }
   };
 
+  // Computed values
   const completedTodos = todos.filter(todo => todo.completed).length;
   const totalTodos = todos.length;
+  const weeklyProgress = totalTodos > 0 ? Math.round((completedTodos / totalTodos) * 100) : 0;
+  const achievement = getAchievementLevel(weeklyProgress);
+  
   const today = new Date().toLocaleDateString('vi-VN', { 
     weekday: 'long', 
     year: 'numeric', 
@@ -82,348 +242,430 @@ function WeeklyPlan() {
     day: 'numeric' 
   });
 
-  const getTodosByWeekDay = (day) => {
-    return todos.filter(todo => todo.weekDay === day);
-  };
-
-  const getWeeklyFocusTodos = () => {
-    const focusCandidates = todos
-      .filter(todo => !todo.completed)
-      .sort((a, b) => {
-        if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
-          return priorityOrder[a.priority] - priorityOrder[b.priority];
-        }
-        const aDate = new Date(a.dueDate || 0).getTime();
-        const bDate = new Date(b.dueDate || 0).getTime();
-        return aDate - bDate;
-      });
-    return focusCandidates.slice(0, 3);
-  };
-
   return (
-    <div className="min-h-screen patterncraft-bg px-6 py-8">
-      <div className="patterncraft-content">
-        <div className="max-w-7xl mx-auto space-y-8">
-        {/* Floating droplet button */}
-        <style>{`
-          @keyframes floatUpDown { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
-          @keyframes liquidExpand {
-            0% { 
-              transform: translate(calc(50vw - 2.5rem), calc(2.5rem - 50vh)) scale(0.05); 
-              opacity: 0.3; 
-              border-radius: 50%;
-              filter: blur(2px);
-            }
-            20% { 
-              transform: translate(calc(50vw - 2.5rem), calc(2.5rem - 50vh)) scale(0.15); 
-              opacity: 0.5; 
-              border-radius: 45%;
-              filter: blur(1px);
-            }
-            40% { 
-              transform: translate(calc(50vw - 2.5rem), calc(2.5rem - 50vh)) scale(0.3); 
-              opacity: 0.7; 
-              border-radius: 40%;
-              filter: blur(0.5px);
-            }
-            60% { 
-              transform: translate(calc(50vw - 2.5rem), calc(2.5rem - 50vh)) scale(0.6); 
-              opacity: 0.8; 
-              border-radius: 35%;
-              filter: blur(0px);
-            }
-            80% { 
-              transform: translate(calc(50vw - 2.5rem), calc(2.5rem - 50vh)) scale(0.85); 
-              opacity: 0.9; 
-              border-radius: 28%;
-              filter: blur(0px);
-            }
-            100% { 
-              transform: translate(-50%, -50%) scale(1); 
-              opacity: 1; 
-              border-radius: 24px;
-              filter: blur(0px);
-            }
-          }
-        `}</style>
-        <button
-          onClick={() => setShowSidePanel(true)}
-          className="fixed right-5 top-5 z-30 rounded-full w-12 h-12 flex items-center justify-center text-white shadow-md active:scale-95 transition-transform"
-          style={{
-            background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.45), rgba(255,255,255,0.15) 40%, rgba(0,0,0,0) 41%), linear-gradient(135deg, #e76f51, #b08968) ',
-            boxShadow: '0 8px 20px rgba(0,0,0,0.15)'
-          }}
-          aria-label="Open summary"
-        >
-          <div className="w-10 h-10 rounded-full" style={{
-            background: 'linear-gradient(145deg, rgba(255,255,255,0.7), rgba(255,255,255,0.25))',
-            animation: 'floatUpDown 3s ease-in-out infinite'
-          }}></div>
-        </button>
-
-        {/* Header with Daily Motivation */}
-        <div className="text-center space-y-4">
-          <div className="bg-gradient-to-r from-brass via-rose to-terracotta bg-clip-text">
-            <h1 className="text-4xl font-bold text-transparent">My Weekly Planner</h1>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+      <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+        
+        {/* Compact Header Section */}
+        <div ref={headerRef} className={`text-center space-y-4 transition-all duration-1000 ease-out ${
+          animatedElements.header ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+        }`}>
+          {/* Welcome badge */}
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 px-4 py-2 rounded-full border border-indigo-500/20">
+            <FaCalendarWeek className="text-indigo-500 text-sm" />
+            <span className="text-sm font-medium text-gray-800">Weekly Planner</span>
           </div>
-          <p className="text-xl text-ink font-medium">{today}</p>
-          <div className="bg-gradient-to-r from-brass/20 to-rose/20 rounded-2xl p-4 border border-brass/30">
-            <p className="text-ink font-medium flex items-center justify-center gap-2">
-              <FaLightbulb className="text-brass" />
-              {motivationalMessages[Math.floor(Math.random() * motivationalMessages.length)]}
-            </p>
-          </div>
+          
+          <h1 className="text-3xl sm:text-4xl font-bold leading-tight">
+            <span className="text-gray-800">Lập kế hoạch tuần</span>
+            <br />
+            <span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+              một cách thông minh
+            </span>
+          </h1>
+          
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            {today} • {CONSTANTS.MOTIVATIONAL_MESSAGES[Math.floor(Math.random() * CONSTANTS.MOTIVATIONAL_MESSAGES.length)]}
+          </p>
         </div>
 
-        {/* Weekly Focus */}
-        <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-bold text-ink flex items-center gap-2">
-              <FaBullseye className="text-rose" />
-              Focus tuần này
-            </h3>
-            <div className="flex items-center gap-2 text-sm">
-              <FaFilter className="text-ink/60" />
-              <select
-                value={weeklyFilter}
-                onChange={(e) => setWeeklyFilter(e.target.value)}
-                className="px-3 py-2 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-terracotta/20 focus:border-terracotta transition-all"
-              >
-                <option value="all">Tất cả</option>
-                <option value="high">Ưu tiên cao</option>
-                <option value="incomplete">Chưa hoàn thành</option>
-                <option value="completed">Đã hoàn thành</option>
-              </select>
+        {/* Main Layout Grid - New Proportions */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          {/* Left Sidebar - Achievement & Focus (25% of layout) */}
+          <div className="lg:col-span-3 space-y-4">
+            
+            {/* Compact Achievement Stats */}
+            <div ref={statsRef} className={`transition-all duration-1000 ease-out ${
+              animatedElements.stats ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}>
+              <div className="bg-white rounded-2xl shadow-lg border border-indigo-100 p-4">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className={`p-2 rounded-full bg-gradient-to-r ${achievement.color} shadow-md`}>
+                    <span className="text-lg">{achievement.icon}</span>
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-800">Thành tích tuần</h3>
+                    <p className="text-sm text-gray-600">{achievement.label} ({weeklyProgress}%)</p>
+                  </div>
+                </div>
+                
+                {/* Compact Progress Ring */}
+                <div className="flex justify-center mb-4">
+                  <div className="relative w-20 h-20">
+                    <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 80 80">
+                      <circle
+                        cx="40"
+                        cy="40"
+                        r="32"
+                        stroke="currentColor"
+                        strokeWidth="6"
+                        fill="none"
+                        className="text-gray-200"
+                      />
+                      <circle
+                        cx="40"
+                        cy="40"
+                        r="32"
+                        stroke="currentColor"
+                        strokeWidth="6"
+                        fill="none"
+                        strokeDasharray={`${2 * Math.PI * 32}`}
+                        strokeDashoffset={`${2 * Math.PI * 32 * (1 - weeklyProgress / 100)}`}
+                        className="text-indigo-500"
+                        style={{ transition: 'stroke-dashoffset 1s ease-in-out' }}
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-sm font-bold text-gray-800">{weeklyProgress}%</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Compact Stats */}
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div className="bg-indigo-50 rounded-lg p-2">
+                    <div className="text-lg font-bold text-indigo-600">{totalTodos}</div>
+                    <div className="text-xs text-gray-600">Tổng</div>
+                  </div>
+                  <div className="bg-green-50 rounded-lg p-2">
+                    <div className="text-lg font-bold text-green-600">{completedTodos}</div>
+                    <div className="text-xs text-gray-600">Xong</div>
+                  </div>
+                  <div className="bg-pink-50 rounded-lg p-2">
+                    <div className="text-lg font-bold text-pink-600">{totalTodos - completedTodos}</div>
+                    <div className="text-xs text-gray-600">Còn</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Compact Focus Section */}
+            <div ref={focusRef} className={`transition-all duration-1000 ease-out ${
+              animatedElements.focus ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`} style={{ transitionDelay: '200ms' }}>
+              <div className="bg-white rounded-2xl shadow-lg border border-indigo-100 p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-bold text-gray-800 flex items-center gap-2">
+                    <div className="p-1.5 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500">
+                      <FaBullseye className="text-white text-sm" />
+                    </div>
+                    Focus tuần
+                  </h3>
+                  <select
+                    value={weeklyFilter}
+                    onChange={(e) => setWeeklyFilter(e.target.value)}
+                    className="text-xs px-2 py-1 border border-indigo-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition-all bg-white"
+                  >
+                    <option value="all">Tất cả</option>
+                    <option value="high">Cao</option>
+                    <option value="incomplete">Chưa xong</option>
+                    <option value="completed">Đã xong</option>
+                  </select>
+                </div>
+
+                <div className="space-y-3">
+                  {(() => {
+                    let focus = getWeeklyFocusTodos(todos);
+                    focus = filterTodos(focus, weeklyFilter);
+                    
+                    if (focus.length === 0) {
+                      return (
+                        <div className="text-center py-6 text-gray-400">
+                          <FaBullseye className="text-2xl mx-auto mb-2" />
+                          <p className="text-sm">Chưa có mục tiêu nổi bật</p>
+                        </div>
+                      );
+                    }
+                    
+                    return focus.map((todo, index) => (
+                      <div 
+                        key={todo.id} 
+                        className={`p-3 rounded-xl border transition-all duration-300 hover:shadow-md ${
+                          todo.completed 
+                            ? 'border-green-200 bg-green-50' 
+                            : 'border-indigo-200 bg-indigo-50'
+                        }`}
+                        style={{ animationDelay: `${index * 100}ms` }}
+                      >
+                        <div className="flex items-start gap-3">
+                          <button
+                            onClick={() => handleToggleTodo(todo.id)}
+                            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all mt-0.5 flex-shrink-0 ${
+                              todo.completed 
+                                ? 'bg-green-500 border-green-500 text-white' 
+                                : 'border-indigo-300 hover:border-indigo-500'
+                            }`}
+                          >
+                            {todo.completed && <FaCheckCircle className="text-xs" />}
+                          </button>
+                          <div className="flex-1 min-w-0">
+                            <div className={`text-sm font-medium leading-relaxed ${
+                              todo.completed ? 'line-through text-gray-500' : 'text-gray-800'
+                            }`}>{todo.text}</div>
+                            <div className="mt-2 flex items-center gap-2">
+                              <span className={`text-xs px-2 py-0.5 rounded-full ${CONSTANTS.PRIORITY.COLORS[todo.priority]}`}>
+                                {CONSTANTS.PRIORITY.LABELS[todo.priority].split(' ')[1]}
+                              </span>
+                              <span className="text-xs text-gray-500">{todo.weekDay}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ));
+                  })()}
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {(() => {
-              let focus = getWeeklyFocusTodos();
-              if (weeklyFilter === 'high') focus = focus.filter(t => t.priority === 'high');
-              if (weeklyFilter === 'incomplete') focus = focus.filter(t => !t.completed);
-              if (weeklyFilter === 'completed') focus = focus.filter(t => t.completed);
-              if (focus.length === 0) {
-                return (
-                  <div className="md:col-span-3 text-center py-6 text-ink/50">
-                    Không có mục tiêu nổi bật. Hãy thêm công việc ưu tiên nhé!
-                  </div>
-                );
-              }
-              return focus.map((todo) => (
-                <div key={todo.id} className={`p-4 rounded-2xl border-2 ${todo.completed ? 'border-green-200 bg-green-50' : 'border-rose/30 bg-rose/5'}`}>
-                  <div className="flex items-start gap-3">
-                    <button
-                      onClick={() => handleToggleTodo(todo.id)}
-                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all mt-0.5 ${
-                        todo.completed ? 'bg-green-400 border-green-400 text-white' : 'border-rose/50 hover:border-terracotta'
-                      }`}
-                    >
-                      {todo.completed && <FaCheckCircle className="text-xs" />}
-                    </button>
-                    <div className="flex-1 min-w-0">
-                      <div className={`font-semibold ${todo.completed ? 'line-through text-gray-500' : 'text-ink'}`}>{todo.text}</div>
-                      <div className="mt-2 flex items-center gap-2 text-xs">
-                        <span className={`px-2 py-1 rounded-full border ${priorityColors[todo.priority]}`}>{priorityLabels[todo.priority]}</span>
-                        <span className="px-2 py-1 rounded-full bg-gray-100 text-ink/70 flex items-center gap-1">
-                          <FaCalendarAlt className="text-terracotta" /> {todo.dueDate}
-                        </span>
-                        <span className="px-2 py-1 rounded-full bg-gray-100 text-ink/70 flex items-center gap-1">
-                          <FaClock className="text-brass" /> {todo.weekDay}
-                        </span>
-                      </div>
+          {/* Main Content - Weekly Plan (75% of layout) */}
+          <div className="lg:col-span-9">
+            <div ref={weeklyGridRef} className={`transition-all duration-1000 ease-out ${
+              animatedElements.weeklyGrid ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`} style={{ transitionDelay: '400ms' }}>
+              
+              {/* Enhanced Weekly Plan Header */}
+              <div className="bg-white rounded-2xl shadow-lg border border-indigo-100 p-6 mb-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                    <div className="p-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500">
+                      <FaCalendarCheck className="text-white text-lg" />
                     </div>
+                    Kế hoạch tuần của bạn
+                  </h3>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-gray-600">Bộ lọc:</span>
+                    <select
+                      value={weeklyFilter}
+                      onChange={(e) => setWeeklyFilter(e.target.value)}
+                      className="px-3 py-2 border-2 border-indigo-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition-all bg-white"
+                    >
+                      <option value="all">Tất cả</option>
+                      <option value="high">Ưu tiên cao</option>
+                      <option value="incomplete">Chưa hoàn thành</option>
+                      <option value="completed">Đã hoàn thành</option>
+                    </select>
                   </div>
                 </div>
-              ));
-            })()}
-          </div>
-        </div>
-
-        {/* Weekly Plan Grid */}
-        <div className="space-y-6">
-          <h3 className="text-xl font-bold text-ink flex items-center gap-2">
-            <FaCalendarWeek className="text-rose" />
-            Kế hoạch tuần của bạn
-          </h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-4">
-            {weekDays.map((day) => {
-              let dayTodos = getTodosByWeekDay(day);
-              if (weeklyFilter === 'high') dayTodos = dayTodos.filter(t => t.priority === 'high');
-              if (weeklyFilter === 'incomplete') dayTodos = dayTodos.filter(t => !t.completed);
-              if (weeklyFilter === 'completed') dayTodos = dayTodos.filter(t => t.completed);
-              // sort by priority then due date
-              dayTodos = dayTodos.sort((a, b) => {
-                if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
-                  return priorityOrder[a.priority] - priorityOrder[b.priority];
-                }
-                const aDate = new Date(a.dueDate || 0).getTime();
-                const bDate = new Date(b.dueDate || 0).getTime();
-                return aDate - bDate;
-              });
-              const isToday = day === weekDays[new Date().getDay()];
-              const completedCount = dayTodos.filter(t => t.completed).length;
-              const totalCount = dayTodos.length;
-              const visible = dayTodos.slice(0, 3);
-              const remaining = totalCount - visible.length;
-              
-              return (
-                <div 
-                  key={day}
-                  className={`bg-white rounded-2xl shadow-lg border-2 p-4 transition-all hover:shadow-xl ${
-                    isToday ? 'border-terracotta bg-gradient-to-br from-terracotta/5 to-brass/5' : 'border-gray-100'
-                  }`}
-                >
-                  <div className="mb-3">
-                    <div className="flex items-center justify-between">
-                      <h4 className={`font-bold text-lg ${isToday ? 'text-terracotta' : 'text-ink'}`}>{day}</h4>
-                      <span className="text-xs text-ink/60">{completedCount}/{totalCount}</span>
-                    </div>
-                    <div className="mt-2 w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                
+                {/* Weekly Overview Stats */}
+                <div className="grid grid-cols-7 gap-3">
+                  {CONSTANTS.WEEK_DAYS.map((day, index) => {
+                    const dayTodos = getTodosByWeekDay(todos, day);
+                    const completedCount = dayTodos.filter(t => t.completed).length;
+                    const totalCount = dayTodos.length;
+                    const isToday = day === CONSTANTS.WEEK_DAYS[new Date().getDay()];
+                    
+                    return (
                       <div 
-                        className="bg-gradient-to-r from-terracotta to-brass h-2 rounded-full"
-                        style={{ width: `${totalCount > 0 ? (completedCount / totalCount) * 100 : 0}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    {totalCount === 0 ? (
-                      <div className="text-center py-4 text-ink/40">
-                        <FaCalendarAlt className="text-2xl mx-auto mb-2" />
-                        <p className="text-xs">Không có công việc</p>
-                      </div>
-                    ) : (
-                      <>
-                        {visible.map((todo) => (
+                        key={day}
+                        className={`text-center p-3 rounded-xl transition-all ${
+                          isToday 
+                            ? 'bg-gradient-to-br from-indigo-100 to-purple-100 border-2 border-indigo-300' 
+                            : 'bg-gray-50 border border-gray-200'
+                        }`}
+                      >
+                        <div className="text-sm font-medium text-gray-700 mb-1">{day}</div>
+                        <div className="text-lg font-bold text-gray-800">{completedCount}/{totalCount}</div>
+                        <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
                           <div 
-                            key={todo.id}
-                            className={`p-3 rounded-xl border transition-all ${
-                              todo.completed 
-                                ? 'bg-green-50 border-green-200' 
-                                : 'bg-gray-50 border-gray-200'
-                            }`}
-                          >
-                            <div className="flex items-start gap-2">
-                              <button
-                                onClick={() => handleToggleTodo(todo.id)}
-                                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all mt-0.5 ${
+                            className={`h-1.5 rounded-full bg-gradient-to-r ${CONSTANTS.DAY_COLORS[day]} transition-all duration-1000`}
+                            style={{ width: `${totalCount > 0 ? (completedCount / totalCount) * 100 : 0}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              
+              {/* Enhanced Weekly Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                {CONSTANTS.WEEK_DAYS.map((day, index) => {
+                  let dayTodos = getTodosByWeekDay(todos, day);
+                  dayTodos = filterTodos(dayTodos, weeklyFilter);
+                  dayTodos = sortTodosByPriority(dayTodos);
+                  
+                  const isToday = day === CONSTANTS.WEEK_DAYS[new Date().getDay()];
+                  const completedCount = dayTodos.filter(t => t.completed).length;
+                  const totalCount = dayTodos.length;
+                  const isCollapsed = collapsedDays[day];
+                  const visible = isCollapsed ? dayTodos.slice(0, 3) : dayTodos.slice(0, 6);
+                  const remaining = totalCount - visible.length;
+                  
+                  return (
+                    <div 
+                      key={day}
+                      className={`bg-white rounded-2xl shadow-lg border-2 overflow-hidden transition-all duration-500 hover:shadow-xl ${
+                        isToday ? 'border-indigo-300 bg-gradient-to-br from-indigo-50 to-purple-50' : 'border-gray-100'
+                      }`}
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
+                      {/* Enhanced Day Header */}
+                      <div className="p-4 border-b border-gray-100">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className={`font-bold text-lg ${isToday ? 'text-indigo-700' : 'text-gray-800'}`}>
+                            {day}
+                          </h4>
+                          <div className="flex items-center gap-2">
+                            {isToday && (
+                              <div className="w-2 h-2 bg-indigo-500 rounded-full animate-ping"></div>
+                            )}
+                            <span className="text-sm font-medium text-gray-600">
+                              {completedCount}/{totalCount}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        {/* Enhanced Progress Bar */}
+                        <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                          <div 
+                            className={`h-2 rounded-full bg-gradient-to-r ${CONSTANTS.DAY_COLORS[day]} transition-all duration-1000`}
+                            style={{ width: `${totalCount > 0 ? (completedCount / totalCount) * 100 : 0}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                      
+                      {/* Enhanced Todos List */}
+                      <div className="p-4 space-y-3">
+                        {totalCount === 0 ? (
+                          <div className="text-center py-8 text-gray-400">
+                            <FaCalendarAlt className="text-2xl mx-auto mb-2" />
+                            <p className="text-sm">Không có công việc</p>
+                          </div>
+                        ) : (
+                          <>
+                            {visible.map((todo) => (
+                              <div 
+                                key={todo.id}
+                                className={`p-3 rounded-xl border transition-all duration-300 hover:shadow-md ${
                                   todo.completed 
-                                    ? 'bg-green-400 border-green-400 text-white' 
-                                    : 'border-gray-300 hover:border-terracotta'
+                                    ? 'bg-green-50 border-green-200' 
+                                    : 'bg-gray-50 border-gray-200 hover:border-indigo-300'
                                 }`}
                               >
-                                {todo.completed && <FaCheckCircle className="text-xs" />}
-                              </button>
-                              
-                              <div className="flex-1 min-w-0">
-                                <div className={`text-sm font-medium ${todo.completed ? 'line-through text-gray-500' : 'text-ink'}`}>{todo.text}</div>
-                                <div className="mt-1 flex items-center gap-2">
-                                  <span className={`text-xs px-2 py-1 rounded-full ${priorityColors[todo.priority]}`}>{priorityLabels[todo.priority].split(' ')[1]}</span>
-                                  <span className="text-xs text-ink/60 flex items-center gap-1"><FaCalendarAlt className="text-terracotta" />{todo.dueDate}</span>
+                                <div className="flex items-start gap-3">
+                                  <button
+                                    onClick={() => handleToggleTodo(todo.id)}
+                                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all mt-0.5 flex-shrink-0 ${
+                                      todo.completed 
+                                        ? 'bg-green-500 border-green-500 text-white' 
+                                        : 'border-gray-300 hover:border-indigo-500'
+                                    }`}
+                                  >
+                                    {todo.completed && <FaCheckCircle className="text-xs" />}
+                                  </button>
+                                  
+                                  <div className="flex-1 min-w-0">
+                                    <div className={`text-sm font-medium leading-relaxed ${
+                                      todo.completed ? 'line-through text-gray-500' : 'text-gray-800'
+                                    }`}>{todo.text}</div>
+                                    <div className="mt-2 flex items-center gap-2">
+                                      <span className={`text-xs px-2 py-1 rounded-full ${CONSTANTS.PRIORITY.COLORS[todo.priority]}`}>
+                                        {CONSTANTS.PRIORITY.LABELS[todo.priority].split(' ')[1]}
+                                      </span>
+                                      <span className="text-xs text-gray-500 flex items-center gap-1">
+                                        <FaClock className="text-xs" /> {todo.dueDate}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  
+                                  <button
+                                    onClick={() => handleDeleteTodo(todo.id)}
+                                    className="p-1 rounded hover:bg-red-100 transition-colors text-red-500 hover:text-red-700"
+                                  >
+                                    <FaTrash className="text-xs" />
+                                  </button>
                                 </div>
                               </div>
-                            </div>
-                          </div>
-                        ))}
-                        {remaining > 0 && (
-                          <div className="flex items-center justify-center text-xs text-ink/60 py-1">
-                            +{remaining} công việc nữa
-                            <FaChevronRight className="ml-1" />
-                          </div>
+                            ))}
+                            
+                            {remaining > 0 && (
+                              <button
+                                onClick={() => toggleDayCollapse(day)}
+                                className="w-full flex items-center justify-center text-sm text-indigo-600 hover:text-indigo-800 py-2 hover:bg-indigo-50 rounded-lg transition-colors"
+                              >
+                                {isCollapsed ? <FaExpand className="mr-1" /> : <FaCompress className="mr-1" />}
+                                {isCollapsed ? `Xem thêm ${remaining} công việc` : `Thu gọn`}
+                              </button>
+                            )}
+                          </>
                         )}
-                      </>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Centered modal: progress + add new */}
+        {/* Floating Action Button */}
+        <button
+          onClick={() => setShowSidePanel(true)}
+          className="fixed right-6 bottom-6 z-30 w-14 h-14 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-full shadow-2xl hover:shadow-3xl hover:scale-110 transition-all duration-300 flex items-center justify-center group"
+        >
+          <FaPlus className="text-xl group-hover:rotate-90 transition-transform duration-300" />
+        </button>
+
+        {/* Enhanced Side Panel */}
         {showSidePanel && (
-          <div className="fixed inset-0 z-40">
-            <div className="absolute inset-0 bg-black/30" onClick={() => setShowSidePanel(false)}></div>
-            <div 
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[92%] sm:w-[560px] bg-white rounded-3xl shadow-2xl border border-gray-200 p-5"
-              style={{
-                animation: 'liquidExpand 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards'
-              }}
-            >
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <FaTachometerAlt className="text-terracotta" />
-                  <span className="font-bold text-ink text-lg">Bảng tổng hợp</span>
+          <div className="fixed inset-0 z-40 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowSidePanel(false)}></div>
+            <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-indigo-100 p-6 animate-slide-up">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500">
+                    <FaTachometerAlt className="text-white" />
+                  </div>
+                  <span className="font-bold text-gray-800 text-lg">Thêm công việc</span>
                 </div>
-                <button className="p-2 rounded-lg hover:bg-gray-100" onClick={() => setShowSidePanel(false)} aria-label="Đóng">
-                  <FaTimes />
+                <button 
+                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors" 
+                  onClick={() => setShowSidePanel(false)}
+                >
+                  <FaTimes className="text-gray-500" />
                 </button>
               </div>
-              <div className="mb-5">
-                <div className="flex items-center justify-between mb-2 text-sm text-ink/70">
-                  <span>Tiến độ hôm nay</span>
-                  <span>{completedTodos}/{totalTodos}</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                  <div className="bg-gradient-to-r from-terracotta to-brass h-3 rounded-full" style={{ width: `${totalTodos > 0 ? (completedTodos / totalTodos) * 100 : 0}%` }}></div>
-                </div>
-                <div className="mt-3 grid grid-cols-3 text-center">
-                  <div>
-                    <div className="text-xl font-bold text-terracotta">{completedTodos}</div>
-                    <div className="text-xs text-ink/70">Hoàn thành</div>
-                  </div>
-                  <div>
-                    <div className="text-xl font-bold text-brass">{totalTodos}</div>
-                    <div className="text-xs text-ink/70">Tổng</div>
-                  </div>
-                  <div>
-                    <div className="text-xl font-bold text-rose">{Math.round((completedTodos / totalTodos) * 100) || 0}%</div>
-                    <div className="text-xs text-ink/70">Tỉ lệ</div>
-                  </div>
-                </div>
-              </div>
-              <div className="mb-2">
-                <div className="font-bold text-ink mb-3 flex items-center gap-2">
-                  <FaPlusCircle className="text-terracotta" />
-                  Thêm công việc mới
-                </div>
-                <div className="space-y-3">
+              
+              <div className="space-y-4">
+                <input
+                  type="text"
+                  placeholder="Bạn muốn hoàn thành gì tuần này? ✨"
+                  value={newTodo}
+                  onChange={(e) => setNewTodo(e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-indigo-200 rounded-xl focus:ring-4 focus:ring-indigo-200 focus:border-indigo-500 transition-all"
+                  onKeyPress={(e) => e.key === 'Enter' && handleAddTodo()}
+                  autoFocus
+                />
+                <div className="flex gap-3">
+                  <select
+                    value={newPriority}
+                    onChange={(e) => setNewPriority(e.target.value)}
+                    className="flex-1 px-3 py-3 border-2 border-indigo-200 rounded-xl focus:ring-4 focus:ring-indigo-200 focus:border-indigo-500 transition-all"
+                  >
+                    <option value="low">🌱 Thấp</option>
+                    <option value="medium">⭐ Trung bình</option>
+                    <option value="high">🔥 Cao</option>
+                  </select>
                   <input
-                    type="text"
-                    placeholder="Bạn muốn hoàn thành gì? ✨"
-                    value={newTodo}
-                    onChange={(e) => setNewTodo(e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-terracotta/20 focus:border-terracotta"
-                    onKeyPress={(e) => e.key === 'Enter' && handleAddTodo()}
+                    type="date"
+                    value={newDueDate}
+                    onChange={(e) => setNewDueDate(e.target.value)}
+                    className="flex-1 px-3 py-3 border-2 border-indigo-200 rounded-xl focus:ring-4 focus:ring-indigo-200 focus:border-indigo-500 transition-all"
                   />
-                  <div className="flex gap-3">
-                    <select
-                      value={newPriority}
-                      onChange={(e) => setNewPriority(e.target.value)}
-                      className="flex-1 px-3 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-terracotta/20 focus:border-terracotta"
-                    >
-                      <option value="low">🌱 Ưu tiên thấp</option>
-                      <option value="medium">⭐ Trung bình</option>
-                      <option value="high">🔥 Ưu tiên cao</option>
-                    </select>
-                    <input
-                      type="date"
-                      value={newDueDate}
-                      onChange={(e) => setNewDueDate(e.target.value)}
-                      className="flex-1 px-3 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-terracotta/20 focus:border-terracotta"
-                    />
-                  </div>
-                  <button onClick={handleAddTodo} className="w-full py-3 bg-gradient-to-r from-terracotta to-brass text-white rounded-xl font-semibold hover:from-brass hover:to-terracotta">
-                    Thêm
-                  </button>
                 </div>
+                <button 
+                  onClick={handleAddTodo} 
+                  className="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl font-semibold hover:from-purple-500 hover:to-indigo-500 transition-all duration-300 shadow-lg hover:shadow-xl"
+                >
+                  Thêm công việc
+                </button>
               </div>
             </div>
           </div>
         )}
-        </div>
       </div>
     </div>
   );

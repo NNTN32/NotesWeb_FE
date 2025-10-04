@@ -6,9 +6,7 @@ import LoadingAnimation from "./components/LoadingAnimation";
 import Home from './pages/Home';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
-import NoteDetail from './pages/users/NoteDetail';
 import NoteForm from './pages/users/NoteForm';
-import Notes from './pages/users/Notes';
 import Todo from './pages/users/Todo';
 import WeeklyPlan from './pages/users/WeeklyPlan';
 import { AuthProvider } from "./context/AuthContext";
@@ -43,9 +41,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-                <Route path="/note/:id" element={<NoteDetail />} />
                 <Route path="/create" element={<NoteForm />} />
-                <Route path="/notes" element={<Notes />} />
                 <Route path="/todo" element={<Todo />} />
                 <Route path="/weekly-plan" element={<WeeklyPlan />} />
               </Routes>

@@ -26,7 +26,6 @@ import { AuthContext } from "../context/AuthContext";
 const navItems = [
   { to: "/", label: "Trang chủ", icon: <FaHome /> },
   { to: "/create", label: "Tạo ghi chú", icon: <FaPlusCircle /> },
-  { to: "/notes", label: "Ghi chú", icon: <FaBookOpen /> },
   { to: "/todo", label: "Todo", icon: <FaTasks /> },
   { to: "/weekly-plan", label: "Weekly Plan", icon: <FaCalendarAlt /> },
 ];

@@ -17,6 +17,7 @@ import {
   FaCheckCircle
 } from "react-icons/fa";
 import { toast } from 'react-toastify';
+import AuroraBackground from "../components/AuroraBackground";
 import { useInView } from '../utils/useInView';
 
 // Enhanced features data with warm, user-friendly design
@@ -455,7 +456,9 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <>
+      <AuroraBackground intensity={0.85} />
+      <div className="min-h-screen app-content-layer">
       {/* Hero Section */}
       <div ref={heroRef}>
         <HeroSection isVisible={animatedElements.hero} onGetStarted={handleGetStarted} />
@@ -480,6 +483,7 @@ export default function Home() {
       <div ref={footerRef}>
         <Footer isVisible={animatedElements.footer} />
       </div>
-    </div>
+      </div>
+    </>
   );
 }

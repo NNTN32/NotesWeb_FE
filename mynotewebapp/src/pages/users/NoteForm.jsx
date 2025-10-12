@@ -31,6 +31,50 @@ const FORM_CONFIG = {
   AUTO_SAVE_SUCCESS_DISPLAY_TIME: 1000 // 1 second
 };
 
+// Fullscreen layout constants for better maintainability
+const FULLSCREEN_CONFIG = {
+  SIDEBAR_WIDTH: {
+    DEFAULT: 'w-16',
+    SM: 'sm:w-18', 
+    LG: 'lg:w-20',
+    XL: 'xl:w-24'
+  },
+  CONTENT_PADDING: {
+    DEFAULT: 'p-1',
+    SM: 'sm:p-2',
+    MD: 'md:p-3',
+    LG: 'lg:p-4',
+    XL: 'xl:p-6'
+  },
+  TITLE_TEXT_SIZE: {
+    DEFAULT: 'text-lg',
+    SM: 'sm:text-xl',
+    MD: 'md:text-2xl',
+    LG: 'lg:text-3xl',
+    XL: 'xl:text-4xl'
+  },
+  CONTENT_TEXT_SIZE: {
+    DEFAULT: 'text-sm',
+    SM: 'sm:text-base',
+    MD: 'md:text-lg',
+    LG: 'lg:text-xl',
+    XL: 'xl:text-2xl'
+  }
+};
+
+// Background configuration for consistent appearance
+const BACKGROUND_CONFIG = {
+  // Use the same background for both fullscreen and normal mode
+  // This ensures visual consistency and maintains the grid pattern across all states
+  MAIN_BACKGROUND: 'min-h-screen bg-white transition-all duration-300 notes-bg'
+};
+
+// Helper functions for cleaner code
+const getFullscreenClasses = (baseClasses, fullscreenClasses) => (isFullscreen) => 
+  isFullscreen ? fullscreenClasses : baseClasses;
+
+const getResponsiveClasses = (config) => Object.values(config).join(' ');
+
 // Debug configuration
 const DEBUG_CONFIG = {
   ENABLE_LOGGING: process.env.NODE_ENV === 'development',
@@ -184,14 +228,55 @@ const FloatingElements = ({ deviceType }) => {
   );
 };
 
-// Collapsible sidebar component
-const CollapsibleSidebar = ({ isOpen, onToggle, deviceType }) => {
+// Collapsible sidebar component with fullscreen optimization
+const CollapsibleSidebar = ({ isOpen, onToggle, deviceType, isFullscreen }) => {
   const getDeviceIcon = () => {
     switch (deviceType) {
       case 'mobile': return <FaMobile className="text-sm" />;
       case 'tablet': return <FaTablet className="text-sm" />;
       default: return <FaDesktop className="text-sm" />;
     }
+  };
+
+  // Device Tips component with compact and full layouts
+  // This component adapts based on fullscreen mode for better space utilization
+  const DeviceTips = ({ isCompact = false }) => {
+    // Device-specific tips for better user experience
+    const tips = {
+      mobile: ['Tap to focus', 'Swipe to navigate', 'Voice input'],
+      tablet: ['Apple Pencil', 'Split screen', 'Pinch to zoom'],
+      desktop: ['Keyboard shortcuts', 'Drag & drop', 'Multi-window']
+    };
+
+    const currentTips = tips[deviceType] || tips.desktop;
+
+    // Compact version for fullscreen mode - uses pill-style badges
+    if (isCompact) {
+      return (
+        <div className="p-2 rounded-md bg-gradient-to-r from-rose/5 to-terracotta/5 border border-rose/10">
+          <h3 className="font-semibold text-ink text-xs mb-1">Tips</h3>
+          <div className="flex flex-wrap gap-1">
+            {currentTips.map((tip, index) => (
+              <span key={index} className="text-xs text-coffee/70 bg-white/50 px-2 py-1 rounded-full">
+                {tip}
+              </span>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // Full version for normal mode - uses traditional list layout
+    return (
+      <div className="p-4 rounded-lg bg-gradient-to-r from-rose/5 to-terracotta/5 border border-rose/10">
+        <h3 className="font-semibold text-ink text-sm mb-2">Device Tips</h3>
+        <ul className="text-xs text-coffee/80 space-y-1">
+          {currentTips.map((tip, index) => (
+            <li key={index}>• {tip}</li>
+          ))}
+        </ul>
+      </div>
+    );
   };
 
   return (
@@ -207,79 +292,90 @@ const CollapsibleSidebar = ({ isOpen, onToggle, deviceType }) => {
       {/* Sidebar */}
       <div className={`
         fixed lg:relative top-0 left-0 h-full bg-white/95 backdrop-blur-sm border-r border-rose/10 z-50 lg:z-auto
-        transform transition-transform duration-300 ease-in-out
+        transform transition-all duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-        w-64 sm:w-72 lg:w-80
+        ${isFullscreen ? getResponsiveClasses(FULLSCREEN_CONFIG.SIDEBAR_WIDTH) : 'w-64 sm:w-72 lg:w-80'}
       `}>
-        <div className="p-4 sm:p-6">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
+        <div className={`${isFullscreen ? 'p-2' : 'p-4 sm:p-6'}`}>
+          {isFullscreen ? (
+            /* Compact fullscreen layout */
+            <div className="flex flex-col items-center space-y-4">
+              {/* App icon only */}
               <div className="p-2 rounded-xl bg-gradient-to-br from-rose to-terracotta">
                 <FaRegStickyNote className="text-white text-lg" />
               </div>
-              <div>
-                <h2 className="font-bold text-ink text-lg">MyNoteApp</h2>
-                <p className="text-xs text-coffee/60">Writing Space</p>
+
+              {/* Device icon */}
+              <div className="p-2 rounded-lg bg-coffee/5">
+                {getDeviceIcon()}
+              </div>
+
+              {/* Quick action icons */}
+              <div className="flex flex-col space-y-2">
+                <button className="p-2 rounded-lg hover:bg-rose/10 transition-colors" title="New Note">
+                  <FaRegStickyNote className="text-terracotta" />
+                </button>
+                <button className="p-2 rounded-lg hover:bg-rose/10 transition-colors" title="Recent Notes">
+                  <FaClock className="text-brass" />
+                </button>
+                <button className="p-2 rounded-lg hover:bg-rose/10 transition-colors" title="Templates">
+                  <FaMagic className="text-rose" />
+                </button>
+              </div>
+
+              {/* Compact Device Tips */}
+              <div className="mt-auto">
+                <DeviceTips isCompact={true} />
               </div>
             </div>
-            <button
-              onClick={onToggle}
-              className="lg:hidden p-2 rounded-lg hover:bg-coffee/10 transition-colors"
-            >
-              <FaTimes className="text-coffee" />
-            </button>
-          </div>
+          ) : (
+            /* Regular layout */
+            <>
+              {/* Header */}
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-gradient-to-br from-rose to-terracotta">
+                    <FaRegStickyNote className="text-white text-lg" />
+                  </div>
+                  <div>
+                    <h2 className="font-bold text-ink text-lg">MyNoteApp</h2>
+                    <p className="text-xs text-coffee/60">Writing Space</p>
+                  </div>
+                </div>
+                <button
+                  onClick={onToggle}
+                  className="lg:hidden p-2 rounded-lg hover:bg-coffee/10 transition-colors"
+                >
+                  <FaTimes className="text-coffee" />
+                </button>
+              </div>
 
-          {/* Device indicator */}
-          <div className="flex items-center gap-2 mb-6 p-3 rounded-lg bg-coffee/5">
-            {getDeviceIcon()}
-            <span className="text-sm text-coffee/80 capitalize">{deviceType} Mode</span>
-          </div>
+              {/* Device indicator */}
+              <div className="flex items-center gap-2 mb-6 p-3 rounded-lg bg-coffee/5">
+                {getDeviceIcon()}
+                <span className="text-sm text-coffee/80 capitalize">{deviceType} Mode</span>
+              </div>
 
-          {/* Quick actions */}
-          <div className="space-y-2 mb-6">
-            <button className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-rose/10 transition-colors text-left">
-              <FaRegStickyNote className="text-terracotta" />
-              <span className="text-sm font-medium text-ink">New Note</span>
-            </button>
-            <button className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-rose/10 transition-colors text-left">
-              <FaClock className="text-brass" />
-              <span className="text-sm font-medium text-ink">Recent Notes</span>
-            </button>
-            <button className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-rose/10 transition-colors text-left">
-              <FaMagic className="text-rose" />
-              <span className="text-sm font-medium text-ink">Templates</span>
-            </button>
-          </div>
+              {/* Quick actions */}
+              <div className="space-y-2 mb-6">
+                <button className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-rose/10 transition-colors text-left">
+                  <FaRegStickyNote className="text-terracotta" />
+                  <span className="text-sm font-medium text-ink">New Note</span>
+                </button>
+                <button className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-rose/10 transition-colors text-left">
+                  <FaClock className="text-brass" />
+                  <span className="text-sm font-medium text-ink">Recent Notes</span>
+                </button>
+                <button className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-rose/10 transition-colors text-left">
+                  <FaMagic className="text-rose" />
+                  <span className="text-sm font-medium text-ink">Templates</span>
+                </button>
+              </div>
 
-          {/* Tips for current device */}
-          <div className="p-4 rounded-lg bg-gradient-to-r from-rose/5 to-terracotta/5 border border-rose/10">
-            <h3 className="font-semibold text-ink text-sm mb-2">Device Tips</h3>
-            <ul className="text-xs text-coffee/80 space-y-1">
-              {deviceType === 'mobile' && (
-                <>
-                  <li>• Tap to focus on writing</li>
-                  <li>• Swipe to navigate</li>
-                  <li>• Use voice input</li>
-                </>
-              )}
-              {deviceType === 'tablet' && (
-                <>
-                  <li>• Perfect for Apple Pencil</li>
-                  <li>• Use split screen</li>
-                  <li>• Pinch to zoom</li>
-                </>
-              )}
-              {deviceType === 'desktop' && (
-                <>
-                  <li>• Use keyboard shortcuts</li>
-                  <li>• Drag & drop files</li>
-                  <li>• Multi-window support</li>
-                </>
-              )}
-            </ul>
-          </div>
+              {/* Device Tips */}
+              <DeviceTips />
+            </>
+          )}
         </div>
       </div>
     </>
@@ -399,9 +495,9 @@ const ModernHeader = ({
   </div>
 );
 
-// Modern title input with floating label
+// Modern title input with floating label - optimized for fullscreen
 const ModernTitleInput = ({ title, onTitleChange, titleRef, isFullscreen, deviceType }) => (
-  <div className="relative mb-6 sm:mb-8">
+  <div className={`relative ${isFullscreen ? 'mb-4' : 'mb-6 sm:mb-8'}`}>
     <div className="relative">
       <input
         ref={titleRef}
@@ -411,7 +507,7 @@ const ModernTitleInput = ({ title, onTitleChange, titleRef, isFullscreen, device
           w-full bg-transparent border-0 border-b-2 border-coffee/20 
           focus:border-terracotta focus:outline-none transition-all duration-300
           text-ink font-medium touch-manipulation
-          ${isFullscreen ? 'text-2xl sm:text-3xl lg:text-4xl py-4' : 
+          ${isFullscreen ? `${getResponsiveClasses(FULLSCREEN_CONFIG.TITLE_TEXT_SIZE)} py-2 sm:py-3` : 
             deviceType === 'mobile' ? 'text-lg py-3' :
             'text-xl sm:text-2xl lg:text-3xl py-3 sm:py-4'}
         `}
@@ -422,7 +518,7 @@ const ModernTitleInput = ({ title, onTitleChange, titleRef, isFullscreen, device
       <label className={`
         absolute left-0 transition-all duration-300 pointer-events-none
         ${title ? 'top-0 text-xs text-coffee/60' : 
-          isFullscreen ? 'top-4 text-lg text-coffee/40' :
+          isFullscreen ? 'top-3 text-sm text-coffee/40' :
           'top-3 sm:top-4 text-sm sm:text-base text-coffee/40'}
       `}>
         <FaLightbulb className="inline mr-2 text-brass" />
@@ -435,7 +531,7 @@ const ModernTitleInput = ({ title, onTitleChange, titleRef, isFullscreen, device
   </div>
 );
 
-// Modern content area - clean and distraction-free
+// Modern content area - optimized for fullscreen writing
 const ModernContentArea = ({ content, onContentChange, contentRef, isFullscreen, deviceType }) => {
   const characterCount = content.length;
   const isNearLimit = characterCount > FORM_CONFIG.MAX_CONTENT_LENGTH * FORM_CONFIG.CONTENT_WARNING_THRESHOLD;
@@ -453,7 +549,7 @@ const ModernContentArea = ({ content, onContentChange, contentRef, isFullscreen,
             w-full h-full bg-transparent border-0 resize-none
             focus:outline-none text-ink leading-relaxed touch-manipulation
             ${isFullscreen ? 
-              'text-lg sm:text-xl lg:text-2xl p-4 sm:p-6 lg:p-8' :
+              `${getResponsiveClasses(FULLSCREEN_CONFIG.CONTENT_TEXT_SIZE)} ${getResponsiveClasses(FULLSCREEN_CONFIG.CONTENT_PADDING)}` :
               deviceType === 'mobile' ? 
                 'text-base p-4 min-h-[300px]' :
                 'text-base sm:text-lg lg:text-xl p-4 sm:p-6 lg:p-8 min-h-[400px] sm:min-h-[500px] lg:min-h-[600px]'
@@ -464,9 +560,13 @@ const ModernContentArea = ({ content, onContentChange, contentRef, isFullscreen,
           maxLength={FORM_CONFIG.MAX_CONTENT_LENGTH}
         />
         
-        {/* Character count - floating */}
+        {/* Character count - optimized for fullscreen */}
         <div className={`
-          absolute bottom-4 right-4 px-2 py-1 rounded-full text-xs transition-all duration-300
+          absolute transition-all duration-300 text-xs
+          ${isFullscreen ? 
+            'bottom-2 right-2 px-2 py-1 rounded-full' :
+            'bottom-4 right-4 px-2 py-1 rounded-full'
+          }
           ${isNearLimit ? 'bg-red-100 text-red-600' : 'bg-coffee/10 text-coffee/60'}
         `}>
           {characterCount}/{FORM_CONFIG.MAX_CONTENT_LENGTH}
@@ -843,10 +943,7 @@ function NoteFormComponent() {
   }, [isFormValid, isFormDisabled, isLoading, hasUnsavedChanges, title.length, content.length]);
 
   return (
-    <div className={`
-      min-h-screen bg-white transition-all duration-300
-      ${isFullscreen ? 'bg-gradient-to-br from-rose/5 to-terracotta/5' : 'notes-bg'}
-    `}>
+    <div className={BACKGROUND_CONFIG.MAIN_BACKGROUND}>
       <FloatingElements deviceType={deviceType} />
       
       {/* Main layout container */}
@@ -856,6 +953,7 @@ function NoteFormComponent() {
           isOpen={sidebarOpen} 
           onToggle={handleToggleSidebar}
           deviceType={deviceType}
+          isFullscreen={isFullscreen}
         />
         
         {/* Main content area */}
@@ -884,8 +982,8 @@ function NoteFormComponent() {
             >
               {/* Content container */}
               <div className={`
-                flex-1 flex flex-col p-4 sm:p-6 lg:p-8 xl:p-12
-                ${isFullscreen ? 'max-w-none' : 'max-w-4xl mx-auto w-full'}
+                flex-1 flex flex-col transition-all duration-300
+                ${isFullscreen ? `${getResponsiveClasses(FULLSCREEN_CONFIG.CONTENT_PADDING)} max-w-none w-full` : 'p-4 sm:p-6 lg:p-8 xl:p-12 max-w-4xl mx-auto w-full'}
               `}>
                 {/* Title input */}
                 <ModernTitleInput

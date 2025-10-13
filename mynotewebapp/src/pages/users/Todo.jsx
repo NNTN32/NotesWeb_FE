@@ -3,20 +3,11 @@ import {
   FaPlus, 
   FaCheckCircle, 
   FaTrash, 
-  FaEdit, 
-  FaSun, 
-  FaMoon, 
   FaRegClock,
   FaChevronDown,
   FaChevronUp,
   FaTasks,
-  FaCalendarAlt,
-  FaStar,
-  FaRocket,
-  FaLightbulb,
-  FaArrowRight,
-  FaPlay,
-  FaHeart
+  FaStar
 } from "react-icons/fa";
 import { useInView } from '../../utils/useInView';
 
@@ -52,7 +43,225 @@ const timeSlotColors = {
   "Đêm (21h-24h)": "from-ink/10 to-rose/10 border-ink/20"
 };
 
-// Enhanced TodoList component with animations and collapsible sections
+// Component cho Current Time Slot
+function CurrentTimeSlot({ currentTimeSlot, animatedElements }) {
+  return (
+    <div className={`bg-gradient-to-r from-ink via-coffee to-terracotta text-white rounded-3xl p-6 text-center relative overflow-hidden transition-all duration-1000 ease-out ${
+      animatedElements ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+    }`}>
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute top-4 left-4 w-8 h-8 bg-white rounded-full animate-pulse"></div>
+        <div className="absolute bottom-4 right-4 w-6 h-6 bg-white rounded-full animate-bounce"></div>
+      </div>
+      <div className="relative flex items-center justify-center gap-3">
+        <FaRegClock className="text-2xl" />
+        <span className="text-xl font-semibold">Khung giờ hiện tại: {currentTimeSlot}</span>
+        <div className="w-3 h-3 bg-rose rounded-full animate-ping"></div>
+      </div>
+    </div>
+  );
+}
+
+// Component cho Add Todo Form
+function AddTodoForm({ 
+  showAddForm, 
+  setShowAddForm, 
+  newTodo, 
+  setNewTodo, 
+  newPriority, 
+  setNewPriority, 
+  newTimeSlot, 
+  setNewTimeSlot, 
+  handleAddTodo, 
+  timeSlots, 
+  animatedElements 
+}) {
+  return (
+    <div className={`transition-all duration-700 ease-out ${
+      animatedElements ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+    }`}>
+      <div className="text-center">
+        <button
+          onClick={() => setShowAddForm(!showAddForm)}
+          className="group bg-gradient-to-r from-terracotta to-brass text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-2xl hover:scale-105 transition-all duration-300 ease-out flex items-center gap-2 mx-auto"
+        >
+          <FaPlus className="group-hover:rotate-90 transition-transform duration-300" />
+          {showAddForm ? 'Đóng form' : 'Thêm công việc mới'}
+        </button>
+      </div>
+
+      {showAddForm && (
+        <div className="mt-6 bg-white rounded-3xl shadow-xl border border-rose/10 p-6">
+          <div className="space-y-4">
+            <input
+              type="text"
+              placeholder="Bạn muốn làm gì hôm nay? ✨"
+              value={newTodo}
+              onChange={(e) => setNewTodo(e.target.value)}
+              className="w-full px-6 py-4 border-2 border-rose/20 rounded-2xl focus:ring-4 focus:ring-rose/20 focus:border-rose text-lg transition-all bg-gradient-to-r from-rose/5 to-terracotta/5"
+              onKeyPress={(e) => e.key === 'Enter' && handleAddTodo()}
+              autoFocus
+            />
+            <div className="flex gap-4">
+              <select
+                value={newPriority}
+                onChange={(e) => setNewPriority(e.target.value)}
+                className="flex-1 px-4 py-3 border-2 border-rose/20 rounded-2xl focus:ring-4 focus:ring-rose/20 focus:border-rose transition-all bg-gradient-to-r from-rose/5 to-terracotta/5"
+              >
+                <option value="low">🌱 Thấp</option>
+                <option value="medium">⭐ Trung bình</option>
+                <option value="high">🔥 Cao</option>
+              </select>
+              <select
+                value={newTimeSlot}
+                onChange={(e) => setNewTimeSlot(e.target.value)}
+                className="flex-1 px-4 py-3 border-2 border-rose/20 rounded-2xl focus:ring-4 focus:ring-rose/20 focus:border-rose transition-all bg-gradient-to-r from-rose/5 to-terracotta/5"
+              >
+                {timeSlots.map(slot => (
+                  <option key={slot} value={slot}>{slot}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={handleAddTodo}
+                className="flex-1 bg-gradient-to-r from-terracotta to-brass text-white py-3 rounded-2xl hover:shadow-xl transition-all font-semibold"
+              >
+                Thêm công việc
+              </button>
+              <button
+                onClick={() => setShowAddForm(false)}
+                className="px-6 py-3 border-2 border-rose/20 text-coffee rounded-2xl hover:border-rose hover:bg-rose/5 transition-all"
+              >
+                Hủy
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Component cho Todo List theo Time Slots
+function TodoTimeSlots({ 
+  timeSlots, 
+  filteredTodosBySlot, 
+  currentTimeSlot, 
+  collapsedSections, 
+  toggleSection, 
+  viewCompact, 
+  handleToggleTodo, 
+  handleDeleteTodo, 
+  setSelectedTodo, 
+  priorityColors, 
+  priorityLabels, 
+  animatedElements 
+}) {
+  return (
+    <div className={`space-y-6 transition-all duration-700 ease-out ${
+      animatedElements ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+    }`}>
+      {timeSlots.map((timeSlot, index) => {
+        const slotTodos = (filteredTodosBySlot && filteredTodosBySlot[timeSlot]) ? filteredTodosBySlot[timeSlot] : [];
+        const isCurrentSlot = timeSlot === currentTimeSlot;
+        const isCollapsed = collapsedSections[timeSlot];
+        
+        if (slotTodos.length === 0) return null;
+        
+        return (
+          <div 
+            key={timeSlot}
+            className={`bg-white rounded-3xl shadow-xl border-2 overflow-hidden transition-all duration-300 hover:shadow-2xl ${
+              isCurrentSlot ? 'border-rose/30 bg-gradient-to-br from-rose/5 to-terracotta/5' : 'border-rose/10'
+            }`}
+            style={{ animationDelay: `${index * 60}ms` }}
+          >
+            <button
+              onClick={() => toggleSection(timeSlot)}
+              className="w-full p-6 flex items-center justify-between hover:bg-rose/5 transition-colors duration-200"
+            >
+              <div className="flex items-center gap-4">
+                {isCurrentSlot && <div className="w-3 h-3 bg-rose rounded-full animate-ping"></div>}
+                <h3 className={`text-xl font-bold ${
+                  isCurrentSlot ? 'text-rose' : 'text-ink'
+                }`}>
+                  {timeSlot}
+                </h3>
+                {isCurrentSlot && (
+                  <span className="text-sm bg-rose text-white px-3 py-1 rounded-full">
+                    Hiện tại
+                  </span>
+                )}
+                <span className="text-sm bg-gradient-to-r from-rose/10 to-terracotta/10 text-coffee px-3 py-1 rounded-full border border-rose/20">
+                  {slotTodos.length} công việc
+                </span>
+              </div>
+              {isCollapsed ? <FaChevronDown className="text-rose" /> : <FaChevronUp className="text-rose" />}
+            </button>
+            
+            {!isCollapsed && (
+              <div className={`px-6 pb-6 space-y-3`}>
+                {slotTodos.map((todo) => (
+                  <div 
+                    key={todo.id} 
+                    className={`cursor-pointer ${viewCompact ? 'p-3' : 'p-4'} rounded-2xl border-2 transition-all duration-200 hover:shadow-lg ${
+                      todo.completed 
+                        ? 'bg-gradient-to-r from-brass/10 to-coffee/10 border-brass/20' 
+                        : 'bg-gradient-to-r from-rose/5 to-terracotta/5 border-rose/20 hover:border-rose/30'
+                    }`}
+                    onClick={() => setSelectedTodo(todo)}
+                  >
+                    <div className="flex items-start gap-3">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleToggleTodo(todo.id); }}
+                        className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all mt-1 flex-shrink-0 ${
+                          todo.completed 
+                            ? 'bg-brass border-brass text-white' 
+                            : 'border-rose/30 hover:border-rose hover:bg-rose/10'
+                        }`}
+                      >
+                        {todo.completed && <FaCheckCircle className="text-sm" />}
+                      </button>
+                      
+                      <div className="flex-1 min-w-0">
+                        <span className={`font-medium ${viewCompact ? 'text-base' : 'text-lg'} leading-relaxed ${
+                          todo.completed 
+                            ? 'line-through text-coffee/60' 
+                            : 'text-ink'
+                        }`}>
+                          {todo.text}
+                        </span>
+                        
+                        <div className={`flex items-center gap-2 mt-2 ${viewCompact ? 'text-[10px]' : ''}`}>
+                          <span className={`text-xs px-3 py-1 rounded-full ${priorityColors[todo.priority]}`}>
+                            {priorityLabels[todo.priority]}
+                          </span>
+                          {!viewCompact && (
+                            <span className="text-xs text-coffee/60">{new Date(todo.createdAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</span>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); handleDeleteTodo(todo.id); }}
+                        className="p-2 text-coffee/40 hover:text-rose hover:bg-rose/10 rounded-lg transition-all flex-shrink-0"
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// Component chính TodoList
 function TodoList() {
   const [todos, setTodos] = useState([
     { 
@@ -279,6 +488,7 @@ function TodoList() {
         }`}>
           {/* Left list and controls */}
           <div className="lg:col-span-7 space-y-6">
+            {/* Search and Filter Controls */}
             <div className="bg-white rounded-3xl shadow-xl border border-rose/10 p-4">
               <div className="flex flex-col md:flex-row gap-3 md:items-center">
                 <div className="flex-1 flex items-center gap-3">
@@ -313,184 +523,42 @@ function TodoList() {
               </div>
             </div>
 
-            {/* Current Time Slot Highlight */}
-            <div className={`bg-gradient-to-r from-ink via-coffee to-terracotta text-white rounded-3xl p-6 text-center relative overflow-hidden`}>
-              <div className="absolute inset-0 opacity-10">
-                <div className="absolute top-4 left-4 w-8 h-8 bg-white rounded-full animate-pulse"></div>
-                <div className="absolute bottom-4 right-4 w-6 h-6 bg-white rounded-full animate-bounce"></div>
-              </div>
-              <div className="relative flex items-center justify-center gap-3">
-                <FaRegClock className="text-2xl" />
-                <span className="text-xl font-semibold">Khung giờ hiện tại: {currentTimeSlot}</span>
-                <div className="w-3 h-3 bg-rose rounded-full animate-ping"></div>
-              </div>
-            </div>
+            {/* Current Time Slot */}
+            <CurrentTimeSlot 
+              currentTimeSlot={currentTimeSlot} 
+              animatedElements={animatedElements.summary}
+            />
 
-            {/* Add Todo Section */}
-            <div ref={addFormRef} className={`transition-all duration-700 ease-out ${
-              animatedElements.addForm ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-            }`}>
-              <div className="text-center">
-                <button
-                  onClick={() => setShowAddForm(!showAddForm)}
-                  className="group bg-gradient-to-r from-terracotta to-brass text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-2xl hover:scale-105 transition-all duration-300 ease-out flex items-center gap-2 mx-auto"
-                >
-                  <FaPlus className="group-hover:rotate-90 transition-transform duration-300" />
-                  {showAddForm ? 'Đóng form' : 'Thêm công việc mới'}
-                </button>
-              </div>
-
-              {showAddForm && (
-                <div className="mt-6 bg-white rounded-3xl shadow-xl border border-rose/10 p-6">
-                  <div className="space-y-4">
-                    <input
-                      type="text"
-                      placeholder="Bạn muốn làm gì hôm nay? ✨"
-                      value={newTodo}
-                      onChange={(e) => setNewTodo(e.target.value)}
-                      className="w-full px-6 py-4 border-2 border-rose/20 rounded-2xl focus:ring-4 focus:ring-rose/20 focus:border-rose text-lg transition-all bg-gradient-to-r from-rose/5 to-terracotta/5"
-                      onKeyPress={(e) => e.key === 'Enter' && handleAddTodo()}
-                      autoFocus
-                    />
-                    <div className="flex gap-4">
-                      <select
-                        value={newPriority}
-                        onChange={(e) => setNewPriority(e.target.value)}
-                        className="flex-1 px-4 py-3 border-2 border-rose/20 rounded-2xl focus:ring-4 focus:ring-rose/20 focus:border-rose transition-all bg-gradient-to-r from-rose/5 to-terracotta/5"
-                      >
-                        <option value="low">🌱 Thấp</option>
-                        <option value="medium">⭐ Trung bình</option>
-                        <option value="high">🔥 Cao</option>
-                      </select>
-                      <select
-                        value={newTimeSlot}
-                        onChange={(e) => setNewTimeSlot(e.target.value)}
-                        className="flex-1 px-4 py-3 border-2 border-rose/20 rounded-2xl focus:ring-4 focus:ring-rose/20 focus:border-rose transition-all bg-gradient-to-r from-rose/5 to-terracotta/5"
-                      >
-                        {timeSlots.map(slot => (
-                          <option key={slot} value={slot}>{slot}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="flex gap-3">
-                      <button
-                        onClick={handleAddTodo}
-                        className="flex-1 bg-gradient-to-r from-terracotta to-brass text-white py-3 rounded-2xl hover:shadow-xl transition-all font-semibold"
-                      >
-                        Thêm công việc
-                      </button>
-                      <button
-                        onClick={() => setShowAddForm(false)}
-                        className="px-6 py-3 border-2 border-rose/20 text-coffee rounded-2xl hover:border-rose hover:bg-rose/5 transition-all"
-                      >
-                        Hủy
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+            {/* Add Todo Form */}
+            <AddTodoForm
+              showAddForm={showAddForm}
+              setShowAddForm={setShowAddForm}
+              newTodo={newTodo}
+              setNewTodo={setNewTodo}
+              newPriority={newPriority}
+              setNewPriority={setNewPriority}
+              newTimeSlot={newTimeSlot}
+              setNewTimeSlot={setNewTimeSlot}
+              handleAddTodo={handleAddTodo}
+              timeSlots={timeSlots}
+              animatedElements={animatedElements.addForm}
+            />
 
             {/* Todo List by Time Slots */}
-            <div ref={timeSlotsRef} className={`space-y-6 transition-all duration-700 ease-out ${
-              animatedElements.timeSlots ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-            }`}>
-              {timeSlots.map((timeSlot, index) => {
-                const slotTodos = (filteredTodosBySlot && filteredTodosBySlot[timeSlot]) ? filteredTodosBySlot[timeSlot] : [];
-                const isCurrentSlot = timeSlot === currentTimeSlot;
-                const isCollapsed = collapsedSections[timeSlot];
-                
-                if (slotTodos.length === 0) return null;
-                
-                return (
-                  <div 
-                    key={timeSlot}
-                    className={`bg-white rounded-3xl shadow-xl border-2 overflow-hidden transition-all duration-300 hover:shadow-2xl ${
-                      isCurrentSlot ? 'border-rose/30 bg-gradient-to-br from-rose/5 to-terracotta/5' : 'border-rose/10'
-                    }`}
-                    style={{ animationDelay: `${index * 60}ms` }}
-                  >
-                    <button
-                      onClick={() => toggleSection(timeSlot)}
-                      className="w-full p-6 flex items-center justify-between hover:bg-rose/5 transition-colors duration-200"
-                    >
-                      <div className="flex items-center gap-4">
-                        {isCurrentSlot && <div className="w-3 h-3 bg-rose rounded-full animate-ping"></div>}
-                        <h3 className={`text-xl font-bold ${
-                          isCurrentSlot ? 'text-rose' : 'text-ink'
-                        }`}>
-                          {timeSlot}
-                        </h3>
-                        {isCurrentSlot && (
-                          <span className="text-sm bg-rose text-white px-3 py-1 rounded-full">
-                            Hiện tại
-                          </span>
-                        )}
-                        <span className="text-sm bg-gradient-to-r from-rose/10 to-terracotta/10 text-coffee px-3 py-1 rounded-full border border-rose/20">
-                          {slotTodos.length} công việc
-                        </span>
-                      </div>
-                      {isCollapsed ? <FaChevronDown className="text-rose" /> : <FaChevronUp className="text-rose" />}
-                    </button>
-                    
-                    {!isCollapsed && (
-                      <div className={`px-6 pb-6 space-y-3`}>
-                        {slotTodos.map((todo) => (
-                          <div 
-                            key={todo.id} 
-                            className={`cursor-pointer ${viewCompact ? 'p-3' : 'p-4'} rounded-2xl border-2 transition-all duration-200 hover:shadow-lg ${
-                              todo.completed 
-                                ? 'bg-gradient-to-r from-brass/10 to-coffee/10 border-brass/20' 
-                                : 'bg-gradient-to-r from-rose/5 to-terracotta/5 border-rose/20 hover:border-rose/30'
-                            }`}
-                            onClick={() => setSelectedTodo(todo)}
-                          >
-                            <div className="flex items-start gap-3">
-                              <button
-                                onClick={(e) => { e.stopPropagation(); handleToggleTodo(todo.id); }}
-                                className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all mt-1 flex-shrink-0 ${
-                                  todo.completed 
-                                    ? 'bg-brass border-brass text-white' 
-                                    : 'border-rose/30 hover:border-rose hover:bg-rose/10'
-                                }`}
-                              >
-                                {todo.completed && <FaCheckCircle className="text-sm" />}
-                              </button>
-                              
-                              <div className="flex-1 min-w-0">
-                                <span className={`font-medium ${viewCompact ? 'text-base' : 'text-lg'} leading-relaxed ${
-                                  todo.completed 
-                                    ? 'line-through text-coffee/60' 
-                                    : 'text-ink'
-                                }`}>
-                                  {todo.text}
-                                </span>
-                                
-                                <div className={`flex items-center gap-2 mt-2 ${viewCompact ? 'text-[10px]' : ''}`}>
-                                  <span className={`text-xs px-3 py-1 rounded-full ${priorityColors[todo.priority]}`}>
-                                    {priorityLabels[todo.priority]}
-                                  </span>
-                                  {!viewCompact && (
-                                    <span className="text-xs text-coffee/60">{new Date(todo.createdAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</span>
-                                  )}
-                                </div>
-                              </div>
-                              
-                              <button 
-                                onClick={(e) => { e.stopPropagation(); handleDeleteTodo(todo.id); }}
-                                className="p-2 text-coffee/40 hover:text-rose hover:bg-rose/10 rounded-lg transition-all flex-shrink-0"
-                              >
-                                <FaTrash />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+            <TodoTimeSlots
+              timeSlots={timeSlots}
+              filteredTodosBySlot={filteredTodosBySlot}
+              currentTimeSlot={currentTimeSlot}
+              collapsedSections={collapsedSections}
+              toggleSection={toggleSection}
+              viewCompact={viewCompact}
+              handleToggleTodo={handleToggleTodo}
+              handleDeleteTodo={handleDeleteTodo}
+              setSelectedTodo={setSelectedTodo}
+              priorityColors={priorityColors}
+              priorityLabels={priorityLabels}
+              animatedElements={animatedElements.timeSlots}
+            />
           </div>
 
           {/* Right focus & summary */}
@@ -548,6 +616,7 @@ function TodoList() {
               </div>
             </div>
 
+            {/* Focus Section */}
             <div className="bg-white rounded-3xl shadow-xl border border-rose/10 p-6">
               <h3 className="text-xl font-bold text-ink mb-4">Trọng tâm hôm nay</h3>
               {!selectedTodo ? (
@@ -617,183 +686,6 @@ function TodoList() {
               )}
             </div>
           </div>
-        </div>
-
-        {/* Current Time Slot Highlight */}
-        <div className={`bg-gradient-to-r from-ink via-coffee to-terracotta text-white rounded-3xl p-6 text-center relative overflow-hidden transition-all duration-1000 ease-out ${
-          animatedElements.summary ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-        }`} style={{ transitionDelay: '200ms' }}>
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-4 left-4 w-8 h-8 bg-white rounded-full animate-pulse"></div>
-            <div className="absolute bottom-4 right-4 w-6 h-6 bg-white rounded-full animate-bounce"></div>
-          </div>
-          <div className="relative flex items-center justify-center gap-3">
-            <FaRegClock className="text-2xl" />
-            <span className="text-xl font-semibold">Khung giờ hiện tại: {currentTimeSlot}</span>
-            <div className="w-3 h-3 bg-rose rounded-full animate-ping"></div>
-          </div>
-        </div>
-
-        {/* Add Todo Section */}
-        <div ref={addFormRef} className={`transition-all duration-1000 ease-out ${
-          animatedElements.addForm ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-        }`} style={{ transitionDelay: '400ms' }}>
-          <div className="text-center">
-            <button
-              onClick={() => setShowAddForm(!showAddForm)}
-              className="group bg-gradient-to-r from-terracotta to-brass text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-2xl hover:scale-105 transition-all duration-500 ease-out flex items-center gap-2 mx-auto"
-            >
-              <FaPlus className="group-hover:rotate-90 transition-transform duration-300" />
-              {showAddForm ? 'Đóng form' : 'Thêm công việc mới'}
-            </button>
-          </div>
-
-          {showAddForm && (
-            <div className="mt-6 bg-white rounded-3xl shadow-xl border border-rose/10 p-6 animate-slide-down">
-              <div className="space-y-4">
-                <input
-                  type="text"
-                  placeholder="Bạn muốn làm gì hôm nay? ✨"
-                  value={newTodo}
-                  onChange={(e) => setNewTodo(e.target.value)}
-                  className="w-full px-6 py-4 border-2 border-rose/20 rounded-2xl focus:ring-4 focus:ring-rose/20 focus:border-rose text-lg transition-all bg-gradient-to-r from-rose/5 to-terracotta/5"
-                  onKeyPress={(e) => e.key === 'Enter' && handleAddTodo()}
-                  autoFocus
-                />
-                <div className="flex gap-4">
-                  <select
-                    value={newPriority}
-                    onChange={(e) => setNewPriority(e.target.value)}
-                    className="flex-1 px-4 py-3 border-2 border-rose/20 rounded-2xl focus:ring-4 focus:ring-rose/20 focus:border-rose transition-all bg-gradient-to-r from-rose/5 to-terracotta/5"
-                  >
-                    <option value="low">🌱 Thấp</option>
-                    <option value="medium">⭐ Trung bình</option>
-                    <option value="high">🔥 Cao</option>
-                  </select>
-                  <select
-                    value={newTimeSlot}
-                    onChange={(e) => setNewTimeSlot(e.target.value)}
-                    className="flex-1 px-4 py-3 border-2 border-rose/20 rounded-2xl focus:ring-4 focus:ring-rose/20 focus:border-rose transition-all bg-gradient-to-r from-rose/5 to-terracotta/5"
-                  >
-                    {timeSlots.map(slot => (
-                      <option key={slot} value={slot}>{slot}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="flex gap-3">
-                  <button
-                    onClick={handleAddTodo}
-                    className="flex-1 bg-gradient-to-r from-terracotta to-brass text-white py-3 rounded-2xl hover:shadow-xl transition-all font-semibold"
-                  >
-                    Thêm công việc
-                  </button>
-                  <button
-                    onClick={() => setShowAddForm(false)}
-                    className="px-6 py-3 border-2 border-rose/20 text-coffee rounded-2xl hover:border-rose hover:bg-rose/5 transition-all"
-                  >
-                    Hủy
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Todo List by Time Slots */}
-        <div ref={timeSlotsRef} className={`space-y-6 transition-all duration-1000 ease-out ${
-          animatedElements.timeSlots ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-        }`} style={{ transitionDelay: '600ms' }}>
-          {timeSlots.map((timeSlot, index) => {
-            const slotTodos = todos.filter(todo => todo.timeSlot === timeSlot);
-            const isCurrentSlot = timeSlot === currentTimeSlot;
-            const isCollapsed = collapsedSections[timeSlot];
-            
-            if (slotTodos.length === 0) return null;
-            
-            return (
-              <div 
-                key={timeSlot}
-                className={`bg-white rounded-3xl shadow-xl border-2 overflow-hidden transition-all duration-500 hover:shadow-2xl ${
-                  isCurrentSlot ? 'border-rose/30 bg-gradient-to-br from-rose/5 to-terracotta/5' : 'border-rose/10'
-                }`}
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <button
-                  onClick={() => toggleSection(timeSlot)}
-                  className="w-full p-6 flex items-center justify-between hover:bg-rose/5 transition-colors duration-300"
-                >
-                  <div className="flex items-center gap-4">
-                    {isCurrentSlot && <div className="w-3 h-3 bg-rose rounded-full animate-ping"></div>}
-                    <h3 className={`text-xl font-bold ${
-                      isCurrentSlot ? 'text-rose' : 'text-ink'
-                    }`}>
-                      {timeSlot}
-                    </h3>
-                    {isCurrentSlot && (
-                      <span className="text-sm bg-rose text-white px-3 py-1 rounded-full">
-                        Hiện tại
-                      </span>
-                    )}
-                    <span className="text-sm bg-gradient-to-r from-rose/10 to-terracotta/10 text-coffee px-3 py-1 rounded-full border border-rose/20">
-                      {slotTodos.length} công việc
-                    </span>
-                  </div>
-                  {isCollapsed ? <FaChevronDown className="text-rose" /> : <FaChevronUp className="text-rose" />}
-                </button>
-                
-                {!isCollapsed && (
-                  <div className="px-6 pb-6 space-y-3 animate-slide-down">
-                    {slotTodos.map((todo) => (
-                      <div 
-                        key={todo.id} 
-                        className={`p-4 rounded-2xl border-2 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 ${
-                          todo.completed 
-                            ? 'bg-gradient-to-r from-brass/10 to-coffee/10 border-brass/20' 
-                            : 'bg-gradient-to-r from-rose/5 to-terracotta/5 border-rose/20 hover:border-rose/30'
-                        }`}
-                      >
-                        <div className="flex items-start gap-3">
-                          <button
-                            onClick={() => handleToggleTodo(todo.id)}
-                            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all mt-1 flex-shrink-0 ${
-                              todo.completed 
-                                ? 'bg-brass border-brass text-white' 
-                                : 'border-rose/30 hover:border-rose hover:bg-rose/10'
-                            }`}
-                          >
-                            {todo.completed && <FaCheckCircle className="text-sm" />}
-                          </button>
-                          
-                          <div className="flex-1 min-w-0">
-                            <span className={`font-medium text-lg leading-relaxed ${
-                              todo.completed 
-                                ? 'line-through text-coffee/60' 
-                                : 'text-ink'
-                            }`}>
-                              {todo.text}
-                            </span>
-                            
-                            <div className="flex items-center gap-2 mt-2">
-                              <span className={`text-xs px-3 py-1 rounded-full ${priorityColors[todo.priority]}`}>
-                                {priorityLabels[todo.priority]}
-                              </span>
-                            </div>
-                          </div>
-                          
-                          <button 
-                            onClick={() => handleDeleteTodo(todo.id)}
-                            className="p-2 text-coffee/40 hover:text-rose hover:bg-rose/10 rounded-lg transition-all flex-shrink-0"
-                          >
-                            <FaTrash />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })}
         </div>
 
         {/* Empty State */}

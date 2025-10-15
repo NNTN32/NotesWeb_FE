@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { 
   FaPlus, 
   FaCheckCircle, 
@@ -7,262 +7,409 @@ import {
   FaChevronDown,
   FaChevronUp,
   FaTasks,
-  FaStar
+  FaStar,
+  FaEdit,
+  FaEye,
+  FaEyeSlash,
+  FaFilter
 } from "react-icons/fa";
 import { useInView } from '../../utils/useInView';
 
-// Enhanced priority system with warm colors matching Home page
-const priorityColors = {
-  high: "bg-gradient-to-r from-red-500 to-rose-500 text-white",
-  medium: "bg-gradient-to-r from-amber-500 to-brass-500 text-white", 
-  low: "bg-gradient-to-r from-green-500 to-emerald-500 text-white"
+// Constants for better maintainability
+const PRIORITY_CONFIG = {
+  high: { 
+    color: "bg-gradient-to-r from-red-500 to-rose-500 text-white",
+    label: "🔥 Cao",
+    order: 0
+  },
+  medium: { 
+    color: "bg-gradient-to-r from-amber-500 to-brass-500 text-white",
+    label: "⭐ TB",
+    order: 1
+  },
+  low: { 
+    color: "bg-gradient-to-r from-green-500 to-emerald-500 text-white",
+    label: "🌱 Thấp",
+    order: 2
+  }
 };
 
-const priorityLabels = {
-  high: "🔥 Cao",
-  medium: "⭐ TB", 
-  low: "🌱 Thấp"
-};
-
-const timeSlots = [
-  "Sáng sớm (6h-9h)",
-  "Sáng (9h-12h)", 
-  "Trưa (12h-14h)",
-  "Chiều (14h-17h)",
-  "Tối (17h-21h)",
-  "Đêm (21h-24h)"
+const TIME_SLOTS = [
+  { id: "morning_early", label: "Sáng sớm", time: "6h-9h", color: "from-rose/10 to-terracotta/10 border-rose/20" },
+  { id: "morning", label: "Sáng", time: "9h-12h", color: "from-brass/10 to-coffee/10 border-brass/20" },
+  { id: "noon", label: "Trưa", time: "12h-14h", color: "from-terracotta/10 to-ink/10 border-terracotta/20" },
+  { id: "afternoon", label: "Chiều", time: "14h-17h", color: "from-rose/10 to-brass/10 border-rose/20" },
+  { id: "evening", label: "Tối", time: "17h-21h", color: "from-coffee/10 to-terracotta/10 border-coffee/20" },
+  { id: "night", label: "Đêm", time: "21h-24h", color: "from-ink/10 to-rose/10 border-ink/20" }
 ];
 
-// Time slot colors matching the warm theme
-const timeSlotColors = {
-  "Sáng sớm (6h-9h)": "from-rose/10 to-terracotta/10 border-rose/20",
-  "Sáng (9h-12h)": "from-brass/10 to-coffee/10 border-brass/20", 
-  "Trưa (12h-14h)": "from-terracotta/10 to-ink/10 border-terracotta/20",
-  "Chiều (14h-17h)": "from-rose/10 to-brass/10 border-rose/20",
-  "Tối (17h-21h)": "from-coffee/10 to-terracotta/10 border-coffee/20",
-  "Đêm (21h-24h)": "from-ink/10 to-rose/10 border-ink/20"
+const ANIMATION_CONFIG = {
+  duration: 300,
+  stagger: 50,
+  easing: "cubic-bezier(0.4, 0, 0.2, 1)"
 };
 
-// Component cho Current Time Slot
-function CurrentTimeSlot({ currentTimeSlot, animatedElements }) {
-  return (
-    <div className={`bg-gradient-to-r from-ink via-coffee to-terracotta text-white rounded-3xl p-6 text-center relative overflow-hidden transition-all duration-1000 ease-out ${
-      animatedElements ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-    }`}>
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-4 left-4 w-8 h-8 bg-white rounded-full animate-pulse"></div>
-        <div className="absolute bottom-4 right-4 w-6 h-6 bg-white rounded-full animate-bounce"></div>
-      </div>
-      <div className="relative flex items-center justify-center gap-3">
-        <FaRegClock className="text-2xl" />
-        <span className="text-xl font-semibold">Khung giờ hiện tại: {currentTimeSlot}</span>
-        <div className="w-3 h-3 bg-rose rounded-full animate-ping"></div>
-      </div>
-    </div>
-  );
+// Add CSS animations
+const fadeInUpStyle = `
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
+// Inject styles
+if (typeof document !== 'undefined') {
+  const styleSheet = document.createElement("style");
+  styleSheet.type = "text/css";
+  styleSheet.innerText = fadeInUpStyle;
+  document.head.appendChild(styleSheet);
 }
 
-// Component cho Add Todo Form
-function AddTodoForm({ 
-  showAddForm, 
-  setShowAddForm, 
-  newTodo, 
-  setNewTodo, 
-  newPriority, 
-  setNewPriority, 
-  newTimeSlot, 
-  setNewTimeSlot, 
-  handleAddTodo, 
-  timeSlots, 
-  animatedElements 
-}) {
-  return (
-    <div className={`transition-all duration-700 ease-out ${
-      animatedElements ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-    }`}>
-      <div className="text-center">
-        <button
-          onClick={() => setShowAddForm(!showAddForm)}
-          className="group bg-gradient-to-r from-terracotta to-brass text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-2xl hover:scale-105 transition-all duration-300 ease-out flex items-center gap-2 mx-auto"
-        >
-          <FaPlus className="group-hover:rotate-90 transition-transform duration-300" />
-          {showAddForm ? 'Đóng form' : 'Thêm công việc mới'}
-        </button>
-      </div>
-
-      {showAddForm && (
-        <div className="mt-6 bg-white rounded-3xl shadow-xl border border-rose/10 p-6">
-          <div className="space-y-4">
-            <input
-              type="text"
-              placeholder="Bạn muốn làm gì hôm nay? ✨"
-              value={newTodo}
-              onChange={(e) => setNewTodo(e.target.value)}
-              className="w-full px-6 py-4 border-2 border-rose/20 rounded-2xl focus:ring-4 focus:ring-rose/20 focus:border-rose text-lg transition-all bg-gradient-to-r from-rose/5 to-terracotta/5"
-              onKeyPress={(e) => e.key === 'Enter' && handleAddTodo()}
-              autoFocus
-            />
-            <div className="flex gap-4">
-              <select
-                value={newPriority}
-                onChange={(e) => setNewPriority(e.target.value)}
-                className="flex-1 px-4 py-3 border-2 border-rose/20 rounded-2xl focus:ring-4 focus:ring-rose/20 focus:border-rose transition-all bg-gradient-to-r from-rose/5 to-terracotta/5"
-              >
-                <option value="low">🌱 Thấp</option>
-                <option value="medium">⭐ Trung bình</option>
-                <option value="high">🔥 Cao</option>
-              </select>
-              <select
-                value={newTimeSlot}
-                onChange={(e) => setNewTimeSlot(e.target.value)}
-                className="flex-1 px-4 py-3 border-2 border-rose/20 rounded-2xl focus:ring-4 focus:ring-rose/20 focus:border-rose transition-all bg-gradient-to-r from-rose/5 to-terracotta/5"
-              >
-                {timeSlots.map(slot => (
-                  <option key={slot} value={slot}>{slot}</option>
-                ))}
-              </select>
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={handleAddTodo}
-                className="flex-1 bg-gradient-to-r from-terracotta to-brass text-white py-3 rounded-2xl hover:shadow-xl transition-all font-semibold"
-              >
-                Thêm công việc
-              </button>
-              <button
-                onClick={() => setShowAddForm(false)}
-                className="px-6 py-3 border-2 border-rose/20 text-coffee rounded-2xl hover:border-rose hover:bg-rose/5 transition-all"
-              >
-                Hủy
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+// Compact Header Component
+const CompactHeader = ({ currentTimeSlot, animated }) => (
+  <div className={`bg-gradient-to-r from-ink via-coffee to-terracotta text-white rounded-2xl p-4 text-center relative overflow-hidden transition-all duration-${ANIMATION_CONFIG.duration} ${ANIMATION_CONFIG.easing} ${
+    animated ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+  }`}>
+    <div className="flex items-center justify-center gap-3">
+      <FaRegClock className="text-xl" />
+      <span className="font-semibold">{currentTimeSlot}</span>
+      <div className="w-2 h-2 bg-rose rounded-full animate-ping"></div>
     </div>
-  );
-}
+  </div>
+);
 
-// Component cho Todo List theo Time Slots
-function TodoTimeSlots({ 
-  timeSlots, 
-  filteredTodosBySlot, 
-  currentTimeSlot, 
-  collapsedSections, 
-  toggleSection, 
-  viewCompact, 
-  handleToggleTodo, 
-  handleDeleteTodo, 
-  setSelectedTodo, 
-  priorityColors, 
-  priorityLabels, 
-  animatedElements 
-}) {
+// Quick Add Todo Component
+const QuickAddTodo = ({ onAddTodo, animated }) => {
+  const [quickText, setQuickText] = useState("");
+  
+  const handleSubmit = useCallback((e) => {
+    e.preventDefault();
+    if (quickText.trim()) {
+      onAddTodo(quickText.trim(), "medium", "Sáng (9h-12h)");
+      setQuickText("");
+    }
+  }, [quickText, onAddTodo]);
+
   return (
-    <div className={`space-y-6 transition-all duration-700 ease-out ${
-      animatedElements ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+    <form onSubmit={handleSubmit} className={`transition-all duration-${ANIMATION_CONFIG.duration} ${ANIMATION_CONFIG.easing} ${
+      animated ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
     }`}>
-      {timeSlots.map((timeSlot, index) => {
-        const slotTodos = (filteredTodosBySlot && filteredTodosBySlot[timeSlot]) ? filteredTodosBySlot[timeSlot] : [];
-        const isCurrentSlot = timeSlot === currentTimeSlot;
-        const isCollapsed = collapsedSections[timeSlot];
-        
-        if (slotTodos.length === 0) return null;
-        
-        return (
-          <div 
-            key={timeSlot}
-            className={`bg-white rounded-3xl shadow-xl border-2 overflow-hidden transition-all duration-300 hover:shadow-2xl ${
-              isCurrentSlot ? 'border-rose/30 bg-gradient-to-br from-rose/5 to-terracotta/5' : 'border-rose/10'
-            }`}
-            style={{ animationDelay: `${index * 60}ms` }}
+      <div className="bg-white rounded-2xl shadow-lg border border-rose/10 p-4">
+        <div className="flex gap-3">
+          <input
+            type="text"
+            placeholder="Thêm công việc nhanh..."
+            value={quickText}
+            onChange={(e) => setQuickText(e.target.value)}
+            className="flex-1 px-4 py-2 border-2 border-rose/20 rounded-xl focus:ring-2 focus:ring-rose/20 focus:border-rose transition-all"
+            autoFocus
+          />
+          <button
+            type="submit"
+            className="bg-gradient-to-r from-terracotta to-brass text-white px-4 py-2 rounded-xl hover:shadow-lg transition-all flex items-center gap-2"
           >
-            <button
-              onClick={() => toggleSection(timeSlot)}
-              className="w-full p-6 flex items-center justify-between hover:bg-rose/5 transition-colors duration-200"
-            >
-              <div className="flex items-center gap-4">
-                {isCurrentSlot && <div className="w-3 h-3 bg-rose rounded-full animate-ping"></div>}
-                <h3 className={`text-xl font-bold ${
-                  isCurrentSlot ? 'text-rose' : 'text-ink'
-                }`}>
-                  {timeSlot}
-                </h3>
-                {isCurrentSlot && (
-                  <span className="text-sm bg-rose text-white px-3 py-1 rounded-full">
-                    Hiện tại
-                  </span>
-                )}
-                <span className="text-sm bg-gradient-to-r from-rose/10 to-terracotta/10 text-coffee px-3 py-1 rounded-full border border-rose/20">
-                  {slotTodos.length} công việc
-                </span>
-              </div>
-              {isCollapsed ? <FaChevronDown className="text-rose" /> : <FaChevronUp className="text-rose" />}
-            </button>
+            <FaPlus className="text-sm" />
+            Thêm
+          </button>
+        </div>
+      </div>
+    </form>
+  );
+};
+
+// Schedule Grid Component - Main focus
+const ScheduleGrid = ({ 
+  todos, 
+  currentTimeSlot, 
+  onToggleTodo, 
+  onDeleteTodo, 
+  onSelectTodo, 
+  animated,
+  compactMode 
+}) => {
+  const getCurrentTimeSlotId = useCallback(() => {
+    const hour = new Date().getHours();
+    if (hour < 9) return "morning_early";
+    if (hour < 12) return "morning";
+    if (hour < 14) return "noon";
+    if (hour < 17) return "afternoon";
+    if (hour < 21) return "evening";
+    return "night";
+  }, []);
+
+  const getTodosForSlot = useCallback((slotId) => {
+    return todos.filter(todo => {
+      const slotTime = `${TIME_SLOTS.find(s => s.id === slotId)?.label} (${TIME_SLOTS.find(s => s.id === slotId)?.time})`;
+      return todo.timeSlot === slotTime;
+    });
+  }, [todos]);
+
+  return (
+    <div className={`transition-all duration-${ANIMATION_CONFIG.duration} ${ANIMATION_CONFIG.easing} ${
+      animated ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+    }`}>
+      <div className="bg-white rounded-3xl shadow-xl border border-rose/10 overflow-hidden">
+        <div className="p-4 border-b border-rose/10">
+          <h2 className="text-xl font-bold text-ink flex items-center gap-2">
+            <FaTasks className="text-rose" />
+            Thời khóa biểu hôm nay
+          </h2>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+          {TIME_SLOTS.map((slot, index) => {
+            const slotTodos = getTodosForSlot(slot.id);
+            const isCurrentSlot = slot.id === getCurrentTimeSlotId();
+            const completedCount = slotTodos.filter(t => t.completed).length;
             
-            {!isCollapsed && (
-              <div className={`px-6 pb-6 space-y-3`}>
-                {slotTodos.map((todo) => (
-                  <div 
-                    key={todo.id} 
-                    className={`cursor-pointer ${viewCompact ? 'p-3' : 'p-4'} rounded-2xl border-2 transition-all duration-200 hover:shadow-lg ${
-                      todo.completed 
-                        ? 'bg-gradient-to-r from-brass/10 to-coffee/10 border-brass/20' 
-                        : 'bg-gradient-to-r from-rose/5 to-terracotta/5 border-rose/20 hover:border-rose/30'
-                    }`}
-                    onClick={() => setSelectedTodo(todo)}
-                  >
-                    <div className="flex items-start gap-3">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); handleToggleTodo(todo.id); }}
-                        className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all mt-1 flex-shrink-0 ${
-                          todo.completed 
-                            ? 'bg-brass border-brass text-white' 
-                            : 'border-rose/30 hover:border-rose hover:bg-rose/10'
+            return (
+              <div
+                key={slot.id}
+                className={`bg-gradient-to-br ${slot.color} rounded-2xl p-4 border-2 transition-all duration-${ANIMATION_CONFIG.duration} hover:shadow-lg ${
+                  isCurrentSlot ? 'border-rose/40 shadow-lg' : 'border-rose/20'
+                }`}
+                style={{ 
+                  animationDelay: `${index * ANIMATION_CONFIG.stagger}ms`,
+                  animation: animated ? 'fadeInUp 0.5s ease-out forwards' : 'none'
+                }}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    {isCurrentSlot && <div className="w-2 h-2 bg-rose rounded-full animate-ping"></div>}
+                    <h3 className={`font-bold ${isCurrentSlot ? 'text-rose' : 'text-ink'}`}>
+                      {slot.label}
+                    </h3>
+                  </div>
+                  <span className="text-sm text-coffee/60">{slot.time}</span>
+                </div>
+                
+                <div className="space-y-2 max-h-40 overflow-y-auto">
+                  {slotTodos.length === 0 ? (
+                    <div className="text-center text-coffee/50 text-sm py-4">
+                      Chưa có công việc
+                    </div>
+                  ) : (
+                    slotTodos.slice(0, compactMode ? 2 : 4).map((todo) => (
+                      <div
+                        key={todo.id}
+                        className={`bg-white/70 backdrop-blur-sm rounded-xl p-3 cursor-pointer transition-all hover:bg-white/90 hover:shadow-md ${
+                          todo.completed ? 'opacity-60' : ''
                         }`}
+                        onClick={() => onSelectTodo(todo)}
                       >
-                        {todo.completed && <FaCheckCircle className="text-sm" />}
-                      </button>
-                      
-                      <div className="flex-1 min-w-0">
-                        <span className={`font-medium ${viewCompact ? 'text-base' : 'text-lg'} leading-relaxed ${
-                          todo.completed 
-                            ? 'line-through text-coffee/60' 
-                            : 'text-ink'
-                        }`}>
-                          {todo.text}
-                        </span>
-                        
-                        <div className={`flex items-center gap-2 mt-2 ${viewCompact ? 'text-[10px]' : ''}`}>
-                          <span className={`text-xs px-3 py-1 rounded-full ${priorityColors[todo.priority]}`}>
-                            {priorityLabels[todo.priority]}
-                          </span>
-                          {!viewCompact && (
-                            <span className="text-xs text-coffee/60">{new Date(todo.createdAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</span>
-                          )}
+                        <div className="flex items-start gap-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onToggleTodo(todo.id);
+                            }}
+                            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 mt-0.5 ${
+                              todo.completed 
+                                ? 'bg-brass border-brass text-white' 
+                                : 'border-rose/30 hover:border-rose hover:bg-rose/10'
+                            }`}
+                          >
+                            {todo.completed && <FaCheckCircle className="text-xs" />}
+                          </button>
+                          
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-sm font-medium leading-relaxed ${
+                              todo.completed ? 'line-through text-coffee/60' : 'text-ink'
+                            }`}>
+                              {todo.text}
+                            </p>
+                            
+                            <div className="flex items-center gap-1 mt-1">
+                              <span className={`text-xs px-2 py-0.5 rounded-full ${PRIORITY_CONFIG[todo.priority].color}`}>
+                                {PRIORITY_CONFIG[todo.priority].label}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onDeleteTodo(todo.id);
+                            }}
+                            className="p-1 text-coffee/40 hover:text-rose hover:bg-rose/10 rounded transition-all flex-shrink-0"
+                          >
+                            <FaTrash className="text-xs" />
+                          </button>
                         </div>
                       </div>
-                      
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); handleDeleteTodo(todo.id); }}
-                        className="p-2 text-coffee/40 hover:text-rose hover:bg-rose/10 rounded-lg transition-all flex-shrink-0"
-                      >
-                        <FaTrash />
-                      </button>
-                    </div>
+                    ))
+                  )}
+                </div>
+                
+                {slotTodos.length > (compactMode ? 2 : 4) && (
+                  <div className="mt-2 text-center">
+                    <span className="text-xs text-coffee/60">
+                      +{slotTodos.length - (compactMode ? 2 : 4)} công việc khác
+                    </span>
                   </div>
-                ))}
+                )}
+                
+                <div className="mt-3 flex items-center justify-between">
+                  <div className="text-xs text-coffee/60">
+                    {completedCount}/{slotTodos.length} hoàn thành
+                  </div>
+                  <div className="w-full bg-coffee/20 rounded-full h-1.5 ml-2">
+                    <div 
+                      className="h-full bg-gradient-to-r from-rose to-terracotta rounded-full transition-all duration-500"
+                      style={{ width: slotTodos.length > 0 ? `${(completedCount / slotTodos.length) * 100}%` : '0%' }}
+                    ></div>
+                  </div>
+                </div>
               </div>
-            )}
-          </div>
-        );
-      })}
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
-}
+};
 
-// Component chính TodoList
+// Focus Panel - Collapsible detail view
+const FocusPanel = ({ selectedTodo, onUpdateTodo, onDeleteTodo, onClose, animated }) => {
+  if (!selectedTodo) return null;
+
+  return (
+    <div className={`transition-all duration-${ANIMATION_CONFIG.duration} ${ANIMATION_CONFIG.easing} ${
+      animated ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'
+    }`}>
+      <div className="bg-white rounded-3xl shadow-xl border border-rose/10 overflow-hidden">
+        <div className="p-4 border-b border-rose/10 flex items-center justify-between">
+          <h3 className="text-lg font-bold text-ink flex items-center gap-2">
+            <FaStar className="text-rose" />
+            Trọng tâm
+          </h3>
+          <button
+            onClick={onClose}
+            className="p-2 text-coffee/40 hover:text-rose hover:bg-rose/10 rounded-lg transition-all"
+          >
+            <FaChevronUp className="text-sm" />
+          </button>
+        </div>
+        
+        <div className="p-4 space-y-4">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => onUpdateTodo(selectedTodo.id, { completed: !selectedTodo.completed })}
+              className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${
+                selectedTodo.completed ? 'bg-brass border-brass text-white' : 'border-rose/30 hover:border-rose hover:bg-rose/10'
+              }`}
+            >
+              {selectedTodo.completed && <FaCheckCircle className="text-sm" />}
+            </button>
+            <div className="flex-1">
+              <h4 className={`text-lg font-semibold ${selectedTodo.completed ? 'line-through text-coffee/60' : 'text-ink'}`}>
+                {selectedTodo.text}
+              </h4>
+              <div className="mt-1 flex items-center gap-2">
+                <span className={`text-xs px-3 py-1 rounded-full ${PRIORITY_CONFIG[selectedTodo.priority].color}`}>
+                  {PRIORITY_CONFIG[selectedTodo.priority].label}
+                </span>
+                <span className="text-xs text-coffee/60">{selectedTodo.timeSlot}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-3">
+            <select
+              value={selectedTodo.priority}
+              onChange={(e) => onUpdateTodo(selectedTodo.id, { priority: e.target.value })}
+              className="px-3 py-2 border-2 border-rose/20 rounded-xl text-sm"
+            >
+              <option value="low">🌱 Thấp</option>
+              <option value="medium">⭐ Trung bình</option>
+              <option value="high">🔥 Cao</option>
+            </select>
+            <select
+              value={selectedTodo.timeSlot}
+              onChange={(e) => onUpdateTodo(selectedTodo.id, { timeSlot: e.target.value })}
+              className="px-3 py-2 border-2 border-rose/20 rounded-xl text-sm"
+            >
+              {TIME_SLOTS.map(slot => (
+                <option key={slot.id} value={`${slot.label} (${slot.time})`}>
+                  {slot.label} ({slot.time})
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          <div className="flex gap-2">
+            <button
+              onClick={() => onDeleteTodo(selectedTodo.id)}
+              className="flex-1 px-4 py-2 rounded-xl border-2 border-rose/20 text-rose hover:bg-rose/5 transition-all text-sm"
+            >
+              Xóa
+            </button>
+            <button
+              onClick={onClose}
+              className="flex-1 px-4 py-2 rounded-xl border-2 border-rose/20 hover:bg-rose/5 transition-all text-sm"
+            >
+              Đóng
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Control Panel - Compact controls
+const ControlPanel = ({ 
+  compactMode, 
+  onToggleCompact, 
+  showFilters, 
+  onToggleFilters, 
+  onQuickAdd,
+  animated 
+}) => {
+  return (
+    <div className={`transition-all duration-${ANIMATION_CONFIG.duration} ${ANIMATION_CONFIG.easing} ${
+      animated ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+    }`}>
+      <div className="bg-white rounded-2xl shadow-lg border border-rose/10 p-4">
+        <div className="flex items-center justify-between gap-3">
+          <button
+            onClick={onToggleCompact}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-rose/20 hover:bg-rose/5 transition-all text-sm"
+          >
+            {compactMode ? <FaEye className="text-sm" /> : <FaEyeSlash className="text-sm" />}
+            {compactMode ? 'Mở rộng' : 'Thu gọn'}
+          </button>
+          
+          <button
+            onClick={onToggleFilters}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-rose/20 hover:bg-rose/5 transition-all text-sm"
+          >
+            <FaFilter className="text-sm" />
+            {showFilters ? 'Ẩn bộ lọc' : 'Hiện bộ lọc'}
+          </button>
+          
+          <button
+            onClick={onQuickAdd}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-terracotta to-brass text-white hover:shadow-lg transition-all text-sm"
+          >
+            <FaPlus className="text-sm" />
+            Thêm nhanh
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Main TodoList Component - Redesigned with Schedule Layout
 function TodoList() {
+  // Core state
   const [todos, setTodos] = useState([
     { 
       id: 1, 
@@ -290,39 +437,25 @@ function TodoList() {
     },
   ]);
   
-  const [newTodo, setNewTodo] = useState("");
-  const [newPriority, setNewPriority] = useState("medium");
-  const [newTimeSlot, setNewTimeSlot] = useState("Sáng (9h-12h)");
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [currentTime, setCurrentTime] = useState(new Date());
+  // UI state
   const [selectedTodo, setSelectedTodo] = useState(null);
-  const [viewCompact, setViewCompact] = useState(false);
-  const [filterPriority, setFilterPriority] = useState("all");
-  const [filterCompletion, setFilterCompletion] = useState("all");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState("priority");
+  const [compactMode, setCompactMode] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [showQuickAdd, setShowQuickAdd] = useState(false);
   
-  // Collapsible states
-  const [collapsedSections, setCollapsedSections] = useState({});
-  const [showSummary, setShowSummary] = useState(true);
+  // Animation state
   const [animatedElements, setAnimatedElements] = useState({
     header: false,
-    summary: false,
-    addForm: false,
-    timeSlots: false
+    controls: false,
+    schedule: false,
+    focus: false
   });
 
   // Animation refs
   const [headerRef, headerInView] = useInView({ threshold: 0.1, once: true });
-  const [summaryRef, summaryInView] = useInView({ threshold: 0.1, once: true });
-  const [addFormRef, addFormInView] = useInView({ threshold: 0.1, once: true });
-  const [timeSlotsRef, timeSlotsInView] = useInView({ threshold: 0.1, once: true });
-
-  // Update current time every minute
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 60000);
-    return () => clearInterval(timer);
-  }, []);
+  const [controlsRef, controlsInView] = useInView({ threshold: 0.1, once: true });
+  const [scheduleRef, scheduleInView] = useInView({ threshold: 0.1, once: true });
+  const [focusRef, focusInView] = useInView({ threshold: 0.1, once: true });
 
   // Animation effects
   useEffect(() => {
@@ -333,65 +466,79 @@ function TodoList() {
   }, []);
 
   useEffect(() => {
-    if (summaryInView) {
-      setAnimatedElements(prev => ({ ...prev, summary: true }));
+    if (controlsInView) {
+      setAnimatedElements(prev => ({ ...prev, controls: true }));
     }
-  }, [summaryInView]);
+  }, [controlsInView]);
 
   useEffect(() => {
-    if (addFormInView) {
-      setAnimatedElements(prev => ({ ...prev, addForm: true }));
+    if (scheduleInView) {
+      setAnimatedElements(prev => ({ ...prev, schedule: true }));
     }
-  }, [addFormInView]);
+  }, [scheduleInView]);
 
   useEffect(() => {
-    if (timeSlotsInView) {
-      setAnimatedElements(prev => ({ ...prev, timeSlots: true }));
+    if (focusInView) {
+      setAnimatedElements(prev => ({ ...prev, focus: true }));
     }
-  }, [timeSlotsInView]);
+  }, [focusInView]);
 
-  // Helper functions
-  const toggleSection = (sectionId) => {
-    setCollapsedSections(prev => ({
-      ...prev,
-      [sectionId]: !prev[sectionId]
-    }));
-  };
-
-  const handleToggleTodo = (id) => {
-    setTodos(todos.map(todo => 
+  // Helper functions - Optimized with useCallback
+  const handleToggleTodo = useCallback((id) => {
+    setTodos(prev => prev.map(todo => 
       todo.id === id ? { ...todo, completed: !todo.completed } : todo
     ));
-  };
+  }, []);
 
-  const handleDeleteTodo = (id) => {
-    setTodos(todos.filter(todo => todo.id !== id));
-  };
-
-  const handleAddTodo = () => {
-    if (newTodo.trim()) {
-      const todo = {
-        id: Date.now(),
-        text: newTodo.trim(),
-        completed: false,
-        priority: newPriority,
-        timeSlot: newTimeSlot,
-        createdAt: new Date()
-      };
-      setTodos([...todos, todo]);
-      setNewTodo("");
-      setNewPriority("medium");
-      setNewTimeSlot("Sáng (9h-12h)");
-      setShowAddForm(false);
-      setSelectedTodo(todo);
+  const handleDeleteTodo = useCallback((id) => {
+    setTodos(prev => prev.filter(todo => todo.id !== id));
+    if (selectedTodo?.id === id) {
+      setSelectedTodo(null);
     }
-  };
+  }, [selectedTodo]);
 
-  // Computed values
-  const completedTodos = todos.filter(todo => todo.completed).length;
-  const totalTodos = todos.length;
-  const progressPercentage = totalTodos > 0 ? Math.round((completedTodos / totalTodos) * 100) : 0;
-  
+  const handleUpdateTodo = useCallback((id, updates) => {
+    setTodos(prev => prev.map(todo => 
+      todo.id === id ? { ...todo, ...updates } : todo
+    ));
+    if (selectedTodo?.id === id) {
+      setSelectedTodo(prev => prev ? { ...prev, ...updates } : null);
+    }
+  }, [selectedTodo]);
+
+  const handleAddTodo = useCallback((text, priority = "medium", timeSlot = "Sáng (9h-12h)") => {
+    const todo = {
+      id: Date.now(),
+      text,
+      completed: false,
+      priority,
+      timeSlot,
+      createdAt: new Date()
+    };
+    setTodos(prev => [...prev, todo]);
+    setSelectedTodo(todo);
+    setShowQuickAdd(false);
+  }, []);
+
+  const getCurrentTimeSlot = useCallback(() => {
+    const hour = new Date().getHours();
+    const slot = TIME_SLOTS.find(s => {
+      const [start, end] = s.time.split('-').map(t => parseInt(t));
+      return hour >= start && hour < end;
+    });
+    return slot ? `${slot.label} (${slot.time})` : "Sáng (9h-12h)";
+  }, []);
+
+  // Computed values - Memoized for performance
+  const stats = useMemo(() => {
+    const completed = todos.filter(todo => todo.completed).length;
+    const total = todos.length;
+    const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
+    return { completed, total, progress };
+  }, [todos]);
+
+  const currentTimeSlot = getCurrentTimeSlot();
+
   const today = new Date().toLocaleDateString('vi-VN', { 
     weekday: 'long', 
     year: 'numeric', 
@@ -399,305 +546,141 @@ function TodoList() {
     day: 'numeric' 
   });
 
-  const currentHour = currentTime.getHours();
-  const getGreeting = () => {
-    if (currentHour < 12) return "Chào buổi sáng! ☀️";
-    if (currentHour < 17) return "Chào buổi chiều! 🌤️";
+  const getGreeting = useCallback(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Chào buổi sáng! ☀️";
+    if (hour < 17) return "Chào buổi chiều! 🌤️";
     return "Chào buổi tối! 🌙";
-  };
-
-  const getCurrentTimeSlot = () => {
-    if (currentHour < 9) return "Sáng sớm (6h-9h)";
-    if (currentHour < 12) return "Sáng (9h-12h)";
-    if (currentHour < 14) return "Trưa (12h-14h)";
-    if (currentHour < 17) return "Chiều (14h-17h)";
-    if (currentHour < 21) return "Tối (17h-21h)";
-    return "Đêm (21h-24h)";
-  };
-
-  const currentTimeSlot = getCurrentTimeSlot();
-
-  // collapse all sections by default except current time slot
-  useEffect(() => {
-    setCollapsedSections(prev => {
-      if (Object.keys(prev).length > 0) return prev;
-      const next = {};
-      timeSlots.forEach(slot => {
-        next[slot] = slot !== currentTimeSlot;
-      });
-      return next;
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const priorityOrder = { high: 0, medium: 1, low: 2 };
-
-  const filteredTodosBySlot = useMemo(() => {
-    const lowerSearch = searchTerm.trim().toLowerCase();
-    const result = {};
-    timeSlots.forEach(slot => {
-      let slotTodos = todos.filter(t => t.timeSlot === slot);
-      if (filterPriority !== "all") slotTodos = slotTodos.filter(t => t.priority === filterPriority);
-      if (filterCompletion !== "all") slotTodos = slotTodos.filter(t => filterCompletion === "completed" ? t.completed : !t.completed);
-      if (lowerSearch) slotTodos = slotTodos.filter(t => t.text.toLowerCase().includes(lowerSearch));
-      const sorted = [...slotTodos].sort((a, b) => {
-        if (sortBy === "priority") {
-          const byPri = priorityOrder[a.priority] - priorityOrder[b.priority];
-          if (byPri !== 0) return byPri;
-          return b.createdAt - a.createdAt;
-        }
-        if (sortBy === "createdAsc") return a.createdAt - b.createdAt;
-        if (sortBy === "createdDesc") return b.createdAt - a.createdAt;
-        return 0;
-      });
-      result[slot] = sorted;
-    });
-    return result;
-  }, [todos, filterPriority, filterCompletion, searchTerm, sortBy]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-ink/5 via-coffee/5 to-terracotta/5">
-      <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
+      <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
         
-        {/* Enhanced Header Section */}
-        <div ref={headerRef} className={`text-center space-y-6 transition-all duration-1000 ease-out ${
-          animatedElements.header ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+        {/* Compact Header */}
+        <div ref={headerRef} className={`text-center space-y-4 transition-all duration-${ANIMATION_CONFIG.duration} ${ANIMATION_CONFIG.easing} ${
+          animatedElements.header ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         }`}>
-          {/* Welcome badge */}
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-rose/10 to-terracotta/10 px-4 py-2 rounded-full border border-rose/20">
             <FaTasks className="text-rose text-sm" />
             <span className="text-sm font-medium text-ink">Todo Hôm Nay</span>
           </div>
           
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
+          <h1 className="text-3xl sm:text-4xl font-bold leading-tight">
             <span className="text-ink">Quản lý công việc</span>
             <br />
             <span className="bg-gradient-to-r from-rose via-terracotta to-brass bg-clip-text text-transparent">
-              một cách thông minh
+              thông minh
             </span>
           </h1>
           
-          <p className="text-xl text-coffee/80 max-w-2xl mx-auto">
+          <p className="text-lg text-coffee/80">
             {today} • {getGreeting()}
           </p>
         </div>
 
-        {/* Main content grid */}
-        <div className={`grid grid-cols-1 lg:grid-cols-12 gap-6 transition-all duration-700 ease-out ${
-          animatedElements.summary ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-        }`}>
-          {/* Left list and controls */}
-          <div className="lg:col-span-7 space-y-6">
-            {/* Search and Filter Controls */}
-            <div className="bg-white rounded-3xl shadow-xl border border-rose/10 p-4">
-              <div className="flex flex-col md:flex-row gap-3 md:items-center">
-                <div className="flex-1 flex items-center gap-3">
-                  <input
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Tìm kiếm công việc..."
-                    className="flex-1 px-4 py-3 border-2 border-rose/20 rounded-2xl focus:ring-4 focus:ring-rose/20 focus:border-rose transition-all"
-                  />
-                </div>
-                <div className="flex flex-wrap gap-3">
-                  <select value={filterPriority} onChange={(e) => setFilterPriority(e.target.value)} className="px-3 py-2 border-2 border-rose/20 rounded-2xl">
-                    <option value="all">Tất cả mức độ</option>
-                    <option value="high">Cao</option>
-                    <option value="medium">Trung bình</option>
-                    <option value="low">Thấp</option>
-                  </select>
-                  <select value={filterCompletion} onChange={(e) => setFilterCompletion(e.target.value)} className="px-3 py-2 border-2 border-rose/20 rounded-2xl">
-                    <option value="all">Tất cả trạng thái</option>
-                    <option value="active">Chưa hoàn thành</option>
-                    <option value="completed">Đã hoàn thành</option>
-                  </select>
-                  <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="px-3 py-2 border-2 border-rose/20 rounded-2xl">
-                    <option value="priority">Ưu tiên</option>
-                    <option value="createdDesc">Mới nhất</option>
-                    <option value="createdAsc">Cũ nhất</option>
-                  </select>
-                  <button onClick={() => setViewCompact(v => !v)} className="px-4 py-2 rounded-2xl border-2 border-rose/20 hover:bg-rose/5">
-                    {viewCompact ? 'Chế độ đầy đủ' : 'Chế độ gọn nhẹ'}
-                  </button>
-                </div>
-              </div>
-            </div>
+        {/* Current Time Slot */}
+        <CompactHeader 
+          currentTimeSlot={currentTimeSlot} 
+          animated={animatedElements.header}
+        />
 
-            {/* Current Time Slot */}
-            <CurrentTimeSlot 
-              currentTimeSlot={currentTimeSlot} 
-              animatedElements={animatedElements.summary}
-            />
+        {/* Control Panel */}
+        <div ref={controlsRef}>
+          <ControlPanel
+            compactMode={compactMode}
+            onToggleCompact={() => setCompactMode(!compactMode)}
+            showFilters={showFilters}
+            onToggleFilters={() => setShowFilters(!showFilters)}
+            onQuickAdd={() => setShowQuickAdd(!showQuickAdd)}
+            animated={animatedElements.controls}
+          />
+        </div>
 
-            {/* Add Todo Form */}
-            <AddTodoForm
-              showAddForm={showAddForm}
-              setShowAddForm={setShowAddForm}
-              newTodo={newTodo}
-              setNewTodo={setNewTodo}
-              newPriority={newPriority}
-              setNewPriority={setNewPriority}
-              newTimeSlot={newTimeSlot}
-              setNewTimeSlot={setNewTimeSlot}
-              handleAddTodo={handleAddTodo}
-              timeSlots={timeSlots}
-              animatedElements={animatedElements.addForm}
-            />
+        {/* Quick Add Form */}
+        {showQuickAdd && (
+          <QuickAddTodo
+            onAddTodo={handleAddTodo}
+            animated={animatedElements.controls}
+          />
+        )}
 
-            {/* Todo List by Time Slots */}
-            <TodoTimeSlots
-              timeSlots={timeSlots}
-              filteredTodosBySlot={filteredTodosBySlot}
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Schedule Grid - Main Focus */}
+          <div className="lg:col-span-2" ref={scheduleRef}>
+            <ScheduleGrid
+              todos={todos}
               currentTimeSlot={currentTimeSlot}
-              collapsedSections={collapsedSections}
-              toggleSection={toggleSection}
-              viewCompact={viewCompact}
-              handleToggleTodo={handleToggleTodo}
-              handleDeleteTodo={handleDeleteTodo}
-              setSelectedTodo={setSelectedTodo}
-              priorityColors={priorityColors}
-              priorityLabels={priorityLabels}
-              animatedElements={animatedElements.timeSlots}
-            />
+                onToggleTodo={handleToggleTodo}
+                onDeleteTodo={handleDeleteTodo}
+                onSelectTodo={setSelectedTodo}
+              animated={animatedElements.schedule}
+              compactMode={compactMode}
+              />
           </div>
 
-          {/* Right focus & summary */}
-          <div className="lg:col-span-5 space-y-6">
-            <div ref={summaryRef} className={`transition-all duration-700 ease-out ${
-              animatedElements.summary ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-        }`}>
-          <div className="bg-white rounded-3xl shadow-xl border border-rose/10 overflow-hidden">
-            <button
-              onClick={() => setShowSummary(!showSummary)}
-                  className="w-full p-5 flex items-center justify-between hover:bg-rose/5 transition-colors duration-200"
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-3 rounded-full bg-gradient-to-br from-rose to-terracotta shadow-lg">
-                  <FaStar className="text-white text-xl" />
+          {/* Right Sidebar */}
+          <div className="space-y-6" ref={focusRef}>
+            {/* Stats Summary */}
+            <div className={`bg-white rounded-3xl shadow-xl border border-rose/10 p-6 transition-all duration-${ANIMATION_CONFIG.duration} ${ANIMATION_CONFIG.easing} ${
+              animatedElements.schedule ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}>
+              <h3 className="text-lg font-bold text-ink mb-4 flex items-center gap-2">
+                <FaStar className="text-rose" />
+                Tổng quan
+              </h3>
+              
+              <div className="grid grid-cols-3 gap-3 mb-4">
+                <div className="bg-gradient-to-br from-rose/10 to-terracotta/10 rounded-xl p-3 text-center border border-rose/20">
+                  <div className="text-2xl font-bold text-rose">{stats.total}</div>
+                  <div className="text-xs text-coffee/80">Tổng</div>
                 </div>
-                <div className="text-left">
-                      <h2 className="text-xl font-bold text-ink">Tổng quan hôm nay</h2>
-                  <p className="text-coffee/60">Tiến độ: {progressPercentage}% hoàn thành</p>
+                <div className="bg-gradient-to-br from-brass/10 to-coffee/10 rounded-xl p-3 text-center border border-brass/20">
+                  <div className="text-2xl font-bold text-brass">{stats.completed}</div>
+                  <div className="text-xs text-coffee/80">Xong</div>
                 </div>
-              </div>
-              {showSummary ? <FaChevronUp className="text-rose" /> : <FaChevronDown className="text-rose" />}
-            </button>
-            
-            {showSummary && (
-                  <div className="px-5 pb-5 space-y-4">
-                    <div className="grid grid-cols-3 gap-3">
-                  <div className="bg-gradient-to-br from-rose/10 to-terracotta/10 rounded-2xl p-4 text-center border border-rose/20">
-                    <div className="text-3xl font-bold text-rose">{totalTodos}</div>
-                    <div className="text-sm text-coffee/80">Tổng cộng</div>
-                  </div>
-                  <div className="bg-gradient-to-br from-brass/10 to-coffee/10 rounded-2xl p-4 text-center border border-brass/20">
-                    <div className="text-3xl font-bold text-brass">{completedTodos}</div>
-                    <div className="text-sm text-coffee/80">Hoàn thành</div>
-                  </div>
-                  <div className="bg-gradient-to-br from-terracotta/10 to-ink/10 rounded-2xl p-4 text-center border border-terracotta/20">
-                    <div className="text-3xl font-bold text-terracotta">{totalTodos - completedTodos}</div>
-                    <div className="text-sm text-coffee/80">Còn lại</div>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm text-coffee/80">
-                    <span>Tiến độ hoàn thành</span>
-                    <span>{progressPercentage}%</span>
-                  </div>
-                  <div className="w-full bg-coffee/20 rounded-full h-3 overflow-hidden">
-                    <div 
-                          className="h-full bg-gradient-to-r from-rose to-terracotta rounded-full transition-all duration-700 ease-out"
-                      style={{ width: `${progressPercentage}%` }}
-                    ></div>
-                  </div>
+                <div className="bg-gradient-to-br from-terracotta/10 to-ink/10 rounded-xl p-3 text-center border border-terracotta/20">
+                  <div className="text-2xl font-bold text-terracotta">{stats.total - stats.completed}</div>
+                  <div className="text-xs text-coffee/80">Còn lại</div>
                 </div>
               </div>
-            )}
+              
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm text-coffee/80">
+                  <span>Tiến độ</span>
+                  <span>{stats.progress}%</span>
+                </div>
+                <div className="w-full bg-coffee/20 rounded-full h-2 overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-rose to-terracotta rounded-full transition-all duration-700 ease-out"
+                    style={{ width: `${stats.progress}%` }}
+                  ></div>
+                </div>
               </div>
             </div>
 
-            {/* Focus Section */}
-            <div className="bg-white rounded-3xl shadow-xl border border-rose/10 p-6">
-              <h3 className="text-xl font-bold text-ink mb-4">Trọng tâm hôm nay</h3>
-              {!selectedTodo ? (
-                <div className="text-coffee/70">Chọn một công việc ở danh sách để xem chi tiết.</div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => handleToggleTodo(selectedTodo.id)}
-                      className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all ${
-                        selectedTodo.completed ? 'bg-brass border-brass text-white' : 'border-rose/30 hover:border-rose hover:bg-rose/10'
-                      }`}
-                    >
-                      {selectedTodo.completed && <FaCheckCircle className="text-sm" />}
-                    </button>
-                    <div className="flex-1">
-                      <div className="text-lg font-semibold text-ink break-words">{selectedTodo.text}</div>
-                      <div className="mt-2 flex items-center gap-2">
-                        <span className={`text-xs px-3 py-1 rounded-full ${priorityColors[selectedTodo.priority]}`}>{priorityLabels[selectedTodo.priority]}</span>
-                        <span className="text-xs text-coffee/60">{selectedTodo.timeSlot}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <select
-                      value={selectedTodo.priority}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        setTodos(prev => prev.map(t => t.id === selectedTodo.id ? { ...t, priority: value } : t));
-                        setSelectedTodo(prev => prev ? { ...prev, priority: value } : prev);
-                      }}
-                      className="px-4 py-3 border-2 border-rose/20 rounded-2xl"
-                    >
-                      <option value="low">🌱 Thấp</option>
-                      <option value="medium">⭐ Trung bình</option>
-                      <option value="high">🔥 Cao</option>
-                    </select>
-                    <select
-                      value={selectedTodo.timeSlot}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        setTodos(prev => prev.map(t => t.id === selectedTodo.id ? { ...t, timeSlot: value } : t));
-                        setSelectedTodo(prev => prev ? { ...prev, timeSlot: value } : prev);
-                      }}
-                      className="px-4 py-3 border-2 border-rose/20 rounded-2xl"
-                    >
-                      {timeSlots.map(slot => (
-                        <option key={slot} value={slot}>{slot}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => handleDeleteTodo(selectedTodo.id)}
-                      className="flex-1 px-4 py-3 rounded-2xl border-2 border-rose/20 text-rose hover:bg-rose/5"
-                    >
-                      Xóa
-                    </button>
-                    <button
-                      onClick={() => setSelectedTodo(null)}
-                      className="flex-1 px-4 py-3 rounded-2xl border-2 border-rose/20 hover:bg-rose/5"
-                    >
-                      Bỏ chọn
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
+            {/* Focus Panel */}
+            <FocusPanel
+              selectedTodo={selectedTodo}
+              onUpdateTodo={handleUpdateTodo}
+              onDeleteTodo={handleDeleteTodo}
+              onClose={() => setSelectedTodo(null)}
+              animated={animatedElements.focus}
+            />
           </div>
         </div>
 
         {/* Empty State */}
         {todos.length === 0 && (
-          <div className={`text-center py-16 transition-all duration-1000 ease-out ${
-            animatedElements.timeSlots ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-          }`} style={{ transitionDelay: '800ms' }}>
-            <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-rose/10 to-terracotta/10 rounded-full flex items-center justify-center border border-rose/20">
-              <FaCheckCircle className="text-4xl text-rose" />
+          <div className={`text-center py-12 transition-all duration-${ANIMATION_CONFIG.duration} ${ANIMATION_CONFIG.easing} ${
+            animatedElements.schedule ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          }`}>
+            <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-rose/10 to-terracotta/10 rounded-full flex items-center justify-center border border-rose/20">
+              <FaCheckCircle className="text-3xl text-rose" />
             </div>
-            <h3 className="text-2xl font-bold text-ink mb-2">Chưa có công việc nào!</h3>
-            <p className="text-coffee/60 text-lg">Hãy bắt đầu với todo đầu tiên của bạn hôm nay ✨</p>
+            <h3 className="text-xl font-bold text-ink mb-2">Chưa có công việc nào!</h3>
+            <p className="text-coffee/60">Hãy thêm công việc đầu tiên của bạn ✨</p>
           </div>
         )}
       </div>

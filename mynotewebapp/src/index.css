@@ -652,3 +652,182 @@ body {
   50% { transform: translateY(5px) translateX(20px) rotate(180deg); }
   75% { transform: translateY(-15px) translateX(-5px) rotate(270deg); }
 }
+
+/* Enhanced floating animations for auth pages */
+@keyframes float5 {
+  0%, 100% { 
+    transform: translateY(0px) translateX(0px) rotate(0deg) scale(1); 
+    opacity: 0.1;
+  }
+  25% { 
+    transform: translateY(-40px) translateX(30px) rotate(120deg) scale(1.1); 
+    opacity: 0.15;
+  }
+  50% { 
+    transform: translateY(-20px) translateX(-25px) rotate(240deg) scale(0.9); 
+    opacity: 0.2;
+  }
+  75% { 
+    transform: translateY(-35px) translateX(15px) rotate(360deg) scale(1.05); 
+    opacity: 0.12;
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+  20%, 40%, 60%, 80% { transform: translateX(2px); }
+}
+
+@keyframes floatEnhanced1 {
+  0%, 100% { 
+    transform: translateY(0px) translateX(0px) rotate(0deg) scale(1); 
+    opacity: 0.08;
+  }
+  25% { 
+    transform: translateY(-50px) translateX(40px) rotate(90deg) scale(1.2); 
+    opacity: 0.12;
+  }
+  50% { 
+    transform: translateY(-20px) translateX(-30px) rotate(180deg) scale(0.8); 
+    opacity: 0.15;
+  }
+  75% { 
+    transform: translateY(-40px) translateX(20px) rotate(270deg) scale(1.1); 
+    opacity: 0.1;
+  }
+}
+
+@keyframes floatEnhanced2 {
+  0%, 100% { 
+    transform: translateY(0px) translateX(0px) rotate(45deg) scale(1); 
+    opacity: 0.1;
+  }
+  25% { 
+    transform: translateY(30px) translateX(-40px) rotate(135deg) scale(1.3); 
+    opacity: 0.15;
+  }
+  50% { 
+    transform: translateY(-25px) translateX(35px) rotate(225deg) scale(0.7); 
+    opacity: 0.18;
+  }
+  75% { 
+    transform: translateY(15px) translateX(-20px) rotate(315deg) scale(1.05); 
+    opacity: 0.12;
+  }
+}
+
+@keyframes floatEnhanced3 {
+  0%, 100% { 
+    transform: translateY(0px) translateX(0px) rotate(0deg) scale(1); 
+    opacity: 0.12;
+  }
+  33% { 
+    transform: translateY(-30px) translateX(25px) rotate(120deg) scale(1.15); 
+    opacity: 0.16;
+  }
+  66% { 
+    transform: translateY(15px) translateX(-35px) rotate(240deg) scale(0.85); 
+    opacity: 0.14;
+  }
+}
+
+@keyframes floatEnhanced4 {
+  0%, 100% { 
+    transform: translateY(0px) translateX(0px) rotate(0deg) scale(1); 
+    opacity: 0.09;
+  }
+  25% { 
+    transform: translateY(-35px) translateX(-25px) rotate(90deg) scale(1.25); 
+    opacity: 0.13;
+  }
+  50% { 
+    transform: translateY(8px) translateX(30px) rotate(180deg) scale(0.9); 
+    opacity: 0.16;
+  }
+  75% { 
+    transform: translateY(-20px) translateX(-10px) rotate(270deg) scale(1.08); 
+    opacity: 0.11;
+  }
+}
+
+@keyframes floatEnhanced5 {
+  0%, 100% { 
+    transform: translateY(0px) translateX(0px) rotate(0deg) scale(1); 
+    opacity: 0.07;
+  }
+  20% { 
+    transform: translateY(-45px) translateX(35px) rotate(72deg) scale(1.3); 
+    opacity: 0.12;
+  }
+  40% { 
+    transform: translateY(-15px) translateX(-40px) rotate(144deg) scale(0.8); 
+    opacity: 0.15;
+  }
+  60% { 
+    transform: translateY(-35px) translateX(20px) rotate(216deg) scale(1.1); 
+    opacity: 0.13;
+  }
+  80% { 
+    transform: translateY(-10px) translateX(-15px) rotate(288deg) scale(0.95); 
+    opacity: 0.1;
+  }
+}
+
+/* Enhanced floating shapes with new animations */
+.auth-pattern-bg .floating-shape.animate-float-1 {
+  animation: floatEnhanced1 20s ease-in-out infinite;
+}
+
+.auth-pattern-bg .floating-shape.animate-float-2 {
+  animation: floatEnhanced2 24s ease-in-out infinite;
+}
+
+.auth-pattern-bg .floating-shape.animate-float-3 {
+  animation: floatEnhanced3 16s ease-in-out infinite;
+}
+
+.auth-pattern-bg .floating-shape.animate-float-4 {
+  animation: floatEnhanced4 22s ease-in-out infinite;
+}
+
+.auth-pattern-bg .floating-shape.animate-float-5 {
+  animation: floatEnhanced5 18s ease-in-out infinite;
+}
+
+/* Shake animation for error messages */
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* Enhanced floating shapes positioning */
+.auth-pattern-bg .floating-shape:nth-child(5) {
+  top: 15%;
+  right: 25%;
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(45deg, #a27b5c, #c9ada7);
+  border-radius: 50%;
+  animation: float5 14s ease-in-out infinite;
+}
+
+/* Additional floating shapes for enhanced effect */
+.auth-pattern-bg .floating-shape:nth-child(6) {
+  top: 60%;
+  left: 5%;
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(45deg, #7c8a6a, #b08d57);
+  clip-path: polygon(50% 0%, 0% 50%, 50% 100%, 100% 50%);
+  animation: floatEnhanced1 26s ease-in-out infinite;
+}
+
+.auth-pattern-bg .floating-shape:nth-child(7) {
+  top: 70%;
+  right: 5%;
+  width: 22px;
+  height: 22px;
+  background: linear-gradient(45deg, #c9ada7, #7c8a6a);
+  border-radius: 50%;
+  animation: floatEnhanced2 30s ease-in-out infinite;
+}

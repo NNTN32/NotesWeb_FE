@@ -243,7 +243,7 @@ function WeeklyPlan() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
         
         {/* Compact Header Section */}
@@ -251,20 +251,20 @@ function WeeklyPlan() {
           animatedElements.header ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}>
           {/* Welcome badge */}
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 px-4 py-2 rounded-full border border-indigo-500/20">
-            <FaCalendarWeek className="text-indigo-500 text-sm" />
-            <span className="text-sm font-medium text-gray-800">Weekly Planner</span>
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 dark:from-indigo-500/20 dark:to-purple-500/20 px-4 py-2 rounded-full border border-indigo-500/20 dark:border-indigo-400/30">
+            <FaCalendarWeek className="text-indigo-500 dark:text-indigo-400 text-sm" />
+            <span className="text-sm font-medium text-gray-800 dark:text-gray-200">Weekly Planner</span>
           </div>
           
           <h1 className="text-3xl sm:text-4xl font-bold leading-tight">
-            <span className="text-gray-800">Lập kế hoạch tuần</span>
+            <span className="text-gray-800 dark:text-gray-200">Lập kế hoạch tuần</span>
             <br />
-            <span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 dark:from-indigo-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
               một cách thông minh
             </span>
           </h1>
           
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
             {today} • {CONSTANTS.MOTIVATIONAL_MESSAGES[Math.floor(Math.random() * CONSTANTS.MOTIVATIONAL_MESSAGES.length)]}
           </p>
         </div>
@@ -285,8 +285,8 @@ function WeeklyPlan() {
                     <span className="text-lg">{achievement.icon}</span>
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-800">Thành tích tuần</h3>
-                    <p className="text-sm text-gray-600">{achievement.label} ({weeklyProgress}%)</p>
+                    <h3 className="font-bold text-gray-800 dark:text-gray-200">Thành tích tuần</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">{achievement.label} ({weeklyProgress}%)</p>
                   </div>
                 </div>
                 
@@ -317,24 +317,24 @@ function WeeklyPlan() {
                       />
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-sm font-bold text-gray-800">{weeklyProgress}%</span>
+                      <span className="text-sm font-bold text-gray-800 dark:text-gray-200">{weeklyProgress}%</span>
                     </div>
                   </div>
                 </div>
                 
                 {/* Compact Stats */}
                 <div className="grid grid-cols-3 gap-2 text-center">
-                  <div className="bg-indigo-50 rounded-lg p-2">
-                    <div className="text-lg font-bold text-indigo-600">{totalTodos}</div>
-                    <div className="text-xs text-gray-600">Tổng</div>
+                  <div className="bg-indigo-50 dark:bg-indigo-900/30 rounded-lg p-2">
+                    <div className="text-lg font-bold text-indigo-600 dark:text-indigo-400">{totalTodos}</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-300">Tổng</div>
                   </div>
-                  <div className="bg-green-50 rounded-lg p-2">
-                    <div className="text-lg font-bold text-green-600">{completedTodos}</div>
-                    <div className="text-xs text-gray-600">Xong</div>
+                  <div className="bg-green-50 dark:bg-green-900/30 rounded-lg p-2">
+                    <div className="text-lg font-bold text-green-600 dark:text-green-400">{completedTodos}</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-300">Xong</div>
                   </div>
-                  <div className="bg-pink-50 rounded-lg p-2">
-                    <div className="text-lg font-bold text-pink-600">{totalTodos - completedTodos}</div>
-                    <div className="text-xs text-gray-600">Còn</div>
+                  <div className="bg-pink-50 dark:bg-pink-900/30 rounded-lg p-2">
+                    <div className="text-lg font-bold text-pink-600 dark:text-pink-400">{totalTodos - completedTodos}</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-300">Còn</div>
                   </div>
                 </div>
               </div>
@@ -346,8 +346,8 @@ function WeeklyPlan() {
             }`} style={{ transitionDelay: '200ms' }}>
               <div className="bg-white rounded-2xl shadow-lg border border-indigo-100 p-4">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-bold text-gray-800 flex items-center gap-2">
-                    <div className="p-1.5 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500">
+                  <h3 className="font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                    <div className="p-1.5 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 dark:from-indigo-400 dark:to-purple-400">
                       <FaBullseye className="text-white text-sm" />
                     </div>
                     Focus tuần
@@ -355,7 +355,7 @@ function WeeklyPlan() {
                   <select
                     value={weeklyFilter}
                     onChange={(e) => setWeeklyFilter(e.target.value)}
-                    className="text-xs px-2 py-1 border border-indigo-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition-all bg-white"
+                    className="text-xs px-2 py-1 border border-indigo-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
                   >
                     <option value="all">Tất cả</option>
                     <option value="high">Cao</option>
@@ -371,7 +371,7 @@ function WeeklyPlan() {
                     
                     if (focus.length === 0) {
                       return (
-                        <div className="text-center py-6 text-gray-400">
+                        <div className="text-center py-6 text-gray-400 dark:text-gray-500">
                           <FaBullseye className="text-2xl mx-auto mb-2" />
                           <p className="text-sm">Chưa có mục tiêu nổi bật</p>
                         </div>
@@ -383,8 +383,8 @@ function WeeklyPlan() {
                         key={todo.id} 
                         className={`p-3 rounded-xl border transition-all duration-300 hover:shadow-md ${
                           todo.completed 
-                            ? 'border-green-200 bg-green-50' 
-                            : 'border-indigo-200 bg-indigo-50'
+                            ? 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/30' 
+                            : 'border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-900/30'
                         }`}
                         style={{ animationDelay: `${index * 100}ms` }}
                       >
@@ -394,20 +394,20 @@ function WeeklyPlan() {
                             className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all mt-0.5 flex-shrink-0 ${
                               todo.completed 
                                 ? 'bg-green-500 border-green-500 text-white' 
-                                : 'border-indigo-300 hover:border-indigo-500'
+                                : 'border-indigo-300 dark:border-indigo-600 hover:border-indigo-500 dark:hover:border-indigo-400'
                             }`}
                           >
                             {todo.completed && <FaCheckCircle className="text-xs" />}
                           </button>
                           <div className="flex-1 min-w-0">
                             <div className={`text-sm font-medium leading-relaxed ${
-                              todo.completed ? 'line-through text-gray-500' : 'text-gray-800'
+                              todo.completed ? 'line-through text-gray-500 dark:text-gray-400' : 'text-gray-800 dark:text-gray-200'
                             }`}>{todo.text}</div>
                             <div className="mt-2 flex items-center gap-2">
                               <span className={`text-xs px-2 py-0.5 rounded-full ${CONSTANTS.PRIORITY.COLORS[todo.priority]}`}>
                                 {CONSTANTS.PRIORITY.LABELS[todo.priority].split(' ')[1]}
                               </span>
-                              <span className="text-xs text-gray-500">{todo.weekDay}</span>
+                              <span className="text-xs text-gray-500 dark:text-gray-400">{todo.weekDay}</span>
                             </div>
                           </div>
                         </div>
@@ -426,20 +426,20 @@ function WeeklyPlan() {
             }`} style={{ transitionDelay: '400ms' }}>
               
               {/* Enhanced Weekly Plan Header */}
-              <div className="bg-white rounded-2xl shadow-lg border border-indigo-100 p-6 mb-6">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-indigo-100 dark:border-gray-700 p-6 mb-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
-                    <div className="p-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500">
+                  <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 flex items-center gap-3">
+                    <div className="p-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 dark:from-purple-400 dark:to-pink-400">
                       <FaCalendarCheck className="text-white text-lg" />
                     </div>
                     Kế hoạch tuần của bạn
                   </h3>
                   <div className="flex items-center gap-3">
-                    <span className="text-sm text-gray-600">Bộ lọc:</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-300">Bộ lọc:</span>
                     <select
                       value={weeklyFilter}
                       onChange={(e) => setWeeklyFilter(e.target.value)}
-                      className="px-3 py-2 border-2 border-indigo-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition-all bg-white"
+                      className="px-3 py-2 border-2 border-indigo-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
                     >
                       <option value="all">Tất cả</option>
                       <option value="high">Ưu tiên cao</option>
@@ -462,13 +462,13 @@ function WeeklyPlan() {
                         key={day}
                         className={`text-center p-3 rounded-xl transition-all ${
                           isToday 
-                            ? 'bg-gradient-to-br from-indigo-100 to-purple-100 border-2 border-indigo-300' 
-                            : 'bg-gray-50 border border-gray-200'
+                            ? 'bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/50 dark:to-purple-900/50 border-2 border-indigo-300 dark:border-indigo-600' 
+                            : 'bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600'
                         }`}
                       >
-                        <div className="text-sm font-medium text-gray-700 mb-1">{day}</div>
-                        <div className="text-lg font-bold text-gray-800">{completedCount}/{totalCount}</div>
-                        <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
+                        <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{day}</div>
+                        <div className="text-lg font-bold text-gray-800 dark:text-gray-200">{completedCount}/{totalCount}</div>
+                        <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-1.5 mt-2">
                           <div 
                             className={`h-1.5 rounded-full bg-gradient-to-r ${CONSTANTS.DAY_COLORS[day]} transition-all duration-1000`}
                             style={{ width: `${totalCount > 0 ? (completedCount / totalCount) * 100 : 0}%` }}
@@ -497,29 +497,29 @@ function WeeklyPlan() {
                   return (
                     <div 
                       key={day}
-                      className={`bg-white rounded-2xl shadow-lg border-2 overflow-hidden transition-all duration-500 hover:shadow-xl ${
-                        isToday ? 'border-indigo-300 bg-gradient-to-br from-indigo-50 to-purple-50' : 'border-gray-100'
+                      className={`bg-white dark:bg-gray-800 rounded-2xl shadow-lg border-2 overflow-hidden transition-all duration-500 hover:shadow-xl ${
+                        isToday ? 'border-indigo-300 dark:border-indigo-600 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30' : 'border-gray-100 dark:border-gray-700'
                       }`}
                       style={{ animationDelay: `${index * 100}ms` }}
                     >
                       {/* Enhanced Day Header */}
                       <div className="p-4 border-b border-gray-100">
                         <div className="flex items-center justify-between mb-3">
-                          <h4 className={`font-bold text-lg ${isToday ? 'text-indigo-700' : 'text-gray-800'}`}>
+                          <h4 className={`font-bold text-lg ${isToday ? 'text-indigo-700 dark:text-indigo-300' : 'text-gray-800 dark:text-gray-200'}`}>
                             {day}
                           </h4>
                           <div className="flex items-center gap-2">
                             {isToday && (
                               <div className="w-2 h-2 bg-indigo-500 rounded-full animate-ping"></div>
                             )}
-                            <span className="text-sm font-medium text-gray-600">
+                            <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
                               {completedCount}/{totalCount}
                             </span>
                           </div>
                         </div>
                         
                         {/* Enhanced Progress Bar */}
-                        <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                        <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2 overflow-hidden">
                           <div 
                             className={`h-2 rounded-full bg-gradient-to-r ${CONSTANTS.DAY_COLORS[day]} transition-all duration-1000`}
                             style={{ width: `${totalCount > 0 ? (completedCount / totalCount) * 100 : 0}%` }}
@@ -530,7 +530,7 @@ function WeeklyPlan() {
                       {/* Enhanced Todos List */}
                       <div className="p-4 space-y-3">
                         {totalCount === 0 ? (
-                          <div className="text-center py-8 text-gray-400">
+                          <div className="text-center py-8 text-gray-400 dark:text-gray-500">
                             <FaCalendarAlt className="text-2xl mx-auto mb-2" />
                             <p className="text-sm">Không có công việc</p>
                           </div>
@@ -541,8 +541,8 @@ function WeeklyPlan() {
                                 key={todo.id}
                                 className={`p-3 rounded-xl border transition-all duration-300 hover:shadow-md ${
                                   todo.completed 
-                                    ? 'bg-green-50 border-green-200' 
-                                    : 'bg-gray-50 border-gray-200 hover:border-indigo-300'
+                                    ? 'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800' 
+                                    : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-600'
                                 }`}
                               >
                                 <div className="flex items-start gap-3">
@@ -551,7 +551,7 @@ function WeeklyPlan() {
                                     className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all mt-0.5 flex-shrink-0 ${
                                       todo.completed 
                                         ? 'bg-green-500 border-green-500 text-white' 
-                                        : 'border-gray-300 hover:border-indigo-500'
+                                        : 'border-gray-300 dark:border-gray-600 hover:border-indigo-500 dark:hover:border-indigo-400'
                                     }`}
                                   >
                                     {todo.completed && <FaCheckCircle className="text-xs" />}
@@ -559,24 +559,24 @@ function WeeklyPlan() {
                                   
                                   <div className="flex-1 min-w-0">
                                     <div className={`text-sm font-medium leading-relaxed ${
-                                      todo.completed ? 'line-through text-gray-500' : 'text-gray-800'
+                                      todo.completed ? 'line-through text-gray-500 dark:text-gray-400' : 'text-gray-800 dark:text-gray-200'
                                     }`}>{todo.text}</div>
                                     <div className="mt-2 flex items-center gap-2">
                                       <span className={`text-xs px-2 py-1 rounded-full ${CONSTANTS.PRIORITY.COLORS[todo.priority]}`}>
                                         {CONSTANTS.PRIORITY.LABELS[todo.priority].split(' ')[1]}
                                       </span>
-                                      <span className="text-xs text-gray-500 flex items-center gap-1">
+                                      <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
                                         <FaClock className="text-xs" /> {todo.dueDate}
                                       </span>
                                     </div>
                                   </div>
                                   
-                                  <button
-                                    onClick={() => handleDeleteTodo(todo.id)}
-                                    className="p-1 rounded hover:bg-red-100 transition-colors text-red-500 hover:text-red-700"
-                                  >
-                                    <FaTrash className="text-xs" />
-                                  </button>
+                                    <button
+                                      onClick={() => handleDeleteTodo(todo.id)}
+                                      className="p-1 rounded hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
+                                    >
+                                      <FaTrash className="text-xs" />
+                                    </button>
                                 </div>
                               </div>
                             ))}
@@ -584,7 +584,7 @@ function WeeklyPlan() {
                             {remaining > 0 && (
                               <button
                                 onClick={() => toggleDayCollapse(day)}
-                                className="w-full flex items-center justify-center text-sm text-indigo-600 hover:text-indigo-800 py-2 hover:bg-indigo-50 rounded-lg transition-colors"
+                                className="w-full flex items-center justify-center text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 py-2 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-colors"
                               >
                                 {isCollapsed ? <FaExpand className="mr-1" /> : <FaCompress className="mr-1" />}
                                 {isCollapsed ? `Xem thêm ${remaining} công việc` : `Thu gọn`}
@@ -604,7 +604,7 @@ function WeeklyPlan() {
         {/* Floating Action Button */}
         <button
           onClick={() => setShowSidePanel(true)}
-          className="fixed right-6 bottom-6 z-30 w-14 h-14 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-full shadow-2xl hover:shadow-3xl hover:scale-110 transition-all duration-300 flex items-center justify-center group"
+          className="fixed right-6 bottom-6 z-30 w-14 h-14 bg-gradient-to-r from-indigo-500 to-purple-500 dark:from-indigo-400 dark:to-purple-400 text-white rounded-full shadow-2xl hover:shadow-3xl hover:scale-110 transition-all duration-300 flex items-center justify-center group"
         >
           <FaPlus className="text-xl group-hover:rotate-90 transition-transform duration-300" />
         </button>
@@ -613,19 +613,19 @@ function WeeklyPlan() {
         {showSidePanel && (
           <div className="fixed inset-0 z-40 flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowSidePanel(false)}></div>
-            <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-indigo-100 p-6 animate-slide-up">
+            <div className="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-indigo-100 dark:border-gray-700 p-6 animate-slide-up">
               <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500">
-                    <FaTachometerAlt className="text-white" />
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 dark:from-indigo-400 dark:to-purple-400">
+                      <FaTachometerAlt className="text-white" />
+                    </div>
+                    <span className="font-bold text-gray-800 dark:text-gray-200 text-lg">Thêm công việc</span>
                   </div>
-                  <span className="font-bold text-gray-800 text-lg">Thêm công việc</span>
-                </div>
                 <button 
-                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors" 
+                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" 
                   onClick={() => setShowSidePanel(false)}
                 >
-                  <FaTimes className="text-gray-500" />
+                  <FaTimes className="text-gray-500 dark:text-gray-400" />
                 </button>
               </div>
               
@@ -635,7 +635,7 @@ function WeeklyPlan() {
                   placeholder="Bạn muốn hoàn thành gì tuần này? ✨"
                   value={newTodo}
                   onChange={(e) => setNewTodo(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-indigo-200 rounded-xl focus:ring-4 focus:ring-indigo-200 focus:border-indigo-500 transition-all"
+                  className="w-full px-4 py-3 border-2 border-indigo-200 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-indigo-200 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
                   onKeyPress={(e) => e.key === 'Enter' && handleAddTodo()}
                   autoFocus
                 />
@@ -658,7 +658,7 @@ function WeeklyPlan() {
                 </div>
                 <button 
                   onClick={handleAddTodo} 
-                  className="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl font-semibold hover:from-purple-500 hover:to-indigo-500 transition-all duration-300 shadow-lg hover:shadow-xl"
+                  className="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500 dark:from-indigo-400 dark:to-purple-400 text-white rounded-xl font-semibold hover:from-purple-500 hover:to-indigo-500 dark:hover:from-purple-400 dark:hover:to-indigo-400 transition-all duration-300 shadow-lg hover:shadow-xl"
                 >
                   Thêm công việc
                 </button>

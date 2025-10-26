@@ -22,6 +22,8 @@ import {
 } from "react-icons/fa";
 import { useContext, useState, useCallback, memo } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
+import { FaMoon, FaSun } from "react-icons/fa";
 
 const navItems = [
   { to: "/", label: "Trang chủ", icon: <FaHome /> },
@@ -39,6 +41,7 @@ const quickActions = [
 
 function SideMenu() {
   const { user, logout } = useContext(AuthContext) || {};
+  const { theme, toggleTheme } = useTheme();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -157,6 +160,17 @@ function SideMenu() {
               
               {/* User Actions */}
               <div className={`flex items-center gap-1 sm:gap-2 ${!isOpen ? "justify-center" : ""}`}>
+                <button 
+                  onClick={toggleTheme}
+                  className="flex-1 p-1.5 sm:p-2 hover:bg-white/20 rounded-lg text-white/80 hover:text-white transition-colors"
+                  title={theme === 'light' ? 'Chuyển sang Dark Mode' : 'Chuyển sang Light Mode'}
+                >
+                  {theme === 'light' ? (
+                    <FaMoon className="text-xs sm:text-sm mx-auto" />
+                  ) : (
+                    <FaSun className="text-xs sm:text-sm mx-auto" />
+                  )}
+                </button>
                 <button className="flex-1 p-1.5 sm:p-2 hover:bg-white/20 rounded-lg text-white/80 hover:text-white transition-colors">
                   <FaBell className="text-xs sm:text-sm mx-auto" />
                 </button>
@@ -176,6 +190,22 @@ function SideMenu() {
             </div>
           ) : (
             <div className="space-y-2">
+              <button 
+                onClick={toggleTheme}
+                className={`
+                  w-full flex items-center justify-center sm:justify-start gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl hover:bg-white/20 
+                  text-white transition-all duration-300 hover:scale-105 font-semibold shadow-md text-sm sm:text-base
+                  ${!isOpen ? "px-2" : ""}
+                `}
+                title={theme === 'light' ? 'Chuyển sang Dark Mode' : 'Chuyển sang Light Mode'}
+              >
+                {theme === 'light' ? (
+                  <FaMoon className="min-w-[16px] sm:min-w-[20px]" />
+                ) : (
+                  <FaSun className="min-w-[16px] sm:min-w-[20px]" />
+                )}
+                {isOpen && <span>{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>}
+              </button>
               <Link
                 to="/login"
                 onClick={() => setIsMobileOpen(false)}

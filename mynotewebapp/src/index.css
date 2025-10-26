@@ -380,6 +380,11 @@ body {
   padding: 0;
 }
 
+/* Dark mode base styles */
+.dark {
+  color-scheme: dark;
+}
+
 /* Aurora background (inspired by reactbits aurora) */
 @keyframes auroraShift {
   0% {
@@ -477,11 +482,19 @@ body {
   min-height: 100vh;
 }
 
+.dark .patterncraft-bg {
+  background: linear-gradient(135deg, #1a1614 0%, #221e1c 25%, #2a2422 50%, #322a28 75%, #3a302e 100%);
+}
+
 /* Notes-specific background with PatternCraft-inspired grid pattern */
 .notes-bg {
   position: relative;
   background: #ffffff;
   min-height: 100vh;
+}
+
+.dark .notes-bg {
+  background: #1a1614;
 }
 
 .notes-bg::before {
@@ -499,6 +512,12 @@ body {
   z-index: 1;
 }
 
+.dark .notes-bg::before {
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+}
+
 .notes-bg::after {
   content: '';
   position: absolute;
@@ -514,6 +533,13 @@ body {
   z-index: 2;
 }
 
+.dark .notes-bg::after {
+  background: 
+    radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
+    linear-gradient(135deg, rgba(26, 22, 20, 0.4) 0%, rgba(34, 30, 28, 0.2) 100%);
+}
+
 /* Ensure content is above the pattern */
 .patterncraft-content {
   position: relative;
@@ -526,6 +552,10 @@ body {
   background: linear-gradient(135deg, #fefaf7 0%, #fdf7f0 25%, #fdf2e8 50%, #fdeee0 75%, #fdefdc 100%);
   min-height: 100vh;
   overflow: hidden;
+}
+
+.dark .auth-pattern-bg {
+  background: linear-gradient(135deg, #1a1614 0%, #221e1c 25%, #2a2422 50%, #322a28 75%, #3a302e 100%);
 }
 
 .auth-pattern-bg::before {

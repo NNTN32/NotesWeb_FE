@@ -10,6 +10,7 @@ import NoteForm from './pages/users/NoteForm';
 import Todo from './pages/users/Todo';
 import WeeklyPlan from './pages/users/WeeklyPlan';
 import { AuthProvider } from "./context/AuthContext";
+import { ThemeProvider } from "./context/ThemeContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -31,8 +32,9 @@ function App() {
   }
 
   return (
-    <AuthProvider>
-      <BrowserRouter>
+    <ThemeProvider>
+      <AuthProvider>
+        <BrowserRouter>
         <div className="min-h-screen flex">
           <SideMenu />
           <div className="flex-1 flex flex-col">
@@ -51,7 +53,8 @@ function App() {
           <ToastContainer position="top-right" autoClose={2000} hideProgressBar theme="colored" />
         </div>
       </BrowserRouter>
-    </AuthProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

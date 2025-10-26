@@ -66,7 +66,7 @@ const FULLSCREEN_CONFIG = {
 const BACKGROUND_CONFIG = {
   // Use the same background for both fullscreen and normal mode
   // This ensures visual consistency and maintains the grid pattern across all states
-  MAIN_BACKGROUND: 'min-h-screen bg-white transition-all duration-300 notes-bg'
+  MAIN_BACKGROUND: 'min-h-screen bg-white dark:bg-gray-900 transition-all duration-300 notes-bg'
 };
 
 // Helper functions for cleaner code
@@ -253,11 +253,11 @@ const CollapsibleSidebar = ({ isOpen, onToggle, deviceType, isFullscreen }) => {
     // Compact version for fullscreen mode - uses pill-style badges
     if (isCompact) {
       return (
-        <div className="p-2 rounded-md bg-gradient-to-r from-rose/5 to-terracotta/5 border border-rose/10">
-          <h3 className="font-semibold text-ink text-xs mb-1">Tips</h3>
+        <div className="p-2 rounded-md bg-gradient-to-r from-rose/5 to-terracotta/5 dark:from-gray-700/50 dark:to-gray-600/50 border border-rose/10 dark:border-gray-600">
+          <h3 className="font-semibold text-ink dark:text-gray-200 text-xs mb-1">Tips</h3>
           <div className="flex flex-wrap gap-1">
             {currentTips.map((tip, index) => (
-              <span key={index} className="text-xs text-coffee/70 bg-white/50 px-2 py-1 rounded-full">
+              <span key={index} className="text-xs text-coffee/70 dark:text-gray-300 bg-white/50 dark:bg-gray-600/50 px-2 py-1 rounded-full">
                 {tip}
               </span>
             ))}
@@ -268,9 +268,9 @@ const CollapsibleSidebar = ({ isOpen, onToggle, deviceType, isFullscreen }) => {
 
     // Full version for normal mode - uses traditional list layout
     return (
-      <div className="p-4 rounded-lg bg-gradient-to-r from-rose/5 to-terracotta/5 border border-rose/10">
-        <h3 className="font-semibold text-ink text-sm mb-2">Device Tips</h3>
-        <ul className="text-xs text-coffee/80 space-y-1">
+      <div className="p-4 rounded-lg bg-gradient-to-r from-rose/5 to-terracotta/5 dark:from-gray-700/50 dark:to-gray-600/50 border border-rose/10 dark:border-gray-600">
+        <h3 className="font-semibold text-ink dark:text-gray-200 text-sm mb-2">Device Tips</h3>
+        <ul className="text-xs text-coffee/80 dark:text-gray-300 space-y-1">
           {currentTips.map((tip, index) => (
             <li key={index}>• {tip}</li>
           ))}
@@ -306,20 +306,20 @@ const CollapsibleSidebar = ({ isOpen, onToggle, deviceType, isFullscreen }) => {
               </div>
 
               {/* Device icon */}
-              <div className="p-2 rounded-lg bg-coffee/5">
+              <div className="p-2 rounded-lg bg-coffee/5 dark:bg-gray-700/50">
                 {getDeviceIcon()}
               </div>
 
               {/* Quick action icons */}
               <div className="flex flex-col space-y-2">
-                <button className="p-2 rounded-lg hover:bg-rose/10 transition-colors" title="New Note">
-                  <FaRegStickyNote className="text-terracotta" />
+                <button className="p-2 rounded-lg hover:bg-rose/10 dark:hover:bg-gray-600/50 transition-colors" title="New Note">
+                  <FaRegStickyNote className="text-terracotta dark:text-rose-400" />
                 </button>
-                <button className="p-2 rounded-lg hover:bg-rose/10 transition-colors" title="Recent Notes">
-                  <FaClock className="text-brass" />
+                <button className="p-2 rounded-lg hover:bg-rose/10 dark:hover:bg-gray-600/50 transition-colors" title="Recent Notes">
+                  <FaClock className="text-brass dark:text-yellow-400" />
                 </button>
-                <button className="p-2 rounded-lg hover:bg-rose/10 transition-colors" title="Templates">
-                  <FaMagic className="text-rose" />
+                <button className="p-2 rounded-lg hover:bg-rose/10 dark:hover:bg-gray-600/50 transition-colors" title="Templates">
+                  <FaMagic className="text-rose dark:text-pink-400" />
                 </button>
               </div>
 
@@ -384,15 +384,15 @@ const CollapsibleSidebar = ({ isOpen, onToggle, deviceType, isFullscreen }) => {
 
 // Status indicator component with dedicated space
 const StatusIndicator = ({ hasUnsavedChanges, lastSaved, isAutoSaving }) => (
-  <div className="flex items-center gap-3 px-3 py-2 bg-white/80 rounded-lg shadow-sm border border-rose/10">
+  <div className="flex items-center gap-3 px-3 py-2 bg-white/80 dark:bg-gray-700/80 rounded-lg shadow-sm border border-rose/10 dark:border-gray-600">
     {/* Save status */}
     {hasUnsavedChanges ? (
-      <div className="flex items-center gap-2 text-amber-600">
+      <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
         <FaExclamationTriangle className="text-xs animate-pulse" />
         <span className="text-xs font-medium">Unsaved changes</span>
       </div>
     ) : (
-      <div className="flex items-center gap-2 text-green-600">
+      <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
         <FaCheckCircle className="text-xs" />
         <span className="text-xs font-medium">Saved</span>
       </div>
@@ -400,7 +400,7 @@ const StatusIndicator = ({ hasUnsavedChanges, lastSaved, isAutoSaving }) => (
     
     {/* Last saved time */}
     {lastSaved && (
-      <div className="text-xs text-coffee/60 border-l border-coffee/20 pl-3">
+      <div className="text-xs text-coffee/60 dark:text-gray-400 border-l border-coffee/20 dark:border-gray-500 pl-3">
         <FaClock className="inline mr-1" />
         {lastSaved}
       </div>
@@ -408,8 +408,8 @@ const StatusIndicator = ({ hasUnsavedChanges, lastSaved, isAutoSaving }) => (
     
     {/* Auto-saving indicator */}
     {isAutoSaving && (
-      <div className="flex items-center gap-1 text-blue-600">
-        <div className="animate-spin rounded-full h-3 w-3 border border-blue-600 border-t-transparent"></div>
+      <div className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
+        <div className="animate-spin rounded-full h-3 w-3 border border-blue-600 dark:border-blue-400 border-t-transparent"></div>
         <span className="text-xs">Auto-saving...</span>
       </div>
     )}
@@ -427,7 +427,7 @@ const ModernHeader = ({
   lastSaved,
   isAutoSaving
 }) => (
-  <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-sm border-b border-rose/10">
+  <div className="sticky top-0 z-30 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border-b border-rose/10 dark:border-gray-600">
     <div className="flex items-center justify-between p-3 sm:p-4 lg:p-6">
       {/* Left side - Menu and back */}
       <div className="flex items-center gap-2 sm:gap-3">
@@ -443,10 +443,10 @@ const ModernHeader = ({
         {/* Back button */}
         <button 
           onClick={onBackClick}
-          className="group flex items-center gap-2 text-coffee hover:text-terracotta transition-all duration-300"
+          className="group flex items-center gap-2 text-coffee dark:text-gray-300 hover:text-terracotta dark:hover:text-rose-400 transition-all duration-300"
           title="Go back to home"
         >
-          <div className="p-2 rounded-lg bg-white/80 shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all duration-300">
+          <div className="p-2 rounded-lg bg-white/80 dark:bg-gray-700/80 shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all duration-300">
             <FaArrowLeft className="text-sm group-hover:-translate-x-1 transition-transform duration-300" />
           </div>
           <span className="font-medium text-sm hidden sm:block">Quay lại</span>
@@ -456,11 +456,11 @@ const ModernHeader = ({
       {/* Center - Title and status */}
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-ink group cursor-default" title="Note Editor">
+          <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-ink dark:text-gray-200 group cursor-default" title="Note Editor">
             {isFullscreen ? 'Writing Mode' : 'Tạo ghi chú mới'}
           </h1>
           {!isFullscreen && (
-            <p className="text-xs sm:text-sm text-coffee/70 mt-1 group-hover:text-coffee/90 transition-colors">
+            <p className="text-xs sm:text-sm text-coffee/70 dark:text-gray-400 mt-1 group-hover:text-coffee/90 dark:group-hover:text-gray-300 transition-colors">
               {deviceType === 'mobile' ? 'Tap to write' : 
                deviceType === 'tablet' ? 'Perfect for Apple Pencil' : 
                'Use keyboard shortcuts'}
@@ -481,13 +481,13 @@ const ModernHeader = ({
         {/* Fullscreen toggle */}
         <button
           onClick={onToggleFullscreen}
-          className="p-2 rounded-lg hover:bg-coffee/10 transition-colors group"
+          className="p-2 rounded-lg hover:bg-coffee/10 dark:hover:bg-gray-600/50 transition-colors group"
           title={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
         >
           {isFullscreen ? (
-            <FaCompress className="text-coffee text-lg group-hover:scale-110 transition-transform" />
+            <FaCompress className="text-coffee dark:text-gray-300 text-lg group-hover:scale-110 transition-transform" />
           ) : (
-            <FaExpand className="text-coffee text-lg group-hover:scale-110 transition-transform" />
+            <FaExpand className="text-coffee dark:text-gray-300 text-lg group-hover:scale-110 transition-transform" />
           )}
         </button>
       </div>
@@ -499,32 +499,32 @@ const ModernHeader = ({
 const ModernTitleInput = ({ title, onTitleChange, titleRef, isFullscreen, deviceType }) => (
   <div className={`relative ${isFullscreen ? 'mb-4' : 'mb-6 sm:mb-8'}`}>
     <div className="relative">
-      <input
-        ref={titleRef}
-        type="text"
-        placeholder=" "
-        className={`
-          w-full bg-transparent border-0 border-b-2 border-coffee/20 
-          focus:border-terracotta focus:outline-none transition-all duration-300
-          text-ink font-medium touch-manipulation
-          ${isFullscreen ? `${getResponsiveClasses(FULLSCREEN_CONFIG.TITLE_TEXT_SIZE)} py-2 sm:py-3` : 
-            deviceType === 'mobile' ? 'text-lg py-3' :
-            'text-xl sm:text-2xl lg:text-3xl py-3 sm:py-4'}
-        `}
-        value={title}
-        onChange={e => onTitleChange(e.target.value)}
-        maxLength={FORM_CONFIG.MAX_TITLE_LENGTH}
-      />
+        <input
+          ref={titleRef}
+          type="text"
+          placeholder=" "
+          className={`
+            w-full bg-transparent border-0 border-b-2 border-coffee/20 dark:border-gray-500
+            focus:border-terracotta dark:focus:border-rose-400 focus:outline-none transition-all duration-300
+            text-ink dark:text-gray-200 font-medium touch-manipulation
+            ${isFullscreen ? `${getResponsiveClasses(FULLSCREEN_CONFIG.TITLE_TEXT_SIZE)} py-2 sm:py-3` : 
+              deviceType === 'mobile' ? 'text-lg py-3' :
+              'text-xl sm:text-2xl lg:text-3xl py-3 sm:py-4'}
+          `}
+          value={title}
+          onChange={e => onTitleChange(e.target.value)}
+          maxLength={FORM_CONFIG.MAX_TITLE_LENGTH}
+        />
       <label className={`
         absolute left-0 transition-all duration-300 pointer-events-none
-        ${title ? 'top-0 text-xs text-coffee/60' : 
-          isFullscreen ? 'top-3 text-sm text-coffee/40' :
-          'top-3 sm:top-4 text-sm sm:text-base text-coffee/40'}
+        ${title ? 'top-0 text-xs text-coffee/60 dark:text-gray-400' : 
+          isFullscreen ? 'top-3 text-sm text-coffee/40 dark:text-gray-500' :
+          'top-3 sm:top-4 text-sm sm:text-base text-coffee/40 dark:text-gray-500'}
       `}>
-        <FaLightbulb className="inline mr-2 text-brass" />
+        <FaLightbulb className="inline mr-2 text-brass dark:text-yellow-400" />
         {isFullscreen ? 'What\'s on your mind?' : 'Tiêu đề ghi chú'}
       </label>
-      <div className="absolute right-0 top-1/2 -translate-y-1/2 text-coffee/50 text-xs">
+      <div className="absolute right-0 top-1/2 -translate-y-1/2 text-coffee/50 dark:text-gray-400 text-xs">
         {title.length}/{FORM_CONFIG.MAX_TITLE_LENGTH}
       </div>
     </div>
@@ -547,7 +547,7 @@ const ModernContentArea = ({ content, onContentChange, contentRef, isFullscreen,
           }
           className={`
             w-full h-full bg-transparent border-0 resize-none
-            focus:outline-none text-ink leading-relaxed touch-manipulation
+            focus:outline-none text-ink dark:text-gray-200 leading-relaxed touch-manipulation
             ${isFullscreen ? 
               `${getResponsiveClasses(FULLSCREEN_CONFIG.CONTENT_TEXT_SIZE)} ${getResponsiveClasses(FULLSCREEN_CONFIG.CONTENT_PADDING)}` :
               deviceType === 'mobile' ? 
@@ -567,7 +567,7 @@ const ModernContentArea = ({ content, onContentChange, contentRef, isFullscreen,
             'bottom-2 right-2 px-2 py-1 rounded-full' :
             'bottom-4 right-4 px-2 py-1 rounded-full'
           }
-          ${isNearLimit ? 'bg-red-100 text-red-600' : 'bg-coffee/10 text-coffee/60'}
+          ${isNearLimit ? 'bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400' : 'bg-coffee/10 dark:bg-gray-700/50 text-coffee/60 dark:text-gray-400'}
         `}>
           {characterCount}/{FORM_CONFIG.MAX_CONTENT_LENGTH}
         </div>
@@ -597,7 +597,7 @@ const FloatingActionBar = ({
       <div className="flex items-center gap-2">
         {/* Save status with dedicated space */}
         {hasUnsavedChanges && (
-          <div className="flex items-center gap-2 px-3 py-2 bg-amber-100 text-amber-700 rounded-full text-sm animate-pulse shadow-sm">
+          <div className="flex items-center gap-2 px-3 py-2 bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 rounded-full text-sm animate-pulse shadow-sm">
             <FaExclamationTriangle className="text-xs" />
             <span className="hidden sm:block">Unsaved</span>
           </div>
@@ -605,7 +605,7 @@ const FloatingActionBar = ({
         
         {/* Last saved time */}
         {lastSaved && !hasUnsavedChanges && (
-          <div className="flex items-center gap-1 px-3 py-2 bg-green-100 text-green-700 rounded-full text-sm shadow-sm">
+          <div className="flex items-center gap-1 px-3 py-2 bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 rounded-full text-sm shadow-sm">
             <FaClock className="text-xs" />
             <span className="hidden sm:block">Saved {lastSaved}</span>
           </div>
@@ -613,8 +613,8 @@ const FloatingActionBar = ({
         
         {/* Auto-saving indicator */}
         {isAutoSaving && (
-          <div className="flex items-center gap-2 px-3 py-2 bg-blue-100 text-blue-700 rounded-full text-sm shadow-sm">
-            <div className="animate-spin rounded-full h-3 w-3 border border-blue-700 border-t-transparent"></div>
+          <div className="flex items-center gap-2 px-3 py-2 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full text-sm shadow-sm">
+            <div className="animate-spin rounded-full h-3 w-3 border border-blue-700 dark:border-blue-300 border-t-transparent"></div>
             <span className="hidden sm:block">Auto-saving...</span>
           </div>
         )}
@@ -628,8 +628,8 @@ const FloatingActionBar = ({
           group relative flex items-center gap-2 px-4 py-3 rounded-full font-semibold 
           transition-all duration-500 touch-manipulation shadow-lg hover:shadow-xl
           ${isDisabled
-            ? 'bg-coffee/20 text-coffee/50 cursor-not-allowed'
-            : 'bg-gradient-to-r from-terracotta to-brass text-white hover:scale-105 active:scale-95'
+            ? 'bg-coffee/20 dark:bg-gray-600/50 text-coffee/50 dark:text-gray-400 cursor-not-allowed'
+            : 'bg-gradient-to-r from-terracotta to-brass dark:from-rose-500 dark:to-pink-500 text-white hover:scale-105 active:scale-95'
           }
           ${isFullscreen ? 'text-base px-6 py-4' : 'text-sm'}
         `}

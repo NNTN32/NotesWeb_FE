@@ -17,7 +17,7 @@ export default function Register() {
 
     try {
       // Simple validation
-      if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+      if (!formData.email || !formData.username || !formData.password || !formData.confirmPassword) {
         throw new Error("Vui lòng điền đầy đủ thông tin");
       }
 
@@ -36,7 +36,7 @@ export default function Register() {
       const userData = {
         id: 1,
         email: formData.email,
-        name: formData.name
+        username: formData.username
       };
       
       login(userData);
@@ -50,21 +50,21 @@ export default function Register() {
 
   const fields = [
     {
-      name: "name",
-      type: "text",
-      label: "Họ và tên",
-      placeholder: "Nhập họ và tên của bạn",
-      required: true,
-      autoComplete: "name",
-      showValidation: true
-    },
-    {
       name: "email",
       type: "email",
       label: "Email",
       placeholder: "Nhập email của bạn",
       required: true,
       autoComplete: "email",
+      showValidation: true
+    },
+    {
+      name: "username",
+      type: "text",
+      label: "Tên đăng nhập",
+      placeholder: "Nhập tên đăng nhập của bạn",
+      required: true,
+      autoComplete: "username",
       showValidation: true
     },
     {

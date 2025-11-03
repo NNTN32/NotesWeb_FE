@@ -95,6 +95,7 @@ export default function AuthForm({
       case "confirmPassword":
         return FaLock;
       case "name":
+      case "username":
         return FaUser;
       default:
         return null;

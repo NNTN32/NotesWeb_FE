@@ -20,14 +20,14 @@ export default function Login() {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Simple validation
-      if (!formData.email || !formData.password) {
+      if (!formData.username || !formData.password) {
         throw new Error("Vui lòng điền đầy đủ thông tin");
       }
 
       // Mock login - replace with actual API call
       const userData = {
         id: 1,
-        email: formData.email,
+        username: formData.username,
         name: "User"
       };
       
@@ -42,12 +42,12 @@ export default function Login() {
 
   const fields = [
     {
-      name: "email",
-      type: "email",
-      label: "Email",
-      placeholder: "Nhập email của bạn",
+      name: "username",
+      type: "text",
+      label: "Tên đăng nhập",
+      placeholder: "Nhập tên đăng nhập của bạn",
       required: true,
-      autoComplete: "email",
+      autoComplete: "username",
       showValidation: true
     },
     {

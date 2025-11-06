@@ -110,7 +110,7 @@ export default function AuthForm({
       case "email":
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
       case "password":
-        return value.length >= 6;
+        return value.length > 0;
       case "confirmPassword":
         return value === formData.password;
       default:

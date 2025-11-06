@@ -1,7 +1,8 @@
 import axios from 'axios';
 
+// Use relative baseURL to work with Vite dev proxy (avoids CORS in dev)
 const axiosConfig = axios.create({
-  baseURL: 'http://localhost:8081'
+  baseURL: '/api'
 });
 
 axiosConfig.interceptors.request.use(

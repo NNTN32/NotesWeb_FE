@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FaUserPlus } from "react-icons/fa";
 import { AuthContext } from "../../context/AuthContext";
 import AuthForm from "../../components/AuthForm";
+import { registerUser } from "../../utils/api/auth";
 
 export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
@@ -16,7 +17,6 @@ export default function Register() {
     setError("");
 
     try {
-      // Simple validation
       if (!formData.email || !formData.username || !formData.password || !formData.confirmPassword) {
         throw new Error("Vui lòng điền đầy đủ thông tin");
       }
@@ -25,24 +25,17 @@ export default function Register() {
         throw new Error("Mật khẩu xác nhận không khớp");
       }
 
-      if (formData.password.length < 6) {
-        throw new Error("Mật khẩu phải có ít nhất 6 ký tự");
-      }
-
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mock registration - replace with actual API call
-      const userData = {
-        id: 1,
+      await registerUser({
         email: formData.email,
-        username: formData.username
-      };
-      
-      login(userData);
-      navigate("/");
+        username: formData.username,
+        password: formData.password
+        // role is defaulted to USER in API helper
+      });
+
+      navigate("/login");
     } catch (err) {
-      setError(err.message);
+      const message = err?.response?.data || err?.message || "Đăng ký thất bại";
+      setError(message);
     } finally {
       setIsLoading(false);
     }
@@ -71,7 +64,7 @@ export default function Register() {
       name: "password",
       type: "password",
       label: "Mật khẩu",
-      placeholder: "Nhập mật khẩu (ít nhất 6 ký tự)",
+      placeholder: "Nhập mật khẩu",
       required: true,
       autoComplete: "new-password"
     },

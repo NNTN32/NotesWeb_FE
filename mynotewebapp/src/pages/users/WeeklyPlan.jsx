@@ -3,31 +3,15 @@ import {
   FaCheckCircle, 
   FaCalendarAlt, 
   FaTrash, 
-  FaEdit, 
-  FaStar, 
-  FaFire, 
-  FaLightbulb, 
   FaClock, 
   FaCalendarWeek, 
   FaBullseye, 
-  FaFilter, 
-  FaChevronRight, 
   FaTachometerAlt, 
-  FaPlusCircle, 
   FaTimes, 
   FaPlus,
-  FaChevronDown,
-  FaChevronUp,
-  FaRocket,
-  FaHeart,
-  FaArrowRight,
-  FaPlay,
-  FaUsers,
-  FaTrophy,
-  FaChartLine,
   FaCalendarCheck,
-  FaExpand,
-  FaCompress
+  FaChevronLeft,
+  FaChevronRight
 } from "react-icons/fa";
 import { useInView } from '../../utils/useInView';
 
@@ -56,13 +40,13 @@ const CONSTANTS = {
   ],
   
   DAY_COLORS: {
-    "Chủ nhật": "from-purple-500 to-indigo-500",
-    "Thứ 2": "from-blue-500 to-cyan-500", 
-    "Thứ 3": "from-green-500 to-emerald-500",
-    "Thứ 4": "from-yellow-500 to-amber-500",
-    "Thứ 5": "from-orange-500 to-red-500",
-    "Thứ 6": "from-pink-500 to-rose-500",
-    "Thứ 7": "from-violet-500 to-purple-500"
+    "Chủ nhật": "from-rose to-terracotta",
+    "Thứ 2": "from-terracotta to-brass", 
+    "Thứ 3": "from-brass to-coffee",
+    "Thứ 4": "from-coffee to-ink",
+    "Thứ 5": "from-ink to-rose",
+    "Thứ 6": "from-rose to-terracotta",
+    "Thứ 7": "from-terracotta to-brass"
   },
   
   MOTIVATIONAL_MESSAGES: [
@@ -147,23 +131,17 @@ function WeeklyPlan() {
   const [newDueDate, setNewDueDate] = useState("");
   const [weeklyFilter, setWeeklyFilter] = useState("all");
   const [showSidePanel, setShowSidePanel] = useState(false);
+  const [showStatsSidebar, setShowStatsSidebar] = useState(false);
   
-  // New state for enhanced UI
-  const [collapsedDays, setCollapsedDays] = useState({});
-  const [showWeeklyStats, setShowWeeklyStats] = useState(true);
+  // Animation state
   const [animatedElements, setAnimatedElements] = useState({
     header: false,
-    stats: false,
-    focus: false,
-    weeklyGrid: false,
-    sidePanel: false
+    weeklyTable: false
   });
 
   // Animation refs
   const [headerRef, headerInView] = useInView({ threshold: 0.1, once: true });
-  const [statsRef, statsInView] = useInView({ threshold: 0.1, once: true });
-  const [focusRef, focusInView] = useInView({ threshold: 0.1, once: true });
-  const [weeklyGridRef, weeklyGridInView] = useInView({ threshold: 0.1, once: true });
+  const [weeklyTableRef, weeklyTableInView] = useInView({ threshold: 0.1, once: true });
 
   // Animation effects
   useEffect(() => {
@@ -174,31 +152,12 @@ function WeeklyPlan() {
   }, []);
 
   useEffect(() => {
-    if (statsInView) {
-      setAnimatedElements(prev => ({ ...prev, stats: true }));
+    if (weeklyTableInView) {
+      setAnimatedElements(prev => ({ ...prev, weeklyTable: true }));
     }
-  }, [statsInView]);
-
-  useEffect(() => {
-    if (focusInView) {
-      setAnimatedElements(prev => ({ ...prev, focus: true }));
-    }
-  }, [focusInView]);
-
-  useEffect(() => {
-    if (weeklyGridInView) {
-      setAnimatedElements(prev => ({ ...prev, weeklyGrid: true }));
-    }
-  }, [weeklyGridInView]);
+  }, [weeklyTableInView]);
 
   // Helper functions
-  const toggleDayCollapse = (day) => {
-    setCollapsedDays(prev => ({
-      ...prev,
-      [day]: !prev[day]
-    }));
-  };
-
   const handleToggleTodo = (id) => {
     setTodos(todos.map(todo => 
       todo.id === id ? { ...todo, completed: !todo.completed } : todo
@@ -243,54 +202,232 @@ function WeeklyPlan() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-ink/5 via-coffee/5 to-terracotta/5 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative">
+      <div className="max-w-[95%] mx-auto px-4 py-6 space-y-6">
         
-        {/* Compact Header Section */}
+        {/* Header Section */}
         <div ref={headerRef} className={`text-center space-y-4 transition-all duration-1000 ease-out ${
           animatedElements.header ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}>
           {/* Welcome badge */}
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 dark:from-indigo-500/20 dark:to-purple-500/20 px-4 py-2 rounded-full border border-indigo-500/20 dark:border-indigo-400/30">
-            <FaCalendarWeek className="text-indigo-500 dark:text-indigo-400 text-sm" />
-            <span className="text-sm font-medium text-gray-800 dark:text-gray-200">Weekly Planner</span>
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-rose/10 to-terracotta/10 dark:from-rose/20 dark:to-terracotta/20 px-4 py-2 rounded-full border border-rose/20 dark:border-rose/30">
+            <FaCalendarWeek className="text-rose dark:text-rose-400 text-sm" />
+            <span className="text-sm font-medium text-ink dark:text-gray-200">Weekly Planner</span>
           </div>
           
           <h1 className="text-3xl sm:text-4xl font-bold leading-tight">
-            <span className="text-gray-800 dark:text-gray-200">Lập kế hoạch tuần</span>
+            <span className="text-ink dark:text-gray-200">Lập kế hoạch tuần</span>
             <br />
-            <span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 dark:from-indigo-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-rose via-terracotta to-brass dark:from-rose-400 dark:via-terracotta-400 dark:to-brass-400 bg-clip-text text-transparent">
               một cách thông minh
             </span>
           </h1>
           
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          <p className="text-lg text-coffee/80 dark:text-gray-300 max-w-2xl mx-auto">
             {today} • {CONSTANTS.MOTIVATIONAL_MESSAGES[Math.floor(Math.random() * CONSTANTS.MOTIVATIONAL_MESSAGES.length)]}
           </p>
         </div>
 
-        {/* Main Layout Grid - New Proportions */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Weekly Plan Section - Right below header */}
+        <div ref={weeklyTableRef} className={`transition-all duration-1000 ease-out ${
+          animatedElements.weeklyTable ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+        }`}>
+          {/* Weekly Plan Header */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-rose/10 dark:border-gray-700 p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-2xl font-bold text-ink dark:text-gray-200 flex items-center gap-3">
+                <div className="p-2 rounded-full bg-gradient-to-r from-rose to-terracotta dark:from-rose-400 dark:to-terracotta-400">
+                  <FaCalendarCheck className="text-white text-lg" />
+                </div>
+                Kế hoạch tuần của bạn
+              </h3>
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-coffee/80 dark:text-gray-300">Bộ lọc:</span>
+                <select
+                  value={weeklyFilter}
+                  onChange={(e) => setWeeklyFilter(e.target.value)}
+                  className="px-3 py-2 border-2 border-rose/20 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-rose/20 dark:focus:ring-rose-400 focus:border-rose dark:focus:border-rose-400 transition-all bg-white dark:bg-gray-700 text-ink dark:text-gray-200"
+                >
+                  <option value="all">Tất cả</option>
+                  <option value="high">Ưu tiên cao</option>
+                  <option value="incomplete">Chưa hoàn thành</option>
+                  <option value="completed">Đã hoàn thành</option>
+                </select>
+              </div>
+            </div>
+          </div>
           
-          {/* Left Sidebar - Achievement & Focus (25% of layout) */}
-          <div className="lg:col-span-3 space-y-4">
-            
-            {/* Compact Achievement Stats */}
-            <div ref={statsRef} className={`transition-all duration-1000 ease-out ${
-              animatedElements.stats ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-            }`}>
-              <div className="bg-white rounded-2xl shadow-lg border border-indigo-100 p-4">
+          {/* Weekly Table - Large horizontal table */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-rose/10 dark:border-gray-700 overflow-hidden">
+            <div className="overflow-x-auto">
+              <div className="grid grid-cols-7 min-w-[1200px]">
+                {CONSTANTS.WEEK_DAYS.map((day, index) => {
+                  let dayTodos = getTodosByWeekDay(todos, day);
+                  dayTodos = filterTodos(dayTodos, weeklyFilter);
+                  dayTodos = sortTodosByPriority(dayTodos);
+                  
+                  const isToday = day === CONSTANTS.WEEK_DAYS[new Date().getDay()];
+                  const completedCount = dayTodos.filter(t => t.completed).length;
+                  const totalCount = dayTodos.length;
+                  
+                  return (
+                    <div 
+                      key={day}
+                      className={`border-r border-rose/10 dark:border-gray-700 last:border-r-0 ${
+                        isToday 
+                          ? 'bg-gradient-to-b from-rose/5 to-terracotta/5 dark:from-rose-900/20 dark:to-terracotta-900/20' 
+                          : 'bg-white dark:bg-gray-800'
+                      }`}
+                    >
+                      {/* Day Header */}
+                      <div className={`p-4 border-b-2 ${
+                        isToday 
+                          ? 'border-rose dark:border-rose-600 bg-gradient-to-r from-rose/10 to-terracotta/10 dark:from-rose-900/30 dark:to-terracotta-900/30' 
+                          : 'border-rose/10 dark:border-gray-700'
+                      }`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className={`font-bold text-lg ${
+                            isToday 
+                              ? 'text-rose dark:text-rose-300' 
+                              : 'text-ink dark:text-gray-200'
+                          }`}>
+                            {day}
+                          </h4>
+                          {isToday && (
+                            <div className="w-2 h-2 bg-rose rounded-full animate-ping"></div>
+                          )}
+                        </div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-medium text-coffee/80 dark:text-gray-400">
+                            {completedCount}/{totalCount}
+                          </span>
+                        </div>
+                        {/* Progress Bar */}
+                        <div className="w-full bg-coffee/20 dark:bg-gray-600 rounded-full h-2 overflow-hidden">
+                          <div 
+                            className={`h-2 rounded-full bg-gradient-to-r ${CONSTANTS.DAY_COLORS[day]} transition-all duration-1000`}
+                            style={{ width: `${totalCount > 0 ? (completedCount / totalCount) * 100 : 0}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                      
+                      {/* Todos List - Vertical */}
+                      <div className="p-3 space-y-2 min-h-[400px] max-h-[600px] overflow-y-auto">
+                        {totalCount === 0 ? (
+                          <div className="text-center py-8 text-coffee/50 dark:text-gray-500">
+                            <FaCalendarAlt className="text-2xl mx-auto mb-2" />
+                            <p className="text-xs">Không có công việc</p>
+                          </div>
+                        ) : (
+                          dayTodos.map((todo) => (
+                            <div 
+                              key={todo.id}
+                              className={`p-3 rounded-lg border transition-all duration-300 hover:shadow-md ${
+                                todo.completed 
+                                  ? 'bg-brass/10 dark:bg-brass-900/30 border-brass/20 dark:border-brass-800' 
+                                  : 'bg-white/50 dark:bg-gray-700 border-rose/10 dark:border-gray-600 hover:border-rose dark:hover:border-rose-600'
+                              }`}
+                            >
+                              <div className="flex items-start gap-2">
+                                <button
+                                  onClick={() => handleToggleTodo(todo.id)}
+                                  className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all mt-0.5 flex-shrink-0 ${
+                                    todo.completed 
+                                      ? 'bg-brass border-brass text-white' 
+                                      : 'border-rose/30 dark:border-gray-600 hover:border-rose dark:hover:border-rose-400'
+                                  }`}
+                                >
+                                  {todo.completed && <FaCheckCircle className="text-xs" />}
+                                </button>
+                                
+                                <div className="flex-1 min-w-0">
+                                  <div className={`text-xs font-medium leading-relaxed mb-1 ${
+                                    todo.completed 
+                                      ? 'line-through text-coffee/60 dark:text-gray-400' 
+                                      : 'text-ink dark:text-gray-200'
+                                  }`}>
+                                    {todo.text}
+                                  </div>
+                                  <div className="flex flex-col gap-1">
+                                    <span className={`text-xs px-2 py-0.5 rounded-full w-fit ${CONSTANTS.PRIORITY.COLORS[todo.priority]}`}>
+                                      {CONSTANTS.PRIORITY.LABELS[todo.priority].split(' ')[1]}
+                                    </span>
+                                    <span className="text-xs text-coffee/60 dark:text-gray-400 flex items-center gap-1">
+                                      <FaClock className="text-xs" /> {todo.dueDate}
+                                    </span>
+                                  </div>
+                                </div>
+                                
+                                <button
+                                  onClick={() => handleDeleteTodo(todo.id)}
+                                  className="p-1 rounded hover:bg-rose/10 dark:hover:bg-rose-900/50 transition-colors text-rose dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 flex-shrink-0"
+                                >
+                                  <FaTrash className="text-xs" />
+                                </button>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Floating Action Button */}
+        <button
+          onClick={() => setShowSidePanel(true)}
+          className="fixed right-6 bottom-6 z-30 w-14 h-14 bg-gradient-to-r from-rose to-terracotta dark:from-rose-400 dark:to-terracotta-400 text-white rounded-full shadow-2xl hover:shadow-3xl hover:scale-110 transition-all duration-300 flex items-center justify-center group"
+        >
+          <FaPlus className="text-xl group-hover:rotate-90 transition-transform duration-300" />
+        </button>
+
+        {/* Stats Sidebar - Collapsible on the right */}
+        {/* 
+          Animation Design:
+          State 1 (HIDDEN): 
+            - Toggle button: fixed at right-0 (screen edge)
+            - Sidebar content: translate-x-full (completely off-screen to the right)
+          
+          State 2 (SHOWN):
+            - Toggle button: moves left, positioned at left edge of sidebar
+            - Sidebar content: translate-x-0 (visible, next to toggle button)
+          
+          Implementation Strategy:
+          - Use flex container with proper ordering
+          - Sidebar content comes first in DOM (order-1), toggle button second (order-2)
+          - When visible: sidebar at translate-x-0, toggle button naturally to its right
+          - But we want toggle on left, so use flex-row-reverse OR change order
+          - Better: Use normal flex, sidebar first, toggle second, but visually toggle should be on left
+          - Solution: flex-row with order utilities OR use absolute positioning
+        */}
+        <div className="fixed top-1/2 -translate-y-1/2 right-0 z-40 flex items-center overflow-hidden">
+          {/* 
+            Sidebar Content - Slides in from right
+            Order: First in DOM, but visually appears after toggle when visible
+            Animation: Smooth slide with translate-x and opacity
+          */}
+          <div className={`w-80 bg-white dark:bg-gray-800 rounded-l-2xl shadow-2xl border-l border-t border-b border-rose/10 dark:border-gray-700 p-6 space-y-4 max-h-[80vh] overflow-y-auto transition-all duration-300 ease-in-out ${
+            showStatsSidebar 
+              ? 'translate-x-0 opacity-100 pointer-events-auto' 
+              : 'translate-x-full opacity-0 pointer-events-none'
+          }`}>
+              {/* Achievement Stats */}
+              <div className="bg-gradient-to-br from-rose/5 to-terracotta/5 dark:from-rose-900/30 dark:to-terracotta-900/30 rounded-xl shadow-lg border border-rose/10 dark:border-gray-700 p-4">
                 <div className="flex items-center gap-3 mb-4">
                   <div className={`p-2 rounded-full bg-gradient-to-r ${achievement.color} shadow-md`}>
                     <span className="text-lg">{achievement.icon}</span>
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-800 dark:text-gray-200">Thành tích tuần</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">{achievement.label} ({weeklyProgress}%)</p>
+                    <h3 className="font-bold text-ink dark:text-gray-200">Thành tích tuần</h3>
+                    <p className="text-sm text-coffee/80 dark:text-gray-300">{achievement.label} ({weeklyProgress}%)</p>
                   </div>
                 </div>
                 
-                {/* Compact Progress Ring */}
+                {/* Progress Ring */}
                 <div className="flex justify-center mb-4">
                   <div className="relative w-20 h-20">
                     <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 80 80">
@@ -301,7 +438,7 @@ function WeeklyPlan() {
                         stroke="currentColor"
                         strokeWidth="6"
                         fill="none"
-                        className="text-gray-200"
+                        className="text-coffee/20"
                       />
                       <circle
                         cx="40"
@@ -312,42 +449,38 @@ function WeeklyPlan() {
                         fill="none"
                         strokeDasharray={`${2 * Math.PI * 32}`}
                         strokeDashoffset={`${2 * Math.PI * 32 * (1 - weeklyProgress / 100)}`}
-                        className="text-indigo-500"
+                        className="text-rose"
                         style={{ transition: 'stroke-dashoffset 1s ease-in-out' }}
                       />
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-sm font-bold text-gray-800 dark:text-gray-200">{weeklyProgress}%</span>
+                      <span className="text-sm font-bold text-ink dark:text-gray-200">{weeklyProgress}%</span>
                     </div>
                   </div>
                 </div>
                 
-                {/* Compact Stats */}
+                {/* Stats */}
                 <div className="grid grid-cols-3 gap-2 text-center">
-                  <div className="bg-indigo-50 dark:bg-indigo-900/30 rounded-lg p-2">
-                    <div className="text-lg font-bold text-indigo-600 dark:text-indigo-400">{totalTodos}</div>
-                    <div className="text-xs text-gray-600 dark:text-gray-300">Tổng</div>
+                  <div className="bg-rose/10 dark:bg-rose-900/30 rounded-lg p-2">
+                    <div className="text-lg font-bold text-rose dark:text-rose-400">{totalTodos}</div>
+                    <div className="text-xs text-coffee/80 dark:text-gray-300">Tổng</div>
                   </div>
-                  <div className="bg-green-50 dark:bg-green-900/30 rounded-lg p-2">
-                    <div className="text-lg font-bold text-green-600 dark:text-green-400">{completedTodos}</div>
-                    <div className="text-xs text-gray-600 dark:text-gray-300">Xong</div>
+                  <div className="bg-brass/10 dark:bg-brass-900/30 rounded-lg p-2">
+                    <div className="text-lg font-bold text-brass dark:text-brass-400">{completedTodos}</div>
+                    <div className="text-xs text-coffee/80 dark:text-gray-300">Xong</div>
                   </div>
-                  <div className="bg-pink-50 dark:bg-pink-900/30 rounded-lg p-2">
-                    <div className="text-lg font-bold text-pink-600 dark:text-pink-400">{totalTodos - completedTodos}</div>
-                    <div className="text-xs text-gray-600 dark:text-gray-300">Còn</div>
-                  </div>
+                  <div className="bg-terracotta/10 dark:bg-terracotta-900/30 rounded-lg p-2">
+                    <div className="text-lg font-bold text-terracotta dark:text-terracotta-400">{totalTodos - completedTodos}</div>
+                    <div className="text-xs text-coffee/80 dark:text-gray-300">Còn</div>
                 </div>
               </div>
             </div>
 
-            {/* Compact Focus Section */}
-            <div ref={focusRef} className={`transition-all duration-1000 ease-out ${
-              animatedElements.focus ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-            }`} style={{ transitionDelay: '200ms' }}>
-              <div className="bg-white rounded-2xl shadow-lg border border-indigo-100 p-4">
+              {/* Focus Section */}
+              <div className="bg-gradient-to-br from-terracotta/5 to-brass/5 dark:from-terracotta-900/30 dark:to-brass-900/30 rounded-xl shadow-lg border border-terracotta/10 dark:border-gray-700 p-4">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
-                    <div className="p-1.5 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 dark:from-indigo-400 dark:to-purple-400">
+                  <h3 className="font-bold text-ink dark:text-gray-200 flex items-center gap-2">
+                    <div className="p-1.5 rounded-full bg-gradient-to-r from-rose to-terracotta dark:from-rose-400 dark:to-terracotta-400">
                       <FaBullseye className="text-white text-sm" />
                     </div>
                     Focus tuần
@@ -355,7 +488,7 @@ function WeeklyPlan() {
                   <select
                     value={weeklyFilter}
                     onChange={(e) => setWeeklyFilter(e.target.value)}
-                    className="text-xs px-2 py-1 border border-indigo-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                    className="text-xs px-2 py-1 border border-rose/20 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-rose/20 dark:focus:ring-rose-400 focus:border-rose dark:focus:border-rose-400 transition-all bg-white dark:bg-gray-700 text-ink dark:text-gray-200"
                   >
                     <option value="all">Tất cả</option>
                     <option value="high">Cao</option>
@@ -371,7 +504,7 @@ function WeeklyPlan() {
                     
                     if (focus.length === 0) {
                       return (
-                        <div className="text-center py-6 text-gray-400 dark:text-gray-500">
+                        <div className="text-center py-6 text-coffee/50 dark:text-gray-500">
                           <FaBullseye className="text-2xl mx-auto mb-2" />
                           <p className="text-sm">Chưa có mục tiêu nổi bật</p>
                         </div>
@@ -383,31 +516,30 @@ function WeeklyPlan() {
                         key={todo.id} 
                         className={`p-3 rounded-xl border transition-all duration-300 hover:shadow-md ${
                           todo.completed 
-                            ? 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/30' 
-                            : 'border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-900/30'
+                            ? 'border-brass/20 dark:border-brass-800 bg-brass/10 dark:bg-brass-900/30' 
+                            : 'border-rose/20 dark:border-rose-800 bg-rose/5 dark:bg-rose-900/30'
                         }`}
-                        style={{ animationDelay: `${index * 100}ms` }}
                       >
                         <div className="flex items-start gap-3">
                           <button
                             onClick={() => handleToggleTodo(todo.id)}
                             className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all mt-0.5 flex-shrink-0 ${
                               todo.completed 
-                                ? 'bg-green-500 border-green-500 text-white' 
-                                : 'border-indigo-300 dark:border-indigo-600 hover:border-indigo-500 dark:hover:border-indigo-400'
+                                ? 'bg-brass border-brass text-white' 
+                                : 'border-rose/30 dark:border-rose-600 hover:border-rose dark:hover:border-rose-400'
                             }`}
                           >
                             {todo.completed && <FaCheckCircle className="text-xs" />}
                           </button>
                           <div className="flex-1 min-w-0">
                             <div className={`text-sm font-medium leading-relaxed ${
-                              todo.completed ? 'line-through text-gray-500 dark:text-gray-400' : 'text-gray-800 dark:text-gray-200'
+                              todo.completed ? 'line-through text-coffee/60 dark:text-gray-400' : 'text-ink dark:text-gray-200'
                             }`}>{todo.text}</div>
                             <div className="mt-2 flex items-center gap-2">
                               <span className={`text-xs px-2 py-0.5 rounded-full ${CONSTANTS.PRIORITY.COLORS[todo.priority]}`}>
                                 {CONSTANTS.PRIORITY.LABELS[todo.priority].split(' ')[1]}
                               </span>
-                              <span className="text-xs text-gray-500 dark:text-gray-400">{todo.weekDay}</span>
+                              <span className="text-xs text-coffee/60 dark:text-gray-400">{todo.weekDay}</span>
                             </div>
                           </div>
                         </div>
@@ -419,213 +551,42 @@ function WeeklyPlan() {
             </div>
           </div>
 
-          {/* Main Content - Weekly Plan (75% of layout) */}
-          <div className="lg:col-span-9">
-            <div ref={weeklyGridRef} className={`transition-all duration-1000 ease-out ${
-              animatedElements.weeklyGrid ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-            }`} style={{ transitionDelay: '400ms' }}>
-              
-              {/* Enhanced Weekly Plan Header */}
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-indigo-100 dark:border-gray-700 p-6 mb-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 flex items-center gap-3">
-                    <div className="p-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 dark:from-purple-400 dark:to-pink-400">
-                      <FaCalendarCheck className="text-white text-lg" />
-                    </div>
-                    Kế hoạch tuần của bạn
-                  </h3>
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm text-gray-600 dark:text-gray-300">Bộ lọc:</span>
-                    <select
-                      value={weeklyFilter}
-                      onChange={(e) => setWeeklyFilter(e.target.value)}
-                      className="px-3 py-2 border-2 border-indigo-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
-                    >
-                      <option value="all">Tất cả</option>
-                      <option value="high">Ưu tiên cao</option>
-                      <option value="incomplete">Chưa hoàn thành</option>
-                      <option value="completed">Đã hoàn thành</option>
-                    </select>
-                  </div>
-                </div>
-                
-                {/* Weekly Overview Stats */}
-                <div className="grid grid-cols-7 gap-3">
-                  {CONSTANTS.WEEK_DAYS.map((day, index) => {
-                    const dayTodos = getTodosByWeekDay(todos, day);
-                    const completedCount = dayTodos.filter(t => t.completed).length;
-                    const totalCount = dayTodos.length;
-                    const isToday = day === CONSTANTS.WEEK_DAYS[new Date().getDay()];
-                    
-                    return (
-                      <div 
-                        key={day}
-                        className={`text-center p-3 rounded-xl transition-all ${
-                          isToday 
-                            ? 'bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/50 dark:to-purple-900/50 border-2 border-indigo-300 dark:border-indigo-600' 
-                            : 'bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600'
-                        }`}
-                      >
-                        <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{day}</div>
-                        <div className="text-lg font-bold text-gray-800 dark:text-gray-200">{completedCount}/{totalCount}</div>
-                        <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-1.5 mt-2">
-                          <div 
-                            className={`h-1.5 rounded-full bg-gradient-to-r ${CONSTANTS.DAY_COLORS[day]} transition-all duration-1000`}
-                            style={{ width: `${totalCount > 0 ? (completedCount / totalCount) * 100 : 0}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-              
-              {/* Enhanced Weekly Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                {CONSTANTS.WEEK_DAYS.map((day, index) => {
-                  let dayTodos = getTodosByWeekDay(todos, day);
-                  dayTodos = filterTodos(dayTodos, weeklyFilter);
-                  dayTodos = sortTodosByPriority(dayTodos);
-                  
-                  const isToday = day === CONSTANTS.WEEK_DAYS[new Date().getDay()];
-                  const completedCount = dayTodos.filter(t => t.completed).length;
-                  const totalCount = dayTodos.length;
-                  const isCollapsed = collapsedDays[day];
-                  const visible = isCollapsed ? dayTodos.slice(0, 3) : dayTodos.slice(0, 6);
-                  const remaining = totalCount - visible.length;
-                  
-                  return (
-                    <div 
-                      key={day}
-                      className={`bg-white dark:bg-gray-800 rounded-2xl shadow-lg border-2 overflow-hidden transition-all duration-500 hover:shadow-xl ${
-                        isToday ? 'border-indigo-300 dark:border-indigo-600 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30' : 'border-gray-100 dark:border-gray-700'
-                      }`}
-                      style={{ animationDelay: `${index * 100}ms` }}
-                    >
-                      {/* Enhanced Day Header */}
-                      <div className="p-4 border-b border-gray-100">
-                        <div className="flex items-center justify-between mb-3">
-                          <h4 className={`font-bold text-lg ${isToday ? 'text-indigo-700 dark:text-indigo-300' : 'text-gray-800 dark:text-gray-200'}`}>
-                            {day}
-                          </h4>
-                          <div className="flex items-center gap-2">
-                            {isToday && (
-                              <div className="w-2 h-2 bg-indigo-500 rounded-full animate-ping"></div>
-                            )}
-                            <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                              {completedCount}/{totalCount}
-                            </span>
-                          </div>
-                        </div>
-                        
-                        {/* Enhanced Progress Bar */}
-                        <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2 overflow-hidden">
-                          <div 
-                            className={`h-2 rounded-full bg-gradient-to-r ${CONSTANTS.DAY_COLORS[day]} transition-all duration-1000`}
-                            style={{ width: `${totalCount > 0 ? (completedCount / totalCount) * 100 : 0}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                      
-                      {/* Enhanced Todos List */}
-                      <div className="p-4 space-y-3">
-                        {totalCount === 0 ? (
-                          <div className="text-center py-8 text-gray-400 dark:text-gray-500">
-                            <FaCalendarAlt className="text-2xl mx-auto mb-2" />
-                            <p className="text-sm">Không có công việc</p>
-                          </div>
-                        ) : (
-                          <>
-                            {visible.map((todo) => (
-                              <div 
-                                key={todo.id}
-                                className={`p-3 rounded-xl border transition-all duration-300 hover:shadow-md ${
-                                  todo.completed 
-                                    ? 'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800' 
-                                    : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-600'
-                                }`}
-                              >
-                                <div className="flex items-start gap-3">
-                                  <button
-                                    onClick={() => handleToggleTodo(todo.id)}
-                                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all mt-0.5 flex-shrink-0 ${
-                                      todo.completed 
-                                        ? 'bg-green-500 border-green-500 text-white' 
-                                        : 'border-gray-300 dark:border-gray-600 hover:border-indigo-500 dark:hover:border-indigo-400'
-                                    }`}
-                                  >
-                                    {todo.completed && <FaCheckCircle className="text-xs" />}
-                                  </button>
-                                  
-                                  <div className="flex-1 min-w-0">
-                                    <div className={`text-sm font-medium leading-relaxed ${
-                                      todo.completed ? 'line-through text-gray-500 dark:text-gray-400' : 'text-gray-800 dark:text-gray-200'
-                                    }`}>{todo.text}</div>
-                                    <div className="mt-2 flex items-center gap-2">
-                                      <span className={`text-xs px-2 py-1 rounded-full ${CONSTANTS.PRIORITY.COLORS[todo.priority]}`}>
-                                        {CONSTANTS.PRIORITY.LABELS[todo.priority].split(' ')[1]}
-                                      </span>
-                                      <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                                        <FaClock className="text-xs" /> {todo.dueDate}
-                                      </span>
-                                    </div>
-                                  </div>
-                                  
-                                    <button
-                                      onClick={() => handleDeleteTodo(todo.id)}
-                                      className="p-1 rounded hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
-                                    >
-                                      <FaTrash className="text-xs" />
-                                    </button>
-                                </div>
-                              </div>
-                            ))}
-                            
-                            {remaining > 0 && (
-                              <button
-                                onClick={() => toggleDayCollapse(day)}
-                                className="w-full flex items-center justify-center text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 py-2 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-colors"
-                              >
-                                {isCollapsed ? <FaExpand className="mr-1" /> : <FaCompress className="mr-1" />}
-                                {isCollapsed ? `Xem thêm ${remaining} công việc` : `Thu gọn`}
+          {/* 
+            Toggle Button - Positioned to the left of sidebar when visible
+            Order: Second in DOM, but appears first visually (on the left) using flex-row-reverse
+            When hidden: Only this button visible at right-0
+            When shown: Button appears at left edge of sidebar content
+          */}
+          <button
+            onClick={() => setShowStatsSidebar(!showStatsSidebar)}
+            className="w-12 h-20 bg-gradient-to-r from-rose to-terracotta dark:from-rose-400 dark:to-terracotta-400 text-white rounded-l-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center z-50 flex-shrink-0 order-first"
+            aria-label={showStatsSidebar ? 'Ẩn sidebar' : 'Hiện sidebar'}
+          >
+            {showStatsSidebar ? (
+              <FaChevronRight className="text-lg transition-transform duration-300" />
+            ) : (
+              <FaChevronLeft className="text-lg transition-transform duration-300" />
+            )}
                               </button>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
         </div>
 
-        {/* Floating Action Button */}
-        <button
-          onClick={() => setShowSidePanel(true)}
-          className="fixed right-6 bottom-6 z-30 w-14 h-14 bg-gradient-to-r from-indigo-500 to-purple-500 dark:from-indigo-400 dark:to-purple-400 text-white rounded-full shadow-2xl hover:shadow-3xl hover:scale-110 transition-all duration-300 flex items-center justify-center group"
-        >
-          <FaPlus className="text-xl group-hover:rotate-90 transition-transform duration-300" />
-        </button>
-
-        {/* Enhanced Side Panel */}
+        {/* Add Todo Side Panel */}
         {showSidePanel && (
-          <div className="fixed inset-0 z-40 flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowSidePanel(false)}></div>
-            <div className="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-indigo-100 dark:border-gray-700 p-6 animate-slide-up">
+            <div className="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-rose/10 dark:border-gray-700 p-6 animate-slide-up">
               <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 dark:from-indigo-400 dark:to-purple-400">
+                  <div className="p-2 rounded-full bg-gradient-to-r from-rose to-terracotta dark:from-rose-400 dark:to-terracotta-400">
                       <FaTachometerAlt className="text-white" />
                     </div>
-                    <span className="font-bold text-gray-800 dark:text-gray-200 text-lg">Thêm công việc</span>
+                  <span className="font-bold text-ink dark:text-gray-200 text-lg">Thêm công việc</span>
                   </div>
                 <button 
-                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" 
+                  className="p-2 rounded-lg hover:bg-rose/10 dark:hover:bg-gray-700 transition-colors" 
                   onClick={() => setShowSidePanel(false)}
                 >
-                  <FaTimes className="text-gray-500 dark:text-gray-400" />
+                  <FaTimes className="text-coffee/60 dark:text-gray-400" />
                 </button>
               </div>
               
@@ -635,7 +596,7 @@ function WeeklyPlan() {
                   placeholder="Bạn muốn hoàn thành gì tuần này? ✨"
                   value={newTodo}
                   onChange={(e) => setNewTodo(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-indigo-200 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-indigo-200 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                  className="w-full px-4 py-3 border-2 border-rose/20 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-rose/20 dark:focus:ring-rose-400 focus:border-rose dark:focus:border-rose-400 transition-all bg-white dark:bg-gray-700 text-ink dark:text-gray-200"
                   onKeyPress={(e) => e.key === 'Enter' && handleAddTodo()}
                   autoFocus
                 />
@@ -643,7 +604,7 @@ function WeeklyPlan() {
                   <select
                     value={newPriority}
                     onChange={(e) => setNewPriority(e.target.value)}
-                    className="flex-1 px-3 py-3 border-2 border-indigo-200 rounded-xl focus:ring-4 focus:ring-indigo-200 focus:border-indigo-500 transition-all"
+                    className="flex-1 px-3 py-3 border-2 border-rose/20 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-rose/20 dark:focus:ring-rose-400 focus:border-rose dark:focus:border-rose-400 transition-all bg-white dark:bg-gray-700 text-ink dark:text-gray-200"
                   >
                     <option value="low">🌱 Thấp</option>
                     <option value="medium">⭐ Trung bình</option>
@@ -653,12 +614,12 @@ function WeeklyPlan() {
                     type="date"
                     value={newDueDate}
                     onChange={(e) => setNewDueDate(e.target.value)}
-                    className="flex-1 px-3 py-3 border-2 border-indigo-200 rounded-xl focus:ring-4 focus:ring-indigo-200 focus:border-indigo-500 transition-all"
+                    className="flex-1 px-3 py-3 border-2 border-rose/20 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-rose/20 dark:focus:ring-rose-400 focus:border-rose dark:focus:border-rose-400 transition-all bg-white dark:bg-gray-700 text-ink dark:text-gray-200"
                   />
                 </div>
                 <button 
                   onClick={handleAddTodo} 
-                  className="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500 dark:from-indigo-400 dark:to-purple-400 text-white rounded-xl font-semibold hover:from-purple-500 hover:to-indigo-500 dark:hover:from-purple-400 dark:hover:to-indigo-400 transition-all duration-300 shadow-lg hover:shadow-xl"
+                  className="w-full py-3 bg-gradient-to-r from-rose to-terracotta dark:from-rose-400 dark:to-terracotta-400 text-white rounded-xl font-semibold hover:from-terracotta hover:to-rose dark:hover:from-terracotta-400 dark:hover:to-rose-400 transition-all duration-300 shadow-lg hover:shadow-xl"
                 >
                   Thêm công việc
                 </button>
@@ -667,8 +628,8 @@ function WeeklyPlan() {
           </div>
         )}
       </div>
-    </div>
   );
 }
 
 export default WeeklyPlan;
+

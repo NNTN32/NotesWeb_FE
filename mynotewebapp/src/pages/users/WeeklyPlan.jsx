@@ -387,34 +387,18 @@ function WeeklyPlan() {
 
         {/* Stats Sidebar - Collapsible on the right */}
         {/* 
-          Animation Design:
-          State 1 (HIDDEN): 
-            - Toggle button: fixed at right-0 (screen edge)
-            - Sidebar content: translate-x-full (completely off-screen to the right)
-          
-          State 2 (SHOWN):
-            - Toggle button: moves left, positioned at left edge of sidebar
-            - Sidebar content: translate-x-0 (visible, next to toggle button)
-          
-          Implementation Strategy:
-          - Use flex container with proper ordering
-          - Sidebar content comes first in DOM (order-1), toggle button second (order-2)
-          - When visible: sidebar at translate-x-0, toggle button naturally to its right
-          - But we want toggle on left, so use flex-row-reverse OR change order
-          - Better: Use normal flex, sidebar first, toggle second, but visually toggle should be on left
-          - Solution: flex-row with order utilities OR use absolute positioning
+          Design:
+          - Sidebar panel is fixed to the right and slides in/out using translate-x.
+          - Toggle button is independently fixed. When panel is open, the button shifts left by panel width (w-80).
+          - This mimics SideMenu behavior: the button hugs the edge of the visible panel.
         */}
-        <div className="fixed top-1/2 -translate-y-1/2 right-0 z-40 flex items-center overflow-hidden">
-          {/* 
-            Sidebar Content - Slides in from right
-            Order: First in DOM, but visually appears after toggle when visible
-            Animation: Smooth slide with translate-x and opacity
-          */}
-          <div className={`w-80 bg-white dark:bg-gray-800 rounded-l-2xl shadow-2xl border-l border-t border-b border-rose/10 dark:border-gray-700 p-6 space-y-4 max-h-[80vh] overflow-y-auto transition-all duration-300 ease-in-out ${
-            showStatsSidebar 
-              ? 'translate-x-0 opacity-100 pointer-events-auto' 
-              : 'translate-x-full opacity-0 pointer-events-none'
-          }`}>
+        {/* Sidebar Panel */}
+        <div
+          className={`fixed right-0 top-1/2 -translate-y-1/2 w-80 bg-white dark:bg-gray-800 rounded-l-2xl shadow-2xl border-l border-t border-b border-rose/10 dark:border-gray-700 p-6 space-y-4 max-h-[80vh] overflow-y-auto transition-transform duration-300 ease-in-out z-40 ${
+            showStatsSidebar ? 'translate-x-0' : 'translate-x-full'
+          }`}
+          aria-hidden={!showStatsSidebar}
+        >
               {/* Achievement Stats */}
               <div className="bg-gradient-to-br from-rose/5 to-terracotta/5 dark:from-rose-900/30 dark:to-terracotta-900/30 rounded-xl shadow-lg border border-rose/10 dark:border-gray-700 p-4">
                 <div className="flex items-center gap-3 mb-4">
@@ -549,26 +533,20 @@ function WeeklyPlan() {
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* 
-            Toggle Button - Positioned to the left of sidebar when visible
-            Order: Second in DOM, but appears first visually (on the left) using flex-row-reverse
-            When hidden: Only this button visible at right-0
-            When shown: Button appears at left edge of sidebar content
-          */}
-          <button
-            onClick={() => setShowStatsSidebar(!showStatsSidebar)}
-            className="w-12 h-20 bg-gradient-to-r from-rose to-terracotta dark:from-rose-400 dark:to-terracotta-400 text-white rounded-l-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center z-50 flex-shrink-0 order-first"
-            aria-label={showStatsSidebar ? 'Ẩn sidebar' : 'Hiện sidebar'}
-          >
-            {showStatsSidebar ? (
-              <FaChevronRight className="text-lg transition-transform duration-300" />
-            ) : (
-              <FaChevronLeft className="text-lg transition-transform duration-300" />
-            )}
-                              </button>
-        </div>
+        {/* Toggle Button - fixed; shifts left when panel is open to hug the panel edge */}
+        <button
+          onClick={() => setShowStatsSidebar(!showStatsSidebar)}
+          className={`fixed top-1/2 -translate-y-1/2 h-20 w-12 bg-gradient-to-r from-rose to-terracotta dark:from-rose-400 dark:to-terracotta-400 text-white rounded-l-lg shadow-lg hover:shadow-xl transition-all duration-300 z-50 ${
+            showStatsSidebar ? 'right-[20rem]' : 'right-0'
+          }`}
+          aria-label={showStatsSidebar ? 'Ẩn sidebar' : 'Hiện sidebar'}
+        >
+          {showStatsSidebar ? (
+            <FaChevronRight className="text-lg transition-transform duration-300" />
+          ) : (
+            <FaChevronLeft className="text-lg transition-transform duration-300" />
+          )}
+        </button>
 
         {/* Add Todo Side Panel */}
         {showSidePanel && (
@@ -628,6 +606,7 @@ function WeeklyPlan() {
           </div>
         )}
       </div>
+    </div>
   );
 }
 

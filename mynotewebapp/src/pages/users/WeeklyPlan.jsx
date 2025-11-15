@@ -132,16 +132,20 @@ function WeeklyPlan() {
   const [weeklyFilter, setWeeklyFilter] = useState("all");
   const [showSidePanel, setShowSidePanel] = useState(false);
   const [showStatsSidebar, setShowStatsSidebar] = useState(false);
+  const [toggleButtonHover, setToggleButtonHover] = useState(false);
+  const [toggleButtonPressed, setToggleButtonPressed] = useState(false);
   
   // Animation state
   const [animatedElements, setAnimatedElements] = useState({
     header: false,
-    weeklyTable: false
+    weeklyTable: false,
+    toggleButton: false
   });
 
   // Animation refs
   const [headerRef, headerInView] = useInView({ threshold: 0.1, once: true });
   const [weeklyTableRef, weeklyTableInView] = useInView({ threshold: 0.1, once: true });
+  const [toggleButtonRef, toggleButtonInView] = useInView({ threshold: 0.1, once: true });
 
   // Animation effects
   useEffect(() => {
@@ -156,6 +160,15 @@ function WeeklyPlan() {
       setAnimatedElements(prev => ({ ...prev, weeklyTable: true }));
     }
   }, [weeklyTableInView]);
+
+  useEffect(() => {
+    if (toggleButtonInView) {
+      const timer = setTimeout(() => {
+        setAnimatedElements(prev => ({ ...prev, toggleButton: true }));
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [toggleButtonInView]);
 
   // Helper functions
   const handleToggleTodo = (id) => {
@@ -186,6 +199,28 @@ function WeeklyPlan() {
       setNewPriority("medium");
       setNewDueDate("");
     }
+  };
+
+  // Toggle button handlers
+  const handleToggleStatsSidebar = () => {
+    setShowStatsSidebar(prev => !prev);
+  };
+
+  const handleToggleButtonMouseEnter = () => {
+    setToggleButtonHover(true);
+  };
+
+  const handleToggleButtonMouseLeave = () => {
+    setToggleButtonHover(false);
+    setToggleButtonPressed(false);
+  };
+
+  const handleToggleButtonMouseDown = () => {
+    setToggleButtonPressed(true);
+  };
+
+  const handleToggleButtonMouseUp = () => {
+    setToggleButtonPressed(false);
   };
 
   // Computed values
@@ -533,18 +568,97 @@ function WeeklyPlan() {
                 </div>
               </div>
             </div>
-        {/* Toggle Button - fixed; shifts left when panel is open to hug the panel edge */}
+        {/* Toggle Button - Enhanced with smooth animations */}
         <button
-          onClick={() => setShowStatsSidebar(!showStatsSidebar)}
-          className={`fixed top-1/2 -translate-y-1/2 h-20 w-12 bg-gradient-to-r from-rose to-terracotta dark:from-rose-400 dark:to-terracotta-400 text-white rounded-l-lg shadow-lg hover:shadow-xl transition-all duration-300 z-50 ${
-            showStatsSidebar ? 'right-[20rem]' : 'right-0'
-          }`}
-          aria-label={showStatsSidebar ? 'Ẩn sidebar' : 'Hiện sidebar'}
+          ref={toggleButtonRef}
+          onClick={handleToggleStatsSidebar}
+          onMouseEnter={handleToggleButtonMouseEnter}
+          onMouseLeave={handleToggleButtonMouseLeave}
+          onMouseDown={handleToggleButtonMouseDown}
+          onMouseUp={handleToggleButtonMouseUp}
+          className={`
+            fixed top-1/2 -translate-y-1/2 z-50
+            h-20 w-12
+            bg-gradient-to-r from-rose to-terracotta dark:from-rose-400 dark:to-terracotta-400
+            text-white rounded-l-xl
+            shadow-2xl
+            transition-all duration-500 ease-in-out
+            group
+            ${showStatsSidebar ? 'right-[20rem]' : 'right-0'}
+            ${animatedElements.toggleButton ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'}
+            ${toggleButtonHover ? 'scale-110 shadow-rose-500/50 dark:shadow-rose-400/50' : 'scale-100'}
+            ${toggleButtonPressed ? 'scale-95' : ''}
+            hover:from-terracotta hover:to-rose dark:hover:from-terracotta-400 dark:hover:to-rose-400
+            active:scale-95
+            focus:outline-none focus:ring-4 focus:ring-rose/30 dark:focus:ring-rose-400/30
+          `}
+          aria-label={showStatsSidebar ? 'Ẩn sidebar thống kê' : 'Hiện sidebar thống kê'}
+          aria-expanded={showStatsSidebar}
         >
-          {showStatsSidebar ? (
-            <FaChevronRight className="text-lg transition-transform duration-300" />
-          ) : (
-            <FaChevronLeft className="text-lg transition-transform duration-300" />
+          {/* Animated background glow effect */}
+          <div 
+            className={`
+              absolute inset-0 rounded-l-xl
+              bg-gradient-to-r from-rose/20 to-terracotta/20 dark:from-rose-400/20 dark:to-terracotta-400/20
+              transition-opacity duration-500
+              ${toggleButtonHover ? 'opacity-100 animate-pulse' : 'opacity-0'}
+            `}
+          />
+          
+          {/* Icon container with rotation animation */}
+          <div className="relative z-10 flex items-center justify-center h-full">
+            <div 
+              className={`
+                transition-all duration-500 ease-in-out
+                ${showStatsSidebar ? 'rotate-0' : 'rotate-180'}
+                ${toggleButtonHover ? 'scale-125' : 'scale-100'}
+                ${toggleButtonPressed ? 'scale-110' : ''}
+              `}
+            >
+              {showStatsSidebar ? (
+                <FaChevronRight 
+                  className={`
+                    text-xl
+                    transition-all duration-300
+                    ${toggleButtonHover ? 'translate-x-1' : 'translate-x-0'}
+                  `}
+                />
+              ) : (
+                <FaChevronLeft 
+                  className={`
+                    text-xl
+                    transition-all duration-300
+                    ${toggleButtonHover ? '-translate-x-1' : 'translate-x-0'}
+                  `}
+                />
+              )}
+            </div>
+          </div>
+
+          {/* Tooltip text */}
+          <div 
+            className={`
+              absolute right-full mr-3 top-1/2 -translate-y-1/2
+              bg-ink dark:bg-gray-800 text-white dark:text-gray-200
+              px-3 py-2 rounded-lg
+              text-sm font-medium whitespace-nowrap
+              shadow-xl
+              pointer-events-none
+              transition-all duration-300
+              ${toggleButtonHover ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-2'}
+              ${showStatsSidebar ? 'hidden' : ''}
+            `}
+          >
+            {showStatsSidebar ? 'Ẩn thống kê' : 'Xem thống kê'}
+            <div className="absolute left-full top-1/2 -translate-y-1/2 border-4 border-transparent border-l-ink dark:border-l-gray-800" />
+          </div>
+
+          {/* Ripple effect on click */}
+          {toggleButtonPressed && (
+            <div 
+              className="absolute inset-0 rounded-l-xl bg-white/30 animate-ping"
+              style={{ animationDuration: '0.6s' }}
+            />
           )}
         </button>
 

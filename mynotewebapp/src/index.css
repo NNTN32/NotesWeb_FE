@@ -444,6 +444,12 @@ body {
   overflow: hidden;
 }
 
+/* Scoped to parent - use on auth pages so aurora doesn't cover SideMenu / block clicks */
+.aurora-container.aurora-contained {
+  position: absolute;
+  inset: 0;
+}
+
 .aurora-layer {
   position: absolute;
   inset: -20% -10% -10% -20%;

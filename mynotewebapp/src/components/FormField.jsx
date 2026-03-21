@@ -56,23 +56,23 @@ export default function FormField({
 
   return (
     <div className={`group ${className}`}>
-      <label 
-        htmlFor={name} 
-        className="block text-sm font-semibold text-gray-700 mb-3 transition-colors group-focus-within:text-terracotta"
+      <label
+        htmlFor={name}
+        className="block text-sm font-semibold text-ink dark:text-paper mb-3 transition-colors group-focus-within:text-terracotta"
       >
         {label}
       </label>
       <div className="relative">
-        {/* Icon */}
         {Icon && (
           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-            <Icon className={`h-5 w-5 transition-all duration-300 ${
-              isFocused ? 'text-terracotta' : 'text-gray-400'
-            }`} />
+            <Icon
+              className={`h-5 w-5 transition-all duration-300 ${
+                isFocused ? "text-terracotta" : "text-coffee/60 dark:text-latte/70"
+              }`}
+            />
           </div>
         )}
-        
-        {/* Input */}
+
         <input
           type={isPasswordField ? (shouldShowPassword ? "text" : "password") : type}
           id={name}
@@ -81,23 +81,26 @@ export default function FormField({
           onChange={onChange}
           onFocus={onFocus}
           onBlur={onBlur}
-          className={`w-full pl-12 pr-12 py-4 border-2 rounded-xl transition-all duration-300 text-lg bg-gray-50/50 focus:bg-white focus:ring-4 focus:ring-brass/20 focus:border-terracotta ${
-            isFocused 
-              ? 'border-terracotta shadow-lg shadow-terracotta/10' 
-              : 'border-gray-200 hover:border-gray-300'
-          }`}
+          className={`w-full pl-12 pr-12 py-4 border-2 rounded-xl transition-all duration-300 text-lg
+            bg-sand/50 dark:bg-ink/50 text-ink dark:text-paper
+            placeholder:text-coffee/60 dark:placeholder:text-latte/60
+            focus:bg-white dark:focus:bg-ink/70 focus:ring-4 focus:ring-brass/20 focus:border-terracotta
+            ${
+              isFocused
+                ? "border-terracotta shadow-lg shadow-terracotta/10"
+                : "border-terracotta/30 dark:border-terracotta/40 hover:border-terracotta/50"
+            }`}
           placeholder={placeholder}
           required={required}
           autoComplete={autoComplete}
           {...props}
         />
-        
-        {/* Password toggle button */}
+
         {isPasswordField && (
           <button
             type="button"
             onClick={handleTogglePassword}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-terracotta transition-all duration-300 p-1 rounded-lg hover:bg-gray-100"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-coffee/60 dark:text-latte/70 hover:text-terracotta transition-all duration-300 p-1 rounded-lg hover:bg-terracotta/10 dark:hover:bg-terracotta/20"
           >
             {shouldShowPassword ? <FaEyeSlash className="h-5 w-5" /> : <FaEye className="h-5 w-5" />}
           </button>

@@ -876,3 +876,87 @@ body {
   border-radius: 50%;
   animation: floatEnhanced2 30s ease-in-out infinite;
 }
+
+/* ========== Home Page & Chibi Mascot ========== */
+@keyframes chibiBob {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-8px) scale(1.02);
+  }
+}
+
+@keyframes chibiBlink {
+  0%, 45%, 55%, 100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(0.1);
+  }
+}
+
+@keyframes chibiSparkle {
+  0%, 100% {
+    opacity: 0.7;
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2) rotate(10deg);
+  }
+}
+
+@keyframes chibiNoteTilt {
+  0%, 100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(2deg);
+  }
+}
+
+.chibi-mascot-container {
+  animation: chibiBob 3s ease-in-out infinite;
+}
+
+.chibi-mascot-svg .chibi-eye-pupil {
+  transform-origin: 50% 50%;
+  animation: chibiBlink 4s ease-in-out infinite;
+}
+
+.chibi-mascot-svg .chibi-sparkle path {
+  animation: chibiSparkle 2s ease-in-out infinite;
+}
+
+.chibi-mascot-svg .chibi-sparkle path:last-child {
+  animation-delay: 0.5s;
+}
+
+.chibi-note {
+  transform-origin: 75% 60%;
+  animation: chibiNoteTilt 2.5s ease-in-out infinite;
+}
+
+/* Home hero entrance */
+@keyframes heroFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-hero-in {
+  animation: heroFadeInUp 0.7s ease-out forwards;
+}
+
+.animate-hero-in-delay-1 { animation-delay: 0.1s; opacity: 0; }
+.animate-hero-in-delay-2 { animation-delay: 0.2s; opacity: 0; }
+.animate-hero-in-delay-3 { animation-delay: 0.3s; opacity: 0; }
+.animate-hero-in-delay-4 { animation-delay: 0.4s; opacity: 0; }
+.animate-hero-in-delay-5 { animation-delay: 0.5s; opacity: 0; }
+.animate-hero-in-delay-6 { animation-delay: 0.6s; opacity: 0; }

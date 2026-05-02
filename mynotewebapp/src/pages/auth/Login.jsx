@@ -1,51 +1,61 @@
-import { useState, useContext, useEffect, useCallback, useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { FaSignInAlt, FaRegStickyNote, FaTasks, FaCalendarAlt } from "react-icons/fa";
+import { useCallback, useContext, useState } from "react";
+import { Navigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { AuthContext } from "../../context/AuthContext";
-import FormField from "../../components/FormField";
-import ChibiMascot from "../../components/ChibiMascot";
-import AuroraBackground from "../../components/AuroraBackground";
 import { useAuthForm } from "../../hooks/useAuthForm";
+import FormField from "../../components/FormField";
+import { loginUser } from "../../utils/api/auth";
+import {
+  authFieldRevealDelayMs,
+  authFooterRevealDelayMs,
+  authSubmitRevealDelayMs,
+} from "./authFormMotion";
 
-const JOURNEY_FEATURES = [
-  { icon: FaRegStickyNote, label: "Ghi chú", desc: "Ý tưởng của bạn đang chờ", to: "/create" },
-  { icon: FaTasks, label: "Todo", desc: "Tiếp tục công việc", to: "/todo" },
-  { icon: FaCalendarAlt, label: "Weekly Plan", desc: "Kế hoạch tuần của bạn", to: "/weekly-plan" },
+const LOGIN_FIELDS = [
+  { name: "email", type: "email", value: "" },
+  { name: "password", type: "password", value: "" },
 ];
 
-export default function Login() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [visible, setVisible] = useState(false);
-  const { login } = useContext(AuthContext);
-  const navigate = useNavigate();
+/**
+ * @param {Object} props
+ * @param {string} [props.idPrefix]
+ * @param {string} [props.titleId]
+ * @param {() => void} [props.onAuthenticated]
+ * @param {() => void} [props.onSwitchToRegister]
+ */
+export function LoginForm({
+  idPrefix = "login",
+  titleId = "login-title",
+  onAuthenticated,
+  onSwitchToRegister,
+}) {
+  const { login } = useContext(AuthContext) || {};
+  const [submitting, setSubmitting] = useState(false);
 
-  const fields = useMemo(
-    () => [
-      { name: "username", type: "text", label: "Tên đăng nhập", placeholder: "Nhập tên đăng nhập", required: true, autoComplete: "username", showValidation: true },
-      { name: "password", type: "password", label: "Mật khẩu", placeholder: "Nhập mật khẩu", required: true, autoComplete: "current-password" },
-    ],
-    []
-  );
-
-  const submitForm = useCallback(
+  const onSubmit = useCallback(
     async (data) => {
-      setIsLoading(true);
-      setError("");
+      setSubmitting(true);
       try {
-        if (!data.username || !data.password) {
-          throw new Error("Vui lòng điền đầy đủ thông tin");
+        const res = await loginUser({ email: data.email, password: data.password });
+        if (res?.token) {
+          localStorage.setItem("token", res.token);
         }
-        await new Promise((r) => setTimeout(r, 1000));
-        login({ id: 1, username: data.username, name: "User" });
-        navigate("/");
+        const user = res?.user ?? { email: data.email, name: res?.name ?? data.email };
+        if (login) login(user);
+        toast.success("Đăng nhập thành công");
+        onAuthenticated?.();
       } catch (err) {
-        setError(err.message);
+        const msg =
+          err.response?.data?.message ||
+          err.response?.data?.error ||
+          err.message ||
+          "Đăng nhập thất bại";
+        toast.error(typeof msg === "string" ? msg : "Đăng nhập thất bại");
       } finally {
-        setIsLoading(false);
+        setSubmitting(false);
       }
     },
-    [login, navigate]
+    [login, onAuthenticated]
   );
 
   const {
@@ -59,115 +69,88 @@ export default function Login() {
     handleSubmit,
     getFieldIcon,
     isFieldValid,
-  } = useAuthForm(fields, submitForm);
+  } = useAuthForm(LOGIN_FIELDS, onSubmit);
 
-  useEffect(() => {
-    const t = setTimeout(() => setVisible(true), 80);
-    return () => clearTimeout(t);
-  }, []);
-
-  const tx = "transition-all duration-500 ease-out";
-  const vis = visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6";
+  const loginSubmitDelayMs = authSubmitRevealDelayMs(LOGIN_FIELDS.length);
+  const loginFooterDelayMs = authFooterRevealDelayMs(LOGIN_FIELDS.length);
 
   return (
-    <div className="patterncraft-bg notes-bg min-h-screen relative flex">
-      <AuroraBackground intensity={0.8} contained />
+    <div className="w-full">
+      <h1
+        id={titleId}
+        className="auth-form-reveal-heading text-2xl font-bold text-ink dark:text-paper sm:text-3xl"
+      >
+        Đăng nhập
+      </h1>
+      <p className="auth-form-reveal-subtitle mt-2 text-sm text-coffee/80 dark:text-latte/80">
+        Chào mừng bạn quay lại MyNoteWeb3
+      </p>
 
-      {/* Left: Compact login form - "Quick return" */}
-      <div className="relative z-10 flex-1 flex items-center justify-center px-6 py-12 lg:py-0">
-        <div className={`w-full max-w-sm ${tx} ${vis}`} style={{ transitionDelay: "0.1s" }}>
-          <div className="mb-8">
-            <span className="text-sm font-semibold text-terracotta dark:text-brass">Quay trở lại</span>
-            <h1 className="text-3xl font-bold text-ink dark:text-paper mt-1">Đăng nhập</h1>
-            <p className="text-coffee dark:text-latte mt-2">
-              Điền thông tin để tiếp tục hành trình của bạn
-            </p>
-          </div>
+      <form
+        onSubmit={handleSubmit}
+        className="mt-8 space-y-5"
+        noValidate
+      >
+        {LOGIN_FIELDS.map((field, index) => {
+          const Icon = getFieldIcon(field);
+          const fid = `${idPrefix}-${field.name}`;
+          return (
+            <FormField
+              key={field.name}
+              type={field.type}
+              name={field.name}
+              value={formData[field.name] ?? ""}
+              onChange={handleChange}
+              onFocus={() => handleFocus(field.name)}
+              onBlur={() => handleBlur(field.name)}
+              label={field.name === "email" ? "Email" : "Mật khẩu"}
+              placeholder={field.name === "email" ? "you@example.com" : "••••••••"}
+              required
+              autoComplete={field.name === "email" ? "email" : "current-password"}
+              icon={Icon}
+              isFocused={fieldFocus[field.name]}
+              showPassword={showPasswords[field.name]}
+              onTogglePassword={() => handleTogglePassword(field.name)}
+              showValidation
+              isValid={isFieldValid(field)}
+              inputId={fid}
+              revealDelayMs={authFieldRevealDelayMs(index)}
+            />
+          );
+        })}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {error && (
-              <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-700 dark:text-red-300 text-sm animate-shake">
-                {error}
-              </div>
-            )}
-            {fields.map((f) => (
-              <FormField
-                key={f.name}
-                {...f}
-                value={formData[f.name] ?? ""}
-                onChange={handleChange}
-                onFocus={() => handleFocus(f.name)}
-                onBlur={() => handleBlur(f.name)}
-                icon={getFieldIcon(f)}
-                isFocused={fieldFocus[f.name]}
-                showPassword={showPasswords[f.name]}
-                onTogglePassword={() => handleTogglePassword(f.name)}
-                showValidation={f.showValidation}
-                isValid={isFieldValid(f)}
-              />
-            ))}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-coffee to-terracotta hover:shadow-lg hover:shadow-terracotta/25 disabled:opacity-50 flex items-center justify-center gap-3 transition-all"
-            >
-              {isLoading ? (
-                <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
-              ) : (
-                <>
-                  <FaSignInAlt />
-                  Đăng nhập
-                </>
-              )}
-            </button>
-          </form>
+        <button
+          type="submit"
+          disabled={submitting}
+          className="auth-form-submit-reveal auth-form-submit-btn w-full rounded-full bg-gradient-to-r from-terracotta to-brass py-4 text-lg font-semibold text-white shadow-lg hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+          style={{ "--auth-submit-delay": `${loginSubmitDelayMs}ms` }}
+        >
+          {submitting ? "Đang xử lý…" : "Đăng nhập"}
+        </button>
+      </form>
 
-          <p className="mt-6 text-center text-coffee dark:text-latte text-sm">
-            Chưa có tài khoản?{" "}
-            <Link to="/register" className="text-terracotta font-semibold hover:underline">
-              Đăng ký ngay
-            </Link>
-          </p>
-        </div>
-      </div>
-
-      {/* Right: Journey panel - "What awaits you" */}
-      <div className="hidden lg:flex relative z-10 flex-1 items-center justify-center px-12 py-16 bg-gradient-to-br from-coffee/10 via-terracotta/5 to-rose/10 dark:from-coffee/20 dark:via-terracotta/10 dark:to-rose/20 border-l border-terracotta/20">
-        <div className={`max-w-md ${tx} ${vis}`} style={{ transitionDelay: "0.2s" }}>
-          <div className="flex flex-col items-center text-center mb-10">
-            <div className="relative mb-6">
-              <div className="absolute -inset-4 bg-gradient-to-r from-coffee/20 to-terracotta/20 blur-2xl rounded-full" />
-              <ChibiMascot size={140} className="relative drop-shadow-xl" />
-            </div>
-            <h2 className="text-2xl font-bold text-ink dark:text-paper">Chào mừng trở lại</h2>
-            <p className="text-coffee dark:text-latte mt-2">
-              Ghi chú, todo và kế hoạch của bạn đang chờ bạn
-            </p>
-          </div>
-
-          <p className="text-sm font-semibold text-ink dark:text-paper mb-4">Tiếp tục với</p>
-          <div className="space-y-3">
-            {JOURNEY_FEATURES.map((item, i) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={i}
-                  to={item.to}
-                  className="flex items-center gap-4 p-4 rounded-xl bg-white/70 dark:bg-ink/40 border border-terracotta/20 hover:border-terracotta/40 hover:shadow-md transition-all group"
-                >
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br from-coffee to-terracotta text-white group-hover:scale-105 transition-transform">
-                    <Icon className="text-xl" />
-                  </div>
-                  <div className="text-left flex-1">
-                    <span className="font-bold text-ink dark:text-paper block">{item.label}</span>
-                    <span className="text-sm text-coffee dark:text-latte">{item.desc}</span>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </div>
+      {onSwitchToRegister && (
+        <p
+          className="auth-form-footer-reveal mt-6 text-center text-sm text-coffee dark:text-latte/90"
+          style={{ "--auth-footer-delay": `${loginFooterDelayMs}ms` }}
+        >
+          Chưa có tài khoản?{" "}
+          <button
+            type="button"
+            onClick={onSwitchToRegister}
+            className="auth-switch-link font-semibold text-terracotta underline decoration-terracotta/40 underline-offset-2 hover:decoration-terracotta"
+          >
+            Đăng ký
+          </button>
+        </p>
+      )}
     </div>
   );
+}
+
+/**
+ * Full-page route: use {@link ./AuthEntry.jsx}. Legacy `/login` redirects here.
+ */
+export default function Login() {
+  return <Navigate to="/auth/login" replace />;
 }

@@ -18,10 +18,12 @@ import {
   FaUsers,
   FaCalendarAlt,
   FaStar,
-  FaHome
+  FaHome,
+  FaUserCircle
 } from "react-icons/fa";
 import { useContext, useState, useCallback, memo } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { useAuthModal } from "../context/AuthModalContext";
 import { useTheme } from "../context/ThemeContext";
 import { FaMoon, FaSun } from "react-icons/fa";
 
@@ -41,6 +43,7 @@ const quickActions = [
 
 function SideMenu() {
   const { user, logout } = useContext(AuthContext) || {};
+  const { openLogin, openRegister } = useAuthModal();
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
@@ -206,30 +209,24 @@ function SideMenu() {
                 )}
                 {isOpen && <span>{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>}
               </button>
-              <Link
-                to="/login"
-                onClick={() => setIsMobileOpen(false)}
-                className={`
-                  w-full flex items-center justify-center sm:justify-start gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl hover:bg-white/20 
-                  text-white transition-all duration-300 hover:scale-105 font-semibold shadow-md text-sm sm:text-base
-                  ${!isOpen ? "px-2" : ""}
-                `}
+              <div
+                className={`flex w-full pt-1 ${isOpen ? "justify-start" : "justify-center"}`}
               >
-                <FaSignInAlt className="min-w-[16px] sm:min-w-[20px]" />
-                {isOpen && <span>Đăng nhập</span>}
-              </Link>
-              <Link
-                to="/register"
-                onClick={() => setIsMobileOpen(false)}
-                className={`
-                  w-full flex items-center justify-center sm:justify-start gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl hover:bg-white/20 
-                  text-white transition-all duration-300 hover:scale-105 font-semibold shadow-md text-sm sm:text-base
-                  ${!isOpen ? "px-2" : ""}
-                `}
-              >
-                <FaUserPlus className="min-w-[16px] sm:min-w-[20px]" />
-                {isOpen && <span>Đăng ký</span>}
-              </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    openLogin();
+                    setIsMobileOpen(false);
+                  }}
+                  className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-full
+                  bg-white/15 shadow-inner border border-white/25 text-white
+                  hover:bg-white/25 hover:scale-105 transition-all duration-300"
+                  title="Đăng nhập"
+                  aria-label="Mở đăng nhập"
+                >
+                  <FaUserCircle className="text-2xl sm:text-3xl" />
+                </button>
+              </div>
             </div>
           )}
         </div>

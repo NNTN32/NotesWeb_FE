@@ -20,6 +20,7 @@ import { FaEye, FaEyeSlash, FaCheckCircle } from "react-icons/fa";
  * @param {Function} props.onTogglePassword - Toggle password visibility handler
  * @param {boolean} props.showValidation - Whether to show validation icon
  * @param {boolean} props.isValid - Whether field is valid
+ * @param {number} [props.revealDelayMs] - Auth forms: staggered entrance delay (see authFormMotion.js + index.css)
  */
 export default function FormField({
   type = "text",
@@ -39,12 +40,16 @@ export default function FormField({
   showValidation = false,
   isValid = false,
   className = "",
+  inputId,
+  revealDelayMs,
   ...props
 }) {
+  const fieldId = inputId ?? name;
   const [internalShowPassword, setInternalShowPassword] = useState(false);
   
   const isPasswordField = type === "password";
   const shouldShowPassword = isPasswordField && (showPassword !== undefined ? showPassword : internalShowPassword);
+  const showValidCheck = showValidation && value && isValid;
   
   const handleTogglePassword = () => {
     if (onTogglePassword) {
@@ -54,10 +59,21 @@ export default function FormField({
     }
   };
 
+  const inputPadRight =
+    isPasswordField && showValidCheck ? "pr-[4.75rem]" : "pr-12";
+
+  const staggerStyle =
+    revealDelayMs != null
+      ? { "--auth-field-delay": `${revealDelayMs}ms` }
+      : undefined;
+
   return (
-    <div className={`group ${className}`}>
+    <div
+      className={`group ${revealDelayMs != null ? "auth-form-field-reveal" : ""} ${className}`}
+      style={staggerStyle}
+    >
       <label
-        htmlFor={name}
+        htmlFor={fieldId}
         className="block text-sm font-semibold text-ink dark:text-paper mb-3 transition-colors group-focus-within:text-terracotta"
       >
         {label}
@@ -75,20 +91,20 @@ export default function FormField({
 
         <input
           type={isPasswordField ? (shouldShowPassword ? "text" : "password") : type}
-          id={name}
+          id={fieldId}
           name={name}
           value={value}
           onChange={onChange}
           onFocus={onFocus}
           onBlur={onBlur}
-          className={`w-full pl-12 pr-12 py-4 border-2 rounded-xl transition-all duration-300 text-lg
-            bg-sand/50 dark:bg-ink/50 text-ink dark:text-paper
+          className={`w-full pl-12 ${inputPadRight} py-4 border-2 rounded-2xl transition-all duration-300 ease-out text-lg
+            bg-sand/60 dark:bg-ink/50 text-ink dark:text-paper
             placeholder:text-coffee/60 dark:placeholder:text-latte/60
-            focus:bg-white dark:focus:bg-ink/70 focus:ring-4 focus:ring-brass/20 focus:border-terracotta
+            focus:bg-white dark:focus:bg-ink/70 focus:ring-4 focus:ring-brass/25 focus:border-terracotta
             ${
               isFocused
-                ? "border-terracotta shadow-lg shadow-terracotta/10"
-                : "border-terracotta/30 dark:border-terracotta/40 hover:border-terracotta/50"
+                ? "border-terracotta shadow-lg shadow-terracotta/10 motion-safe:scale-[1.01]"
+                : "border-coffee/[0.08] dark:border-white/15 hover:border-terracotta/45"
             }`}
           placeholder={placeholder}
           required={required}
@@ -107,9 +123,14 @@ export default function FormField({
         )}
         
         {/* Validation icon */}
-        {showValidation && value && isValid && (
-          <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
-            <FaCheckCircle className="h-5 w-5 text-green-500 animate-pulse" />
+        {showValidCheck && isPasswordField && (
+          <div className="pointer-events-none absolute inset-y-0 right-[3.15rem] flex items-center">
+            <FaCheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400 auth-validation-check-enter" />
+          </div>
+        )}
+        {showValidCheck && !isPasswordField && (
+          <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+            <FaCheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400 auth-validation-check-enter" />
           </div>
         )}
       </div>

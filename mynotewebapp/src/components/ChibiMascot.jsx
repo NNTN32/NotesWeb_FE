@@ -1,15 +1,18 @@
 import { memo } from "react";
 
 /**
- * AI Chibi mascot - friendly animated character for the Home page.
- * Uses pure CSS/SVG for maintainability. Idle: gentle bob, blink.
+ * AI Chibi mascot — friendly idle animation (bob, blink). Pure CSS/SVG for easy tweaks.
+ *
+ * Props:
+ * - `decorative` — omit from the accessibility tree (e.g. auth modal accent).
  */
-function ChibiMascot({ className = "", size = 160 }) {
+function ChibiMascot({ className = "", size = 160, decorative = false }) {
   return (
     <div
       className={`chibi-mascot-container ${className}`}
-      role="img"
-      aria-label="Cute AI assistant mascot"
+      role={decorative ? undefined : "img"}
+      aria-label={decorative ? undefined : "Cute AI assistant mascot"}
+      aria-hidden={decorative ? true : undefined}
     >
       <svg
         width={size}

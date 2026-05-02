@@ -1,15 +1,16 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import SideMenu from "./components/SideMenu";
 import Footer from "./components/Footer";
 import LoadingAnimation from "./components/LoadingAnimation";
 import Home from './pages/Home';
-import Login from './pages/auth/Login';
-import Register from './pages/auth/Register';
+import AuthEntry from './pages/auth/AuthEntry';
 import NoteForm from './pages/users/NoteForm';
 import Todo from './pages/users/Todo';
 import WeeklyPlan from './pages/users/WeeklyPlan';
 import { AuthProvider } from "./context/AuthContext";
+import { AuthModalProvider } from "./context/AuthModalContext";
+import AuthModal from "./components/auth/AuthModal";
 import { ThemeProvider } from "./context/ThemeContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -35,14 +36,16 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <BrowserRouter>
+        <AuthModalProvider>
         <div className="min-h-screen flex">
           <SideMenu />
           <div className="flex-1 flex flex-col">
             <main className="flex-grow">
               <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
+                <Route path="/auth/:mode" element={<AuthEntry />} />
+                <Route path="/login" element={<Navigate to="/auth/login" replace />} />
+                <Route path="/register" element={<Navigate to="/auth/register" replace />} />
                 <Route path="/create" element={<NoteForm />} />
                 <Route path="/todo" element={<Todo />} />
                 <Route path="/weekly-plan" element={<WeeklyPlan />} />
@@ -51,7 +54,9 @@ function App() {
             <Footer />
           </div>
           <ToastContainer position="top-right" autoClose={2000} hideProgressBar theme="colored" />
+          <AuthModal />
         </div>
+        </AuthModalProvider>
       </BrowserRouter>
       </AuthProvider>
     </ThemeProvider>

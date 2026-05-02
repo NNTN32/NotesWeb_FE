@@ -474,11 +474,11 @@ export function QuickActionsSection() {
 
             {!user && (
               <p className="text-center text-coffee dark:text-latte mt-8 text-sm">
-                <Link to="/login" className="text-terracotta dark:text-brass font-semibold hover:underline">
+                <Link to="/auth/login" className="text-terracotta dark:text-brass font-semibold hover:underline">
                   Đăng nhập
                 </Link>
                 {" hoặc "}
-                <Link to="/register" className="text-terracotta dark:text-brass font-semibold hover:underline">
+                <Link to="/auth/register" className="text-terracotta dark:text-brass font-semibold hover:underline">
                   Đăng ký
                 </Link>
                 {" để lưu dữ liệu của bạn."}

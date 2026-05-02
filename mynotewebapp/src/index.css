@@ -1093,3 +1093,276 @@ body {
     animation: none !important;
   }
 }
+
+/* ========== Auth modal: liquid glass + pop-in ========== */
+.liquid-glass-panel {
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.78) 0%,
+    rgba(249, 245, 231, 0.55) 45%,
+    rgba(255, 255, 255, 0.4) 100%
+  );
+}
+
+.dark .liquid-glass-panel {
+  background: linear-gradient(
+    145deg,
+    rgba(47, 42, 42, 0.88) 0%,
+    rgba(34, 30, 28, 0.75) 50%,
+    rgba(47, 42, 42, 0.65) 100%
+  );
+}
+
+@keyframes modalBackdropIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalPopIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.88) translateY(20px);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.02) translateY(-3px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-modal-backdrop {
+  animation: modalBackdropIn 0.34s ease-out forwards;
+}
+
+.animate-modal-pop {
+  animation: modalPopIn 0.55s cubic-bezier(0.34, 1.45, 0.64, 1) forwards;
+}
+
+@keyframes modalBackdropOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes modalPopOut {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.94) translateY(14px);
+  }
+}
+
+.animate-modal-backdrop-out {
+  animation: modalBackdropOut 0.28s ease-in forwards;
+}
+
+.animate-modal-pop-out {
+  animation: modalPopOut 0.26s ease-in forwards;
+}
+
+/* ========== Auth forms: staggered reveal + interactions (Login / Register / modal) ==========
+   Stagger timings: `authFormMotion.js`. Heading/subtitle use +45ms / +95ms — keep aligned with AUTH_FORM_REVEAL. */
+@keyframes authFormRevealSoft {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes authFormCheckEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.55) rotate(-10deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes authModalMascotIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -10px, 0) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes authEntryOrbPulse {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.12;
+  }
+  50% {
+    transform: translate3d(-12px, -20px, 0) scale(1.06);
+    opacity: 0.18;
+  }
+}
+
+.auth-form-reveal-heading,
+.auth-form-reveal-subtitle,
+.auth-form-field-reveal,
+.auth-form-submit-reveal,
+.auth-form-footer-reveal {
+  opacity: 0;
+  animation: authFormRevealSoft 0.48s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.auth-form-reveal-heading {
+  animation-delay: calc(var(--auth-reveal-delay, 0ms) + 45ms);
+}
+
+.auth-form-reveal-subtitle {
+  animation-delay: calc(var(--auth-reveal-delay, 0ms) + 95ms);
+}
+
+.auth-form-field-reveal {
+  animation-delay: var(--auth-field-delay, 0ms);
+}
+
+.auth-form-submit-reveal {
+  animation-delay: var(--auth-submit-delay, 0ms);
+}
+
+.auth-form-footer-reveal {
+  animation-delay: var(--auth-footer-delay, 0ms);
+}
+
+.auth-validation-check-enter {
+  animation: authFormCheckEnter 0.38s cubic-bezier(0.34, 1.35, 0.64, 1) forwards;
+}
+
+.auth-form-submit-btn {
+  transition:
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.28s ease,
+    filter 0.2s ease;
+}
+
+.auth-form-submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow:
+    0 14px 32px -10px rgba(162, 123, 92, 0.42),
+    0 4px 12px -4px rgba(47, 42, 42, 0.12);
+}
+
+.auth-form-submit-btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.985);
+}
+
+.auth-switch-link {
+  transition:
+    transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.2s ease,
+    text-decoration-color 0.2s ease;
+}
+
+.auth-switch-link:hover {
+  transform: translateY(-1px);
+}
+
+.auth-switch-link:active {
+  transform: translateY(0);
+}
+
+/* Modal-only mascot: softer idle + entrance */
+.auth-modal-mascot-wrap {
+  animation: authModalMascotIn 0.52s cubic-bezier(0.34, 1.25, 0.64, 1) both;
+  animation-delay: 0.08s;
+}
+
+.auth-modal-mascot-wrap .auth-context-chibi.chibi-mascot-container {
+  animation: chibiBob 3.8s ease-in-out infinite;
+}
+
+.auth-modal-mascot-wrap .chibi-mascot-svg {
+  filter: drop-shadow(0 6px 14px rgba(162, 123, 92, 0.22));
+}
+
+/* Full-page auth route: ambient orb (behind modal) */
+.auth-entry-ambient-orb {
+  position: absolute;
+  width: clamp(140px, 22vw, 220px);
+  height: clamp(140px, 22vw, 220px);
+  bottom: min(14%, 120px);
+  right: clamp(12px, 8vw, 72px);
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 35% 35%,
+    rgba(176, 141, 87, 0.35),
+    transparent 62%
+  );
+  animation: authEntryOrbPulse 14s ease-in-out infinite;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-modal-backdrop,
+  .animate-modal-pop,
+  .animate-modal-backdrop-out,
+  .animate-modal-pop-out {
+    animation: none !important;
+  }
+
+  [role="dialog"] .animate-auth-liquid {
+    animation: none !important;
+  }
+
+  .auth-form-reveal-heading,
+  .auth-form-reveal-subtitle,
+  .auth-form-field-reveal,
+  .auth-form-submit-reveal,
+  .auth-form-footer-reveal {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .auth-validation-check-enter {
+    animation: none !important;
+  }
+
+  .auth-modal-mascot-wrap {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .auth-entry-ambient-orb {
+    animation: none !important;
+  }
+
+  .auth-form-submit-btn:hover:not(:disabled),
+  .auth-form-submit-btn:active:not(:disabled) {
+    transform: none !important;
+  }
+
+  .auth-switch-link:hover,
+  .auth-switch-link:active {
+    transform: none !important;
+  }
+}

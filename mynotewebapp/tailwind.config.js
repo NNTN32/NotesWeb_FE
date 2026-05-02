@@ -7,6 +7,22 @@ export default {
   darkMode: 'class', // Enable dark mode with class strategy
   theme: {
     extend: {
+      keyframes: {
+        authLiquidMorph: {
+          "0%, 100%": {
+            borderRadius: "58% 42% 62% 38% / 42% 58% 38% 62%",
+          },
+          "33%": {
+            borderRadius: "42% 58% 48% 52% / 52% 48% 58% 42%",
+          },
+          "66%": {
+            borderRadius: "52% 48% 38% 62% / 62% 38% 52% 48%",
+          },
+        },
+      },
+      animation: {
+        "auth-liquid": "authLiquidMorph 10s ease-in-out infinite",
+      },
       colors: {
         paper: '#f9f5e7',
         sand: '#efe3c8',

@@ -1,56 +1,76 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { FaUserPlus, FaShieldAlt, FaClock } from "react-icons/fa";
-import FormField from "../../components/FormField";
-import ChibiMascot from "../../components/ChibiMascot";
-import AuroraBackground from "../../components/AuroraBackground";
+import { useCallback, useContext, useState } from "react";
+import { Navigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { AuthContext } from "../../context/AuthContext";
 import { useAuthForm } from "../../hooks/useAuthForm";
+import FormField from "../../components/FormField";
 import { registerUser } from "../../utils/api/auth";
+import {
+  authFieldRevealDelayMs,
+  authFooterRevealDelayMs,
+  authSubmitRevealDelayMs,
+} from "./authFormMotion";
 
-const REGISTER_STEPS = [
-  { num: 1, label: "Email", desc: "Để khôi phục tài khoản" },
-  { num: 2, label: "Tên đăng nhập", desc: "Định danh của bạn" },
-  { num: 3, label: "Mật khẩu", desc: "Bảo vệ tài khoản" },
+const REGISTER_FIELDS = [
+  { name: "email", type: "email", value: "" },
+  { name: "username", type: "text", value: "" },
+  { name: "password", type: "password", value: "" },
+  { name: "confirmPassword", type: "password", value: "" },
 ];
 
-export default function Register() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [visible, setVisible] = useState(false);
-  const navigate = useNavigate();
+/**
+ * @param {Object} props
+ * @param {string} [props.idPrefix]
+ * @param {string} [props.titleId]
+ * @param {() => void} [props.onAuthenticated]
+ * @param {() => void} [props.onSwitchToLogin]
+ */
+export function RegisterForm({
+  idPrefix = "register",
+  titleId = "register-title",
+  onAuthenticated,
+  onSwitchToLogin,
+}) {
+  const { login } = useContext(AuthContext) || {};
+  const [submitting, setSubmitting] = useState(false);
 
-  const fields = useMemo(
-    () => [
-      { name: "email", type: "email", label: "Email", placeholder: "Nhập email của bạn", required: true, autoComplete: "email", showValidation: true },
-      { name: "username", type: "text", label: "Tên đăng nhập", placeholder: "Nhập tên đăng nhập", required: true, autoComplete: "username", showValidation: true },
-      { name: "password", type: "password", label: "Mật khẩu", placeholder: "Tạo mật khẩu mạnh", required: true, autoComplete: "new-password" },
-      { name: "confirmPassword", type: "password", label: "Xác nhận mật khẩu", placeholder: "Nhập lại mật khẩu", required: true, autoComplete: "new-password", showValidation: true },
-    ],
-    []
-  );
-
-  const submitForm = useCallback(
+  const onSubmit = useCallback(
     async (data) => {
-      setIsLoading(true);
-      setError("");
+      if (data.password !== data.confirmPassword) {
+        toast.error("Mật khẩu xác nhận không khớp");
+        return;
+      }
+      setSubmitting(true);
       try {
-        if (!data.email || !data.username || !data.password || !data.confirmPassword) {
-          throw new Error("Vui lòng điền đầy đủ thông tin");
+        const res = await registerUser({
+          email: data.email,
+          username: data.username,
+          password: data.password,
+        });
+        if (res?.token) {
+          localStorage.setItem("token", res.token);
         }
-        if (data.password !== data.confirmPassword) {
-          throw new Error("Mật khẩu xác nhận không khớp");
-        }
-        await registerUser({ email: data.email, username: data.username, password: data.password });
-        navigate("/login");
+        const user =
+          res?.user ??
+          ({
+            email: data.email,
+            name: data.username,
+          });
+        if (login) login(user);
+        toast.success("Đăng ký thành công");
+        onAuthenticated?.();
       } catch (err) {
-        const res = err?.response?.data;
-        const msg = (typeof res === "string" ? res : res?.message) || err?.message || "Đăng ký thất bại";
-        setError(msg);
+        const msg =
+          err.response?.data?.message ||
+          err.response?.data?.error ||
+          err.message ||
+          "Đăng ký thất bại";
+        toast.error(typeof msg === "string" ? msg : "Đăng ký thất bại");
       } finally {
-        setIsLoading(false);
+        setSubmitting(false);
       }
     },
-    [navigate]
+    [login, onAuthenticated]
   );
 
   const {
@@ -64,123 +84,103 @@ export default function Register() {
     handleSubmit,
     getFieldIcon,
     isFieldValid,
-  } = useAuthForm(fields, submitForm);
+  } = useAuthForm(REGISTER_FIELDS, onSubmit);
 
-  useEffect(() => {
-    const t = setTimeout(() => setVisible(true), 80);
-    return () => clearTimeout(t);
-  }, []);
+  const fieldLabels = {
+    email: "Email",
+    username: "Tên hiển thị",
+    password: "Mật khẩu",
+    confirmPassword: "Xác nhận mật khẩu",
+  };
 
-  const tx = "transition-all duration-500 ease-out";
-  const vis = visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6";
+  const placeholders = {
+    email: "you@example.com",
+    username: "Tên của bạn",
+    password: "••••••••",
+    confirmPassword: "Nhập lại mật khẩu",
+  };
+
+  const registerSubmitDelayMs = authSubmitRevealDelayMs(REGISTER_FIELDS.length);
+  const registerFooterDelayMs = authFooterRevealDelayMs(REGISTER_FIELDS.length);
 
   return (
-    <div className="patterncraft-bg notes-bg min-h-screen relative flex flex-col lg:flex-row">
-      <AuroraBackground intensity={0.8} contained />
+    <div className="w-full">
+      <h1
+        id={titleId}
+        className="auth-form-reveal-heading text-2xl font-bold text-ink dark:text-paper sm:text-3xl"
+      >
+        Đăng ký
+      </h1>
+      <p className="auth-form-reveal-subtitle mt-2 text-sm text-coffee/80 dark:text-latte/80">
+        Tạo tài khoản để đồng bộ ghi chú của bạn
+      </p>
 
-      {/* Left: Step guide + form - "Provide your information" */}
-      <div className="relative z-10 flex-1 flex items-center justify-center px-6 py-12 lg:py-16">
-        <div className={`w-full max-w-lg ${tx} ${vis}`} style={{ transitionDelay: "0.1s" }}>
-          <div className="mb-8">
-            <span className="text-sm font-semibold text-rose dark:text-brass">Bắt đầu hành trình</span>
-            <h1 className="text-3xl font-bold text-ink dark:text-paper mt-1">Tạo tài khoản</h1>
-            <p className="text-coffee dark:text-latte mt-2">
-              Chúng tôi cần một vài thông tin để thiết lập tài khoản của bạn
-            </p>
-          </div>
+      <form onSubmit={handleSubmit} className="mt-8 space-y-5" noValidate>
+        {REGISTER_FIELDS.map((field, index) => {
+          const Icon = getFieldIcon(field);
+          const fid = `${idPrefix}-${field.name}`;
+          return (
+            <FormField
+              key={field.name}
+              type={field.type}
+              name={field.name}
+              value={formData[field.name] ?? ""}
+              onChange={handleChange}
+              onFocus={() => handleFocus(field.name)}
+              onBlur={() => handleBlur(field.name)}
+              label={fieldLabels[field.name]}
+              placeholder={placeholders[field.name]}
+              required
+              autoComplete={
+                field.name === "email"
+                  ? "email"
+                  : field.name === "username"
+                    ? "username"
+                    : field.name === "password"
+                      ? "new-password"
+                      : "new-password"
+              }
+              icon={Icon}
+              isFocused={fieldFocus[field.name]}
+              showPassword={showPasswords[field.name]}
+              onTogglePassword={() => handleTogglePassword(field.name)}
+              showValidation
+              isValid={isFieldValid(field)}
+              inputId={fid}
+              revealDelayMs={authFieldRevealDelayMs(index)}
+            />
+          );
+        })}
 
-          {/* Step indicator - info collection focus */}
-          <div className="flex gap-4 mb-8 p-4 rounded-xl bg-white/60 dark:bg-ink/30 border border-terracotta/20">
-            {REGISTER_STEPS.map((step) => (
-              <div key={step.num} className="flex-1 text-center">
-                <span className="inline-flex w-8 h-8 items-center justify-center rounded-full bg-gradient-to-r from-rose to-brass text-white text-sm font-bold">
-                  {step.num}
-                </span>
-                <p className="text-xs font-semibold text-ink dark:text-paper mt-2">{step.label}</p>
-                <p className="text-[10px] text-coffee dark:text-latte">{step.desc}</p>
-              </div>
-            ))}
-          </div>
+        <button
+          type="submit"
+          disabled={submitting}
+          className="auth-form-submit-reveal auth-form-submit-btn w-full rounded-full bg-gradient-to-r from-brass to-terracotta py-4 text-lg font-semibold text-white shadow-lg hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+          style={{ "--auth-submit-delay": `${registerSubmitDelayMs}ms` }}
+        >
+          {submitting ? "Đang xử lý…" : "Đăng ký"}
+        </button>
+      </form>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {error && (
-              <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-700 dark:text-red-300 text-sm animate-shake">
-                {error}
-              </div>
-            )}
-            {fields.map((f) => (
-              <FormField
-                key={f.name}
-                {...f}
-                value={formData[f.name] ?? ""}
-                onChange={handleChange}
-                onFocus={() => handleFocus(f.name)}
-                onBlur={() => handleBlur(f.name)}
-                icon={getFieldIcon(f)}
-                isFocused={fieldFocus[f.name]}
-                showPassword={showPasswords[f.name]}
-                onTogglePassword={() => handleTogglePassword(f.name)}
-                showValidation={f.showValidation}
-                isValid={isFieldValid(f)}
-              />
-            ))}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-rose to-brass hover:shadow-lg hover:shadow-rose/25 disabled:opacity-50 flex items-center justify-center gap-3 transition-all"
-            >
-              {isLoading ? (
-                <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
-              ) : (
-                <>
-                  <FaUserPlus />
-                  Đăng ký
-                </>
-              )}
-            </button>
-          </form>
-
-          <p className="mt-6 text-center text-coffee dark:text-latte text-sm">
-            Đã có tài khoản?{" "}
-            <Link to="/login" className="text-terracotta font-semibold hover:underline">
-              Đăng nhập ngay
-            </Link>
-          </p>
-        </div>
-      </div>
-
-      {/* Right: Trust panel + Chibi - "Your info, your control" */}
-      <div className="hidden lg:flex relative z-10 w-full lg:w-[420px] flex-shrink-0 flex-col items-center justify-center px-12 py-16 bg-gradient-to-br from-rose/10 via-terracotta/5 to-brass/10 dark:from-rose/20 dark:via-terracotta/10 dark:to-brass/20 border-l border-terracotta/20">
-        <div className={`max-w-xs ${tx} ${vis}`} style={{ transitionDelay: "0.2s" }}>
-          <div className="flex flex-col items-center text-center mb-10">
-            <div className="relative mb-6">
-              <div className="absolute -inset-4 bg-gradient-to-r from-rose/20 to-brass/20 blur-2xl rounded-full" />
-              <ChibiMascot size={140} className="relative drop-shadow-xl" />
-            </div>
-            <h2 className="text-xl font-bold text-ink dark:text-paper">Thông tin của bạn</h2>
-            <p className="text-coffee dark:text-latte text-sm mt-2">
-              Chỉ dùng để tạo tài khoản. Chúng tôi bảo vệ dữ liệu của bạn.
-            </p>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-start gap-3 p-4 rounded-xl bg-white/60 dark:bg-ink/30 border border-terracotta/20">
-              <FaShieldAlt className="text-terracotta text-xl flex-shrink-0 mt-0.5" />
-              <div className="text-left">
-                <p className="font-semibold text-ink dark:text-paper text-sm">Bảo mật</p>
-                <p className="text-xs text-coffee dark:text-latte">Thông tin được mã hóa và lưu trữ an toàn</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3 p-4 rounded-xl bg-white/60 dark:bg-ink/30 border border-terracotta/20">
-              <FaClock className="text-terracotta text-xl flex-shrink-0 mt-0.5" />
-              <div className="text-left">
-                <p className="font-semibold text-ink dark:text-paper text-sm">Chỉ vài phút</p>
-                <p className="text-xs text-coffee dark:text-latte">Điền 4 trường là xong — đơn giản và nhanh</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      {onSwitchToLogin && (
+        <p
+          className="auth-form-footer-reveal mt-6 text-center text-sm text-coffee dark:text-latte/90"
+          style={{ "--auth-footer-delay": `${registerFooterDelayMs}ms` }}
+        >
+          Đã có tài khoản?{" "}
+          <button
+            type="button"
+            onClick={onSwitchToLogin}
+            className="auth-switch-link font-semibold text-terracotta underline decoration-terracotta/40 underline-offset-2 hover:decoration-terracotta"
+          >
+            Đăng nhập
+          </button>
+        </p>
+      )}
     </div>
   );
+}
+
+export default function Register() {
+  return <Navigate to="/auth/register" replace />;
 }

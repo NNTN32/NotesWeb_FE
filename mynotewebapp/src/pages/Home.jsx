@@ -1,6 +1,8 @@
 import AuroraBackground from "../components/AuroraBackground";
 import {
   HeroSection,
+  SectionJumpBar,
+  ProblemSolverSection,
   ValuePropsSection,
   FeaturesSection,
   WorkflowSection,
@@ -21,6 +23,8 @@ export default function Home() {
       <AuroraBackground intensity={0.85} />
       <div className="patterncraft-content relative z-10">
         <HeroSection />
+        <SectionJumpBar />
+        <ProblemSolverSection />
         <ValuePropsSection />
         <FeaturesSection />
         <WorkflowSection />

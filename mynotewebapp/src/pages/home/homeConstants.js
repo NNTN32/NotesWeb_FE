@@ -5,6 +5,9 @@ import {
   FaBolt,
   FaCoffee,
   FaSync,
+  FaLightbulb,
+  FaRegListAlt,
+  FaRegClock,
 } from "react-icons/fa";
 
 /**
@@ -13,10 +16,19 @@ import {
  */
 export const SECTION_IDS = {
   hero: "home-hero",
+  scenarios: "home-scenarios",
   features: "home-features",
   workflow: "home-workflow",
   quickStart: "home-quick-start",
 };
+
+/** Anchor targets for the jump bar — order matches recommended reading flow */
+export const HOME_JUMP_LINKS = [
+  { sectionId: SECTION_IDS.scenarios, label: "Giải pháp" },
+  { sectionId: SECTION_IDS.features, label: "Tính năng" },
+  { sectionId: SECTION_IDS.workflow, label: "Quy trình" },
+  { sectionId: SECTION_IDS.quickStart, label: "Bắt đầu" },
+];
 
 /** Main product pillars — drives feature cards and quick-action chips */
 export const FEATURES = [
@@ -29,6 +41,10 @@ export const FEATURES = [
     to: "/create",
     gradient: "from-terracotta to-brass",
     label: "Tạo ghi chú",
+    tips: [
+      "Viết tiêu đề ngắn trước, bổ sung nội dung sau — giảm ma sát khi bắt đầu.",
+      "Dùng ghi chú làm “bãi đỗ” ý tưởng trước khi chuyển sang Todo hoặc Weekly Plan.",
+    ],
   },
   {
     id: "todo",
@@ -39,6 +55,10 @@ export const FEATURES = [
     to: "/todo",
     gradient: "from-coffee to-terracotta",
     label: "Xem Todo",
+    tips: [
+      "Chia việc lớn thành bước nhỏ có thể hoàn thành trong một phiên làm việc.",
+      "Ưu tiên 3 việc quan trọng nhất mỗi ngày thay vì cố gắng làm hết danh sách.",
+    ],
   },
   {
     id: "weekly",
@@ -49,6 +69,10 @@ export const FEATURES = [
     to: "/weekly-plan",
     gradient: "from-rose to-coffee",
     label: "Lên kế hoạch",
+    tips: [
+      "Nhìn tuần giúp bạn thấy chỗ bị “dồn việc” và điều chỉnh sớm.",
+      "Giữ một khối thời gian trống cho việc phát sinh — tránh kế hoạch quá kín.",
+    ],
   },
 ];
 
@@ -78,6 +102,49 @@ export const VALUE_PROPS = [
     title: "Luồng liền mạch",
     body: "Các phần của app bổ trợ nhau: ghi → làm → lên kế hoạch.",
     icon: FaSync,
+  },
+];
+
+/**
+ * Interactive “problem → path” scenarios — copy lives here for easy tuning.
+ * `featureId` ties to FEATURES[].id for cross-links in the UI.
+ */
+export const USER_SCENARIOS = [
+  {
+    id: "scatter",
+    pain: "Nhiều ý tưởng nhưng khó bắt đầu",
+    detail: "Bạn ghi được vài dòng rồi bị kẹt, hoặc nhảy qua nhảy lại giữa nhiều việc.",
+    solveTitle: "Ghi nhanh, tinh gọn",
+    solveBody:
+      "Mở ghi chú, chốt một ý chính trước. Khi đủ rõ, chuyển sang Todo để biến ý thành hành động cụ thể.",
+    cta: "Tạo ghi chú",
+    to: "/create",
+    featureId: "notes",
+    icon: FaLightbulb,
+  },
+  {
+    id: "overload",
+    pain: "Không biết việc nào quan trọng nhất",
+    detail: "Danh sách dài khiến bạn chần chừ, dễ làm việc “dễ” thay vì việc “cần”.",
+    solveTitle: "Todo có trọng tâm",
+    solveBody:
+      "Dùng Todo để lọc và ưu tiên. Hoàn thành từng mục nhỏ giúp bạn lấy lại đà làm việc.",
+    cta: "Mở Todo",
+    to: "/todo",
+    featureId: "todo",
+    icon: FaRegListAlt,
+  },
+  {
+    id: "week",
+    pain: "Tuần trôi mà không khớp kế hoạch",
+    detail: "Bạn cảm giác bị cuốn theo lịch, khó nhìn xa hơn một hai ngày.",
+    solveTitle: "Weekly Plan làm khung",
+    solveBody:
+      "Nhìn cả tuần trên một màn hình để phân bổ thời gian và chủ động điều chỉnh khi ưu tiên thay đổi.",
+    cta: "Weekly Plan",
+    to: "/weekly-plan",
+    featureId: "weekly",
+    icon: FaRegClock,
   },
 ];
 

@@ -26,6 +26,16 @@ export function authFieldRevealDelayMs(index) {
   return AUTH_FORM_REVEAL.fieldStartMs + index * AUTH_FORM_REVEAL.fieldStepMs;
 }
 
+/** Social buttons — before first field (sync: `.auth-form-social-reveal` in index.css) */
+export function authSocialRevealDelayMs() {
+  return AUTH_FORM_REVEAL.fieldStartMs - 32;
+}
+
+/** “hoặc” divider between social and email form */
+export function authDividerRevealDelayMs() {
+  return AUTH_FORM_REVEAL.fieldStartMs - 14;
+}
+
 /**
  * @param {number} fieldCount
  * @returns {number} milliseconds delay for submit button reveal

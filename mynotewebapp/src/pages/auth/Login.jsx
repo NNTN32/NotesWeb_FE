@@ -1,15 +1,25 @@
 import { useCallback, useContext, useState } from "react";
 import { Navigate } from "react-router-dom";
+import { FaApple } from "react-icons/fa";
+import { FaGoogle } from "react-icons/fa6";
 import { toast } from "react-toastify";
 import { AuthContext } from "../../context/AuthContext";
 import { useAuthForm } from "../../hooks/useAuthForm";
 import FormField from "../../components/FormField";
-import { loginUser } from "../../utils/api/auth";
+import { loginUser, loginWithSocialProvider } from "../../utils/api/auth";
 import {
+  authDividerRevealDelayMs,
   authFieldRevealDelayMs,
   authFooterRevealDelayMs,
+  authSocialRevealDelayMs,
   authSubmitRevealDelayMs,
 } from "./authFormMotion";
+
+/** Social providers — `id` must match `POST /auth/oauth/:id` */
+const SOCIAL_LOGIN_OPTIONS = [
+  { id: "google", label: "Google", Icon: FaGoogle, ariaLabel: "Đăng nhập bằng Google" },
+  { id: "apple", label: "Apple", Icon: FaApple, ariaLabel: "Đăng nhập bằng Apple" },
+];
 
 const LOGIN_FIELDS = [
   { name: "email", type: "email", value: "" },
@@ -31,19 +41,27 @@ export function LoginForm({
 }) {
   const { login } = useContext(AuthContext) || {};
   const [submitting, setSubmitting] = useState(false);
+  const [socialSubmitting, setSocialSubmitting] = useState(null);
+
+  const completeLogin = useCallback(
+    (res, fallbackEmail) => {
+      if (res?.token) {
+        localStorage.setItem("token", res.token);
+      }
+      const user = res?.user ?? { email: fallbackEmail, name: res?.name ?? fallbackEmail };
+      if (login) login(user);
+      toast.success("Đăng nhập thành công");
+      onAuthenticated?.();
+    },
+    [login, onAuthenticated]
+  );
 
   const onSubmit = useCallback(
     async (data) => {
       setSubmitting(true);
       try {
         const res = await loginUser({ email: data.email, password: data.password });
-        if (res?.token) {
-          localStorage.setItem("token", res.token);
-        }
-        const user = res?.user ?? { email: data.email, name: res?.name ?? data.email };
-        if (login) login(user);
-        toast.success("Đăng nhập thành công");
-        onAuthenticated?.();
+        completeLogin(res, data.email);
       } catch (err) {
         const msg =
           err.response?.data?.message ||
@@ -55,7 +73,28 @@ export function LoginForm({
         setSubmitting(false);
       }
     },
-    [login, onAuthenticated]
+    [completeLogin]
+  );
+
+  const handleSocialLogin = useCallback(
+    async (providerId) => {
+      setSocialSubmitting(providerId);
+      try {
+        const res = await loginWithSocialProvider(providerId);
+        const email = res?.user?.email ?? res?.email ?? "";
+        completeLogin(res, email);
+      } catch (err) {
+        const msg =
+          err.response?.data?.message ||
+          err.response?.data?.error ||
+          err.message ||
+          "Đăng nhập thất bại";
+        toast.error(typeof msg === "string" ? msg : "Đăng nhập thất bại");
+      } finally {
+        setSocialSubmitting(null);
+      }
+    },
+    [completeLogin]
   );
 
   const {
@@ -73,6 +112,9 @@ export function LoginForm({
 
   const loginSubmitDelayMs = authSubmitRevealDelayMs(LOGIN_FIELDS.length);
   const loginFooterDelayMs = authFooterRevealDelayMs(LOGIN_FIELDS.length);
+  const socialRevealDelayMs = authSocialRevealDelayMs();
+  const dividerRevealDelayMs = authDividerRevealDelayMs();
+  const authBusy = submitting || Boolean(socialSubmitting);
 
   return (
     <div className="w-full">
@@ -86,11 +128,42 @@ export function LoginForm({
         Chào mừng bạn quay lại MyNoteWeb3
       </p>
 
-      <form
-        onSubmit={handleSubmit}
-        className="mt-8 space-y-5"
-        noValidate
+      <div
+        className="auth-form-social-reveal mt-8 grid grid-cols-2 gap-3"
+        style={{ "--auth-social-delay": `${socialRevealDelayMs}ms` }}
       >
+        {SOCIAL_LOGIN_OPTIONS.map((option) => {
+          const { Icon } = option;
+          const isLoading = socialSubmitting === option.id;
+
+          return (
+            <button
+              key={option.id}
+              type="button"
+              disabled={authBusy}
+              aria-label={option.ariaLabel}
+              onClick={() => handleSocialLogin(option.id)}
+              className={`auth-social-btn auth-social-btn--${option.id} disabled:cursor-not-allowed disabled:opacity-60`}
+            >
+              <Icon className="auth-social-btn-icon" aria-hidden="true" />
+              <span>{isLoading ? "Đang xử lý…" : option.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div
+        className="auth-form-divider-reveal auth-form-divider"
+        style={{ "--auth-divider-delay": `${dividerRevealDelayMs}ms` }}
+        role="separator"
+        aria-label="hoặc đăng nhập bằng email"
+      >
+        <span className="auth-form-divider-line" aria-hidden="true" />
+        <span className="auth-form-divider-text">hoặc</span>
+        <span className="auth-form-divider-line" aria-hidden="true" />
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-5" noValidate>
         {LOGIN_FIELDS.map((field, index) => {
           const Icon = getFieldIcon(field);
           const fid = `${idPrefix}-${field.name}`;
@@ -121,7 +194,7 @@ export function LoginForm({
 
         <button
           type="submit"
-          disabled={submitting}
+          disabled={authBusy}
           className="auth-form-submit-reveal auth-form-submit-btn w-full rounded-full bg-gradient-to-r from-terracotta to-brass py-4 text-lg font-semibold text-white shadow-lg hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
           style={{ "--auth-submit-delay": `${loginSubmitDelayMs}ms` }}
         >

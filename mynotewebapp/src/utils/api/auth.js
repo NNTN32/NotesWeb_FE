@@ -8,6 +8,15 @@ export async function loginUser(credentials) {
   return response.data;
 }
 
+/**
+ * OAuth / social sign-in — backend: `POST /auth/oauth/:provider`
+ * @param {"google" | "apple"} provider
+ */
+export async function loginWithSocialProvider(provider) {
+  const response = await axios.post(`/auth/oauth/${provider}`);
+  return response.data;
+}
+
 export async function registerUser({ email, username, password }) {
   // Always default role to USER per requirement
   const payload = {

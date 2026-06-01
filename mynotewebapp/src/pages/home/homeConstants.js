@@ -5,9 +5,6 @@ import {
   FaBolt,
   FaCoffee,
   FaSync,
-  FaLightbulb,
-  FaRegListAlt,
-  FaRegClock,
 } from "react-icons/fa";
 
 /**
@@ -22,21 +19,31 @@ export const HOME_MOTION = {
   missionScrollMultiplier: 2.4,
 };
 
+/** Hero desk stack — auto-tear interval & animation id (see `.home-desk-card--tearing` in index.css) */
+export const HOME_DESK_MOTION = {
+  autoTearIntervalMs: 5200,
+  tearAnimationName: "homeDeskTear",
+};
+
+/** Icons for the three module floating chips (Notes · Todo · Week) */
+export const FLOATING_MODULE_ICONS = {
+  note: FaRegStickyNote,
+  todo: FaTasks,
+  week: FaCalendarAlt,
+};
+
 export const SECTION_IDS = {
   hero: "home-hero",
   mission: "home-mission",
   principles: "home-principles",
   scenarios: "home-scenarios",
-  features: "home-features",
-  workflow: "home-workflow",
-  quickStart: "home-quick-start",
 };
 
 /** Decorative sticky notes in the hero — % position, rotation in deg */
 export const FLOATING_CHIPS = [
-  { id: "chip-note-1", label: "Ghi chú", variant: "note", top: "10%", left: "6%", delay: "0s", duration: "14s", rotate: "-6deg", alt: false },
-  { id: "chip-todo-1", label: "Todo", variant: "todo", top: "18%", left: "80%", delay: "-2s", duration: "16s", rotate: "5deg", alt: true },
-  { id: "chip-week-1", label: "Tuần", variant: "week", top: "56%", left: "4%", delay: "-5s", duration: "18s", rotate: "4deg", alt: true },
+  { id: "chip-note-1", module: "note", variant: "note", ariaLabel: "Ghi chú", top: "10%", left: "6%", delay: "0s", duration: "14s", rotate: "-6deg", alt: false },
+  { id: "chip-todo-1", module: "todo", variant: "todo", ariaLabel: "Todo", top: "18%", left: "80%", delay: "-2s", duration: "16s", rotate: "5deg", alt: true },
+  { id: "chip-week-1", module: "week", variant: "week", ariaLabel: "Tuần", top: "56%", left: "4%", delay: "-5s", duration: "18s", rotate: "4deg", alt: true },
   { id: "chip-check", label: "✓", variant: "check", top: "66%", left: "84%", delay: "-1s", duration: "13s", rotate: "-3deg", alt: false },
   { id: "chip-idea", label: "Ý tưởng", variant: "idea", top: "36%", left: "86%", delay: "-7s", duration: "15s", rotate: "7deg", alt: false },
   { id: "chip-plan", label: "Kế hoạch", variant: "plan", top: "76%", left: "40%", delay: "-4s", duration: "17s", rotate: "-5deg", alt: true },
@@ -72,6 +79,17 @@ export const MISSION_COPY = {
   outro: "— thông qua ba module Ghi chú, Todo và Weekly Plan trong một giao diện gọn gàng.",
 };
 
+/** Mission visual — module flow on the right (pairs with FLOATING_MODULE_ICONS) */
+export const MISSION_FLOW_STEPS = [
+  { id: "mission-notes", module: "note", label: "Ghi chú", hint: "Bắt ý tưởng khi còn mới" },
+  { id: "mission-todo", module: "todo", label: "Todo", hint: "Biến ý thành việc cụ thể" },
+  { id: "mission-week", module: "week", label: "Weekly Plan", hint: "Nhìn toàn cảnh cả tuần" },
+];
+
+export const MISSION_FLOW_MOTION = {
+  stepIntervalMs: 2800,
+};
+
 /** Principles section chrome */
 export const PRINCIPLES_COPY = {
   ghostLabel: "nguyên tắc",
@@ -79,16 +97,18 @@ export const PRINCIPLES_COPY = {
   title: "MyNote tồn tại để phục vụ nhịp làm việc hàng ngày của bạn",
 };
 
-/** Resources / features band (Sui “Dive deeper”) */
-export const RESOURCES_COPY = {
-  eyebrow: "Khám phá",
-  title: "Đi sâu hơn vào từng module",
+/** Scenarios band — duy nhất giới thiệu chi tiết từng module sau Sứ mệnh */
+export const SCENARIOS_COPY = {
+  eyebrow: "Giải pháp",
+  title: "Từ vướng mắc đến lối đi rõ ràng",
+  tabListLabel: "Chọn module",
+  panelPrefix: "Điểm chính",
 };
 
 /** Final CTA band */
 export const FINAL_CTA_COPY = {
   title: "Sẵn sàng bắt đầu tuần mới?",
-  body: "Tạo ghi chú đầu tiên, thêm vài việc vào Todo, hoặc mở Weekly Plan — chỉ vài cú nhấp.",
+  body: "Chọn một điểm bắt đầu — mọi module đều nằm trong cùng một giao diện.",
   primaryCta: "Bắt đầu miễn phí",
   secondaryCta: "Mở Weekly Plan",
 };
@@ -98,54 +118,6 @@ export const HOME_JUMP_LINKS = [
   { sectionId: SECTION_IDS.mission, label: "Sứ mệnh" },
   { sectionId: SECTION_IDS.principles, label: "Nguyên tắc" },
   { sectionId: SECTION_IDS.scenarios, label: "Giải pháp" },
-  { sectionId: SECTION_IDS.features, label: "Module" },
-  { sectionId: SECTION_IDS.quickStart, label: "Bắt đầu" },
-];
-
-/** Main product pillars — drives feature cards and quick-action chips */
-export const FEATURES = [
-  {
-    id: "notes",
-    title: "Ghi chú",
-    description:
-      "Tạo và quản lý ghi chú mọi lúc mọi nơi. Ghi lại ý tưởng, tài liệu và thông tin quan trọng.",
-    icon: FaRegStickyNote,
-    to: "/create",
-    gradient: "from-terracotta to-brass",
-    label: "Tạo ghi chú",
-    tips: [
-      "Viết tiêu đề ngắn trước, bổ sung nội dung sau — giảm ma sát khi bắt đầu.",
-      "Dùng ghi chú làm “bãi đỗ” ý tưởng trước khi chuyển sang Todo hoặc Weekly Plan.",
-    ],
-  },
-  {
-    id: "todo",
-    title: "Todo",
-    description:
-      "Theo dõi công việc với danh sách todo. Ưu tiên, lọc và hoàn thành từng nhiệm vụ.",
-    icon: FaTasks,
-    to: "/todo",
-    gradient: "from-coffee to-terracotta",
-    label: "Xem Todo",
-    tips: [
-      "Chia việc lớn thành bước nhỏ có thể hoàn thành trong một phiên làm việc.",
-      "Ưu tiên 3 việc quan trọng nhất mỗi ngày thay vì cố gắng làm hết danh sách.",
-    ],
-  },
-  {
-    id: "weekly",
-    title: "Weekly Plan",
-    description:
-      "Lên kế hoạch tuần hiệu quả. Phân bổ thời gian và theo dõi tiến độ hàng ngày.",
-    icon: FaCalendarAlt,
-    to: "/weekly-plan",
-    gradient: "from-rose to-coffee",
-    label: "Lên kế hoạch",
-    tips: [
-      "Nhìn tuần giúp bạn thấy chỗ bị “dồn việc” và điều chỉnh sớm.",
-      "Giữ một khối thời gian trống cho việc phát sinh — tránh kế hoạch quá kín.",
-    ],
-  },
 ];
 
 /** Short metrics row under the hero — adjust numbers/copy without touching layout */
@@ -178,72 +150,34 @@ export const VALUE_PROPS = [
 ];
 
 /**
- * Interactive “problem → path” scenarios — copy lives here for easy tuning.
- * `featureId` ties to FEATURES[].id for cross-links in the UI.
+ * Mỗi module: icon (`module` → FLOATING_MODULE_ICONS) + tagline ngắn + 2 điểm chính.
  */
 export const USER_SCENARIOS = [
   {
     id: "scatter",
-    pain: "Nhiều ý tưởng nhưng khó bắt đầu",
-    detail: "Bạn ghi được vài dòng rồi bị kẹt, hoặc nhảy qua nhảy lại giữa nhiều việc.",
-    solveTitle: "Ghi nhanh, tinh gọn",
-    solveBody:
-      "Mở ghi chú, chốt một ý chính trước. Khi đủ rõ, chuyển sang Todo để biến ý thành hành động cụ thể.",
+    module: "note",
+    moduleLabel: "Ghi chú",
+    tagline: "Bắt ý tưởng trước khi quên",
+    points: ["Một ý chính mỗi ghi chú", "Chuyển Todo khi đã rõ"],
     cta: "Tạo ghi chú",
     to: "/create",
-    featureId: "notes",
-    icon: FaLightbulb,
   },
   {
     id: "overload",
-    pain: "Không biết việc nào quan trọng nhất",
-    detail: "Danh sách dài khiến bạn chần chừ, dễ làm việc “dễ” thay vì việc “cần”.",
-    solveTitle: "Todo có trọng tâm",
-    solveBody:
-      "Dùng Todo để lọc và ưu tiên. Hoàn thành từng mục nhỏ giúp bạn lấy lại đà làm việc.",
+    module: "todo",
+    moduleLabel: "Todo",
+    tagline: "Biết việc nào làm trước",
+    points: ["Ưu tiên 3 việc mỗi ngày", "Chia nhỏ từng bước"],
     cta: "Mở Todo",
     to: "/todo",
-    featureId: "todo",
-    icon: FaRegListAlt,
   },
   {
     id: "week",
-    pain: "Tuần trôi mà không khớp kế hoạch",
-    detail: "Bạn cảm giác bị cuốn theo lịch, khó nhìn xa hơn một hai ngày.",
-    solveTitle: "Weekly Plan làm khung",
-    solveBody:
-      "Nhìn cả tuần trên một màn hình để phân bổ thời gian và chủ động điều chỉnh khi ưu tiên thay đổi.",
+    module: "week",
+    moduleLabel: "Weekly Plan",
+    tagline: "Nhìn cả tuần một lần",
+    points: ["Phân bổ thời gian rõ", "Chừa chỗ cho phát sinh"],
     cta: "Weekly Plan",
     to: "/weekly-plan",
-    featureId: "weekly",
-    icon: FaRegClock,
-  },
-];
-
-/** Numbered journey for the “How it works” band */
-export const WORKFLOW_STEPS = [
-  {
-    id: "capture",
-    title: "Ghi lại",
-    body: "Viết ghi chú hoặc thêm việc cần làm khi ý tưởng vừa đến.",
-    to: "/create",
-    cta: "Mở ghi chú",
-    highlights: ["Mở trang tạo ghi chú ngay", "Giữ ý tưởng trước khi quên"],
-  },
-  {
-    id: "organize",
-    title: "Sắp xếp",
-    body: "Ưu tiên todo và xem toàn cảnh tuần để biết việc gì quan trọng nhất.",
-    to: "/todo",
-    cta: "Mở Todo",
-    highlights: ["Lọc và sắp xếp theo mức ưu tiên", "Đánh dấu hoàn thành từng việc"],
-  },
-  {
-    id: "plan",
-    title: "Lên kế hoạch",
-    body: "Phân bổ thời gian theo tuần để duy trì nhịp độ bền vững.",
-    to: "/weekly-plan",
-    cta: "Weekly Plan",
-    highlights: ["Nhìn cả tuần trên một màn hình", "Điều chỉnh khi ưu tiên thay đổi"],
   },
 ];

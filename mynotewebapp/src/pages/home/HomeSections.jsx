@@ -1,22 +1,24 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { FaChevronDown } from "react-icons/fa";
 import {
   SECTION_IDS,
   HOME_MOTION,
+  HOME_DESK_MOTION,
   FLOATING_CHIPS,
+  FLOATING_MODULE_ICONS,
   HERO_COPY,
   HERO_STATS,
   HERO_DESK_PREVIEW,
   MISSION_COPY,
+  MISSION_FLOW_STEPS,
+  MISSION_FLOW_MOTION,
   PRINCIPLES_COPY,
-  RESOURCES_COPY,
+  SCENARIOS_COPY,
   FINAL_CTA_COPY,
   HOME_JUMP_LINKS,
-  FEATURES,
   VALUE_PROPS,
   USER_SCENARIOS,
-  WORKFLOW_STEPS,
 } from "./homeConstants";
 
 /* ========== Scroll + reveal (homepage motion only) ========== */
@@ -75,6 +77,82 @@ function useRevealOnScroll() {
   }, []);
 
   return ref;
+}
+
+const HOME_JUMP_SECTION_IDS = HOME_JUMP_LINKS.map((link) => link.sectionId);
+
+/** Highlights jump-bar tab from scroll position (paired with SectionJumpBar). */
+function useHomeSectionSpy(sectionIds) {
+  const [active, setActive] = useState(sectionIds[0]);
+  const clickLock = useRef(false);
+
+  useEffect(() => {
+    const ratios = new Map(sectionIds.map((id) => [id, 0]));
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          ratios.set(entry.target.id, entry.isIntersecting ? entry.intersectionRatio : 0);
+        });
+
+        if (clickLock.current) return;
+
+        let bestId = sectionIds[0];
+        let bestRatio = 0;
+
+        for (const id of sectionIds) {
+          const ratio = ratios.get(id) ?? 0;
+          if (ratio > bestRatio) {
+            bestRatio = ratio;
+            bestId = id;
+          }
+        }
+
+        if (bestRatio > 0) setActive(bestId);
+      },
+      {
+        rootMargin: "-18% 0px -52% 0px",
+        threshold: [0, 0.15, 0.35, 0.55, 0.75, 1],
+      }
+    );
+
+    sectionIds.forEach((id) => {
+      const node = document.getElementById(id);
+      if (node) observer.observe(node);
+    });
+
+    return () => observer.disconnect();
+  }, [sectionIds]);
+
+  const setActiveFromClick = useCallback((sectionId) => {
+    setActive(sectionId);
+    clickLock.current = true;
+    window.setTimeout(() => {
+      clickLock.current = false;
+    }, 900);
+  }, []);
+
+  return [active, setActiveFromClick];
+}
+
+/** Shows floating jump bar after the hero scrolls out of view. */
+function useJumpBarDocked() {
+  const [docked, setDocked] = useState(false);
+
+  useEffect(() => {
+    const hero = document.getElementById(SECTION_IDS.hero);
+    if (!hero) return undefined;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setDocked(!entry.isIntersecting),
+      { threshold: 0.08, rootMargin: "0px 0px 0px 0px" }
+    );
+
+    observer.observe(hero);
+    return () => observer.disconnect();
+  }, []);
+
+  return docked;
 }
 
 /* ========== Layout primitives ========== */
@@ -141,46 +219,157 @@ function scrollToSection(sectionId) {
 function HeroStickyChips() {
   return (
     <div className="home-sticky-field pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-      {FLOATING_CHIPS.map((chip) => (
-        <div
-          key={chip.id}
-          className={`home-sticky-chip home-sticky-chip--${chip.variant} ${chip.alt ? "home-sticky-chip--alt" : ""}`}
-          style={{
-            top: chip.top,
-            left: chip.left,
-            "--chip-delay": chip.delay,
-            "--chip-duration": chip.duration,
-            "--chip-rotate": chip.rotate,
-          }}
-        >
-          <span className="home-sticky-tape" />
-          {chip.label}
-        </div>
-      ))}
+      {FLOATING_CHIPS.map((chip) => {
+        const ModuleIcon = chip.module ? FLOATING_MODULE_ICONS[chip.module] : null;
+
+        return (
+          <div
+            key={chip.id}
+            className={`home-sticky-chip home-sticky-chip--${chip.variant} ${chip.alt ? "home-sticky-chip--alt" : ""} ${ModuleIcon ? "home-sticky-chip--module" : ""}`}
+            style={{
+              top: chip.top,
+              left: chip.left,
+              "--chip-delay": chip.delay,
+              "--chip-duration": chip.duration,
+              "--chip-rotate": chip.rotate,
+            }}
+          >
+            {ModuleIcon ? (
+              <ModuleIcon
+                className={`home-sticky-module-icon home-sticky-module-icon--${chip.module}`}
+                aria-label={chip.ariaLabel}
+              />
+            ) : (
+              <>
+                <span className="home-sticky-tape" />
+                {chip.label}
+              </>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
 
+function rotateDeckToBack(order) {
+  const top = order[order.length - 1];
+  return [top, ...order.slice(0, -1)];
+}
+
 function HeroDeskStack() {
+  const cardById = useMemo(
+    () => Object.fromEntries(HERO_DESK_PREVIEW.map((card) => [card.id, card])),
+    []
+  );
+  const [deckOrder, setDeckOrder] = useState(() => HERO_DESK_PREVIEW.map((card) => card.id));
+  const [tearingId, setTearingId] = useState(null);
+  const [stackSettled, setStackSettled] = useState(false);
+  const tearBusy = useRef(false);
+  const deckOrderRef = useRef(deckOrder);
+
+  deckOrderRef.current = deckOrder;
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setStackSettled(true), 1100);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  const finishTear = useCallback(() => {
+    setDeckOrder((prev) => rotateDeckToBack(prev));
+    setTearingId(null);
+    tearBusy.current = false;
+  }, []);
+
+  const startTear = useCallback(() => {
+    if (tearBusy.current) return;
+
+    const order = deckOrderRef.current;
+    const topId = order[order.length - 1];
+    if (!topId) return;
+
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) {
+      setDeckOrder(rotateDeckToBack(order));
+      return;
+    }
+
+    tearBusy.current = true;
+    setTearingId(topId);
+  }, []);
+
+  const handleTearAnimationEnd = useCallback(
+    (event) => {
+      if (!event.animationName.includes(HOME_DESK_MOTION.tearAnimationName)) return;
+      finishTear();
+    },
+    [finishTear]
+  );
+
+  useEffect(() => {
+    if (!stackSettled) return undefined;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
+
+    const intervalId = window.setInterval(() => {
+      startTear();
+    }, HOME_DESK_MOTION.autoTearIntervalMs);
+
+    return () => window.clearInterval(intervalId);
+  }, [startTear, stackSettled]);
+
+  const topId = deckOrder[deckOrder.length - 1];
+
   return (
     <div className="home-desk-stack relative w-full max-w-md mx-auto lg:mx-0 lg:ml-auto aspect-[4/3] sm:aspect-[5/4]">
-      {HERO_DESK_PREVIEW.map((card, index) => (
-        <article
-          key={card.id}
-          className={`home-desk-card home-desk-card--${card.tone}`}
-          style={{ "--desk-index": index }}
-        >
-          <div className="home-desk-card-hole" />
-          <h3 className="font-semibold text-ink dark:text-ink text-sm sm:text-base mb-2">{card.title}</h3>
-          <ul className="space-y-1.5 text-xs sm:text-sm text-coffee/90 dark:text-coffee">
-            {card.lines.map((line) => (
-              <li key={line} className="home-ruled-line pl-1">
-                {line}
-              </li>
-            ))}
-          </ul>
-        </article>
-      ))}
+      {deckOrder.map((cardId, stackIndex) => {
+        const card = cardById[cardId];
+        if (!card) return null;
+
+        const isTop = cardId === topId;
+        const isTearing = tearingId === cardId;
+
+        return (
+          <article
+            key={card.id}
+            data-stack={stackIndex}
+            className={[
+              "home-desk-card",
+              `home-desk-card--${card.tone}`,
+              stackSettled ? "home-desk-card--settled" : "",
+              isTop ? "home-desk-card--top" : "",
+              isTearing ? "home-desk-card--tearing" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+            style={{ "--desk-stack": stackIndex }}
+            onClick={isTop && !isTearing ? startTear : undefined}
+            onAnimationEnd={isTearing ? handleTearAnimationEnd : undefined}
+            role={isTop ? "button" : undefined}
+            tabIndex={isTop ? 0 : undefined}
+            onKeyDown={
+              isTop
+                ? (event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      startTear();
+                    }
+                  }
+                : undefined
+            }
+            aria-label={isTop ? `Xé và chuyển tờ: ${card.title}. Nhấn để xé thủ công.` : undefined}
+          >
+            <div className="home-desk-card-hole" />
+            <h3 className="font-semibold text-ink dark:text-ink text-sm sm:text-base mb-2">{card.title}</h3>
+            <ul className="space-y-1.5 text-xs sm:text-sm text-coffee/90 dark:text-coffee">
+              {card.lines.map((line) => (
+                <li key={line} className="home-ruled-line pl-1">
+                  {line}
+                </li>
+              ))}
+            </ul>
+          </article>
+        );
+      })}
     </div>
   );
 }
@@ -254,37 +443,94 @@ export function HeroSection() {
 /* ========== Jump bar ========== */
 
 export function SectionJumpBar() {
-  const [active, setActive] = useState(HOME_JUMP_LINKS[0]?.sectionId);
+  const [active, setActiveFromClick] = useHomeSectionSpy(HOME_JUMP_SECTION_IDS);
+  const docked = useJumpBarDocked();
 
-  const handleJump = useCallback((sectionId) => {
-    setActive(sectionId);
-    scrollToSection(sectionId);
-  }, []);
+  const handleJump = useCallback(
+    (sectionId) => {
+      setActiveFromClick(sectionId);
+      scrollToSection(sectionId);
+    },
+    [setActiveFromClick]
+  );
 
   return (
     <nav
-      className="home-jump-bar sticky top-2 z-30 mb-12 sm:mb-16"
+      className={`home-jump-bar home-jump-bar--dock ${docked ? "home-jump-bar--visible" : ""}`}
       aria-label="Điều hướng nhanh trang chủ"
     >
-      <HomeReveal className="home-jump-inner flex flex-wrap justify-center gap-2 p-2 rounded-2xl">
+      <div className="home-jump-inner flex flex-wrap justify-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-2xl">
         {HOME_JUMP_LINKS.map((link) => (
           <button
             key={link.sectionId}
             type="button"
             onClick={() => handleJump(link.sectionId)}
-            className={`home-jump-tab px-4 py-2 text-sm font-medium rounded-xl transition-all ${
+            className={`home-jump-tab px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-xl transition-all ${
               active === link.sectionId ? "home-jump-tab--active" : ""
             }`}
+            aria-current={active === link.sectionId ? "true" : undefined}
           >
             {link.label}
           </button>
         ))}
-      </HomeReveal>
+      </div>
     </nav>
   );
 }
 
 /* ========== Mission (scroll-scrubbed via --home-mission) ========== */
+
+function MissionFlowVisual() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const stepCount = MISSION_FLOW_STEPS.length;
+
+  useEffect(() => {
+    if (stepCount < 2) return undefined;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
+
+    const intervalId = window.setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % stepCount);
+    }, MISSION_FLOW_MOTION.stepIntervalMs);
+
+    return () => window.clearInterval(intervalId);
+  }, [stepCount]);
+
+  return (
+    <div className="home-mission-visual" aria-hidden="true">
+      <div className="home-mission-visual-glow" />
+      <ol className="home-mission-flow">
+        {MISSION_FLOW_STEPS.map((step, index) => {
+          const Icon = FLOATING_MODULE_ICONS[step.module];
+          const isActive = index === activeIndex;
+
+          return (
+            <li key={step.id} className="home-mission-flow-item">
+              {index > 0 && (
+                <span
+                  className={`home-mission-flow-connector ${index <= activeIndex ? "home-mission-flow-connector--lit" : ""}`}
+                />
+              )}
+              <div
+                className={`home-mission-flow-step ${isActive ? "home-mission-flow-step--active" : ""}`}
+                style={{ "--flow-index": index }}
+              >
+                {Icon && (
+                  <span className="home-mission-flow-icon-wrap">
+                    <Icon className={`home-mission-flow-icon home-mission-flow-icon--${step.module}`} />
+                  </span>
+                )}
+                <span className="home-mission-flow-copy">
+                  <span className="home-mission-flow-label">{step.label}</span>
+                  <span className="home-mission-flow-hint">{step.hint}</span>
+                </span>
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+    </div>
+  );
+}
 
 export function MissionSection() {
   return (
@@ -293,25 +539,31 @@ export function MissionSection() {
       data-home-mission
       className="home-mission home-section py-16 sm:py-24 mb-8 sm:mb-12"
     >
-      <HomeReveal>
-        <p className="text-lg sm:text-xl text-coffee dark:text-latte/80 mb-6 font-medium">
-          {MISSION_COPY.intro}
-        </p>
-        <div className="space-y-2 sm:space-y-3">
-          {MISSION_COPY.lines.map((line, i) => (
-            <p
-              key={line}
-              className="home-mission-line font-serif text-2xl sm:text-3xl lg:text-4xl text-ink dark:text-paper"
-              style={{ "--mission-i": i }}
-            >
-              {line}
-            </p>
-          ))}
-        </div>
-        <p className="home-mission-outro mt-8 text-base sm:text-lg text-coffee/80 dark:text-latte/70 max-w-3xl">
-          {MISSION_COPY.outro}
-        </p>
-      </HomeReveal>
+      <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+        <HomeReveal>
+          <p className="text-lg sm:text-xl text-coffee dark:text-latte/80 mb-6 font-medium">
+            {MISSION_COPY.intro}
+          </p>
+          <div className="space-y-2 sm:space-y-3">
+            {MISSION_COPY.lines.map((line, i) => (
+              <p
+                key={line}
+                className="home-mission-line font-serif text-2xl sm:text-3xl lg:text-4xl text-ink dark:text-paper"
+                style={{ "--mission-i": i }}
+              >
+                {line}
+              </p>
+            ))}
+          </div>
+          <p className="home-mission-outro mt-8 text-base sm:text-lg text-coffee/80 dark:text-latte/70 max-w-xl">
+            {MISSION_COPY.outro}
+          </p>
+        </HomeReveal>
+
+        <HomeReveal delay={120} className="relative min-h-[260px] sm:min-h-[300px]">
+          <MissionFlowVisual />
+        </HomeReveal>
+      </div>
     </section>
   );
 }
@@ -348,52 +600,90 @@ export function PrinciplesSection() {
 
 /* ========== Scenarios ========== */
 
+/** Icon 3D/4D — `module` khớp FLOATING_MODULE_ICONS; animation trong index.css */
+function ScenarioModuleIcon({ module, size = "tab", active = false }) {
+  const Icon = FLOATING_MODULE_ICONS[module];
+  if (!Icon) return null;
+
+  return (
+    <div
+      className={[
+        "home-scenario-icon-4d",
+        `home-scenario-icon-4d--${module}`,
+        `home-scenario-icon-4d--${size}`,
+        active ? "home-scenario-icon-4d--active" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      aria-hidden="true"
+    >
+      <span className="home-scenario-icon-4d-floor" />
+      <span className="home-scenario-icon-4d-glow" />
+      <span className="home-scenario-icon-4d-core">
+        <Icon className="home-scenario-icon-4d-svg" />
+      </span>
+    </div>
+  );
+}
+
 export function ProblemSolverSection() {
   const [activeId, setActiveId] = useState(USER_SCENARIOS[0]?.id);
 
   const active = USER_SCENARIOS.find((s) => s.id === activeId) ?? USER_SCENARIOS[0];
-  const ActiveIcon = active?.icon;
 
   return (
     <section id={SECTION_IDS.scenarios} className="home-section py-16 sm:py-20">
       <HomeReveal className="mb-10">
-        <SectionEyebrow>Giải pháp</SectionEyebrow>
-        <SectionTitle className="max-w-2xl">Từ vướng mắc đến lối đi rõ ràng</SectionTitle>
+        <SectionEyebrow>{SCENARIOS_COPY.eyebrow}</SectionEyebrow>
+        <SectionTitle className="max-w-2xl">{SCENARIOS_COPY.title}</SectionTitle>
       </HomeReveal>
 
-      <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] gap-8">
-        <div className="flex flex-col gap-2" role="tablist" aria-label="Tình huống">
-          {USER_SCENARIOS.map((scenario) => (
-            <button
-              key={scenario.id}
-              type="button"
-              role="tab"
-              aria-selected={activeId === scenario.id}
-              onClick={() => setActiveId(scenario.id)}
-              className={`home-scenario-tab text-left p-4 sm:p-5 rounded-2xl transition-all ${
-                activeId === scenario.id ? "home-scenario-tab--active" : ""
-              }`}
-            >
-              <span className="block text-sm font-semibold text-terracotta dark:text-brass mb-1">{scenario.pain}</span>
-              <span className="block text-xs text-coffee/70 dark:text-latte/60 line-clamp-2">{scenario.detail}</span>
-            </button>
-          ))}
+      <div className="grid lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] gap-6 lg:gap-8">
+        <div className="flex flex-col gap-2.5" role="tablist" aria-label={SCENARIOS_COPY.tabListLabel}>
+          {USER_SCENARIOS.map((scenario) => {
+            const isActive = activeId === scenario.id;
+
+            return (
+              <button
+                key={scenario.id}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => setActiveId(scenario.id)}
+                className={`home-scenario-tab flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-2xl transition-all ${
+                  isActive ? "home-scenario-tab--active" : ""
+                }`}
+              >
+                <ScenarioModuleIcon module={scenario.module} size="tab" active={isActive} />
+                <span className="min-w-0 text-left">
+                  <span className="block text-sm font-semibold text-ink dark:text-paper">{scenario.moduleLabel}</span>
+                  <span className="block text-xs text-coffee/75 dark:text-latte/70 mt-0.5 line-clamp-1">{scenario.tagline}</span>
+                </span>
+              </button>
+            );
+          })}
         </div>
 
         {active && (
-          <HomeReveal key={active.id} className="home-scenario-panel p-6 sm:p-8 rounded-3xl">
-            <div className="flex items-start gap-4 mb-5">
-              {ActiveIcon && (
-                <div className="shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-terracotta/20 to-brass/20 flex items-center justify-center text-terracotta">
-                  <ActiveIcon className="w-6 h-6" />
-                </div>
-              )}
-              <div>
-                <h3 className="font-semibold text-xl text-ink dark:text-paper">{active.solveTitle}</h3>
-                <p className="text-sm text-coffee dark:text-latte/80 mt-2 leading-relaxed">{active.solveBody}</p>
+          <HomeReveal key={active.id} className="home-scenario-panel p-6 sm:p-8 rounded-3xl flex flex-col">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-5 mb-5">
+              <ScenarioModuleIcon module={active.module} size="panel" active />
+              <div className="text-center sm:text-left">
+                <p className="text-xs font-bold uppercase tracking-wider text-terracotta dark:text-brass">
+                  {active.moduleLabel}
+                </p>
+                <p className="text-base sm:text-lg font-medium text-ink dark:text-paper mt-1">{active.tagline}</p>
               </div>
             </div>
-            <PrimaryButton to={active.to} className="text-sm">
+
+            <p className="sr-only">{SCENARIOS_COPY.panelPrefix}</p>
+            <ul className="home-scenario-points mb-6">
+              {active.points.map((point) => (
+                <li key={point}>{point}</li>
+              ))}
+            </ul>
+
+            <PrimaryButton to={active.to} className="text-sm w-full sm:w-auto mt-auto">
               {active.cta}
             </PrimaryButton>
           </HomeReveal>
@@ -403,90 +693,7 @@ export function ProblemSolverSection() {
   );
 }
 
-/* ========== Features ========== */
-
-export function FeaturesSection() {
-  return (
-    <section id={SECTION_IDS.features} className="home-section py-16 sm:py-20">
-      <HomeReveal className="mb-12 text-center max-w-2xl mx-auto">
-        <SectionEyebrow>{RESOURCES_COPY.eyebrow}</SectionEyebrow>
-        <SectionTitle>{RESOURCES_COPY.title}</SectionTitle>
-      </HomeReveal>
-
-      <div className="grid md:grid-cols-3 gap-6">
-        {FEATURES.map((feature, i) => {
-          const Icon = feature.icon;
-          return (
-            <HomeReveal key={feature.id} delay={i * 100} className="home-feature-card group flex flex-col rounded-3xl overflow-hidden">
-              <div className={`h-2 bg-gradient-to-r ${feature.gradient}`} />
-              <div className="flex-1 p-6 sm:p-7 flex flex-col">
-                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center text-paper mb-4 home-feature-icon`}>
-                  <Icon className="w-6 h-6" />
-                </div>
-                <h3 className="font-semibold text-xl text-ink dark:text-paper mb-2">{feature.title}</h3>
-                <p className="text-sm text-coffee dark:text-latte/80 mb-4 flex-1">{feature.description}</p>
-                <ul className="text-xs text-coffee/70 dark:text-latte/60 space-y-2 mb-6 border-t border-dashed border-coffee/15 dark:border-paper/10 pt-4">
-                  {feature.tips.map((tip) => (
-                    <li key={tip} className="flex gap-2">
-                      <span className="text-terracotta">•</span>
-                      {tip}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  to={feature.to}
-                  className="text-sm font-semibold text-terracotta dark:text-brass hover:underline underline-offset-4"
-                >
-                  {feature.label} →
-                </Link>
-              </div>
-            </HomeReveal>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
-/* ========== Workflow ========== */
-
-export function WorkflowSection() {
-  return (
-    <section id={SECTION_IDS.workflow} className="home-section py-16 sm:py-20">
-      <HomeReveal className="mb-12">
-        <SectionEyebrow>Quy trình</SectionEyebrow>
-        <SectionTitle className="max-w-xl">Ba bước — một nhịp làm việc</SectionTitle>
-      </HomeReveal>
-
-      <ol className="home-workflow-list relative space-y-0">
-        {WORKFLOW_STEPS.map((step, i) => (
-          <HomeReveal key={step.id} delay={i * 120} className="home-workflow-step relative pl-12 sm:pl-16 pb-12 last:pb-0">
-            <span className="home-workflow-num absolute left-0 top-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm font-bold text-paper bg-terracotta shadow-md">
-              {i + 1}
-            </span>
-            <div className="home-workflow-body p-5 sm:p-6 rounded-2xl">
-              <h3 className="font-semibold text-lg text-ink dark:text-paper mb-2">{step.title}</h3>
-              <p className="text-sm text-coffee dark:text-latte/80 mb-4">{step.body}</p>
-              <ul className="text-xs text-coffee/70 space-y-1 mb-4">
-                {step.highlights.map((h) => (
-                  <li key={h} className="flex items-center gap-2">
-                    <span className="home-check-mark">✓</span>
-                    {h}
-                  </li>
-                ))}
-              </ul>
-              <Link to={step.to} className="text-sm font-semibold text-terracotta dark:text-brass hover:underline">
-                {step.cta} →
-              </Link>
-            </div>
-          </HomeReveal>
-        ))}
-      </ol>
-    </section>
-  );
-}
-
-/* ========== CTA + quick start ========== */
+/* ========== CTA ========== */
 
 export function FinalCTASection() {
   return (
@@ -497,31 +704,6 @@ export function FinalCTASection() {
         <div className="flex flex-wrap justify-center gap-3">
           <PrimaryButton to="/create">{FINAL_CTA_COPY.primaryCta}</PrimaryButton>
           <GhostButton to="/weekly-plan">{FINAL_CTA_COPY.secondaryCta}</GhostButton>
-        </div>
-      </HomeReveal>
-    </section>
-  );
-}
-
-export function QuickActionsSection() {
-  return (
-    <section id={SECTION_IDS.quickStart} className="home-section pb-8">
-      <HomeReveal>
-        <SectionEyebrow>Bắt đầu nhanh</SectionEyebrow>
-        <div className="flex flex-wrap gap-3">
-          {FEATURES.map((feature) => {
-            const Icon = feature.icon;
-            return (
-              <Link
-                key={feature.id}
-                to={feature.to}
-                className="home-quick-chip inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium"
-              >
-                <Icon className="w-4 h-4 text-terracotta" />
-                {feature.label}
-              </Link>
-            );
-          })}
         </div>
       </HomeReveal>
     </section>

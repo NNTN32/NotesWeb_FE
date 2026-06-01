@@ -1,9 +1,12 @@
+import { useRef } from "react";
 import AuroraBackground from "../components/AuroraBackground";
 import {
+  useHomeScrollProgress,
   HeroSection,
   SectionJumpBar,
+  MissionSection,
+  PrinciplesSection,
   ProblemSolverSection,
-  ValuePropsSection,
   FeaturesSection,
   WorkflowSection,
   FinalCTASection,
@@ -11,21 +14,26 @@ import {
 } from "./home/HomeSections";
 
 /**
- * Marketing landing page.
- *
- * Content and routes: `src/pages/home/homeConstants.js`
- * Sections and layout: `src/pages/home/HomeSections.jsx`
- * Motion styles: `src/index.css` (`.home-*`, prefers-reduced-motion)
+ * Marketing landing — planner / notebook layout.
+ * Copy: `home/homeConstants.js` · Sections + motion hooks: `home/HomeSections.jsx` · CSS: `index.css` (.home-*)
  */
 export default function Home() {
+  const pageRef = useRef(null);
+  useHomeScrollProgress(pageRef);
+
   return (
-    <div className="home-page patterncraft-bg notes-bg min-h-screen relative">
-      <AuroraBackground intensity={0.85} />
-      <div className="patterncraft-content relative z-10">
+    <div
+      ref={pageRef}
+      className="home-page home-planner-bg min-h-screen relative overflow-x-hidden"
+    >
+      <div className="home-planner-spine" aria-hidden="true" />
+      <AuroraBackground intensity={0.42} className="opacity-45 dark:opacity-30" />
+      <div className="home-content-layer max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
         <HeroSection />
         <SectionJumpBar />
+        <MissionSection />
+        <PrinciplesSection />
         <ProblemSolverSection />
-        <ValuePropsSection />
         <FeaturesSection />
         <WorkflowSection />
         <FinalCTASection />

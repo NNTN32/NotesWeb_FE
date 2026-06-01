@@ -14,19 +14,91 @@ import {
  * Central copy and routing for the marketing home page.
  * Edit text and links here instead of hunting through JSX.
  */
+
+/** Intersection + scroll motion tuning (paired with `.home-*` in index.css) */
+export const HOME_MOTION = {
+  revealRootMargin: "0px 0px -10% 0px",
+  revealThreshold: 0.14,
+  missionScrollMultiplier: 2.4,
+};
+
 export const SECTION_IDS = {
   hero: "home-hero",
+  mission: "home-mission",
+  principles: "home-principles",
   scenarios: "home-scenarios",
   features: "home-features",
   workflow: "home-workflow",
   quickStart: "home-quick-start",
 };
 
+/** Decorative sticky notes in the hero — % position, rotation in deg */
+export const FLOATING_CHIPS = [
+  { id: "chip-note-1", label: "Ghi chú", variant: "note", top: "10%", left: "6%", delay: "0s", duration: "14s", rotate: "-6deg", alt: false },
+  { id: "chip-todo-1", label: "Todo", variant: "todo", top: "18%", left: "80%", delay: "-2s", duration: "16s", rotate: "5deg", alt: true },
+  { id: "chip-week-1", label: "Tuần", variant: "week", top: "56%", left: "4%", delay: "-5s", duration: "18s", rotate: "4deg", alt: true },
+  { id: "chip-check", label: "✓", variant: "check", top: "66%", left: "84%", delay: "-1s", duration: "13s", rotate: "-3deg", alt: false },
+  { id: "chip-idea", label: "Ý tưởng", variant: "idea", top: "36%", left: "86%", delay: "-7s", duration: "15s", rotate: "7deg", alt: false },
+  { id: "chip-plan", label: "Kế hoạch", variant: "plan", top: "76%", left: "40%", delay: "-4s", duration: "17s", rotate: "-5deg", alt: true },
+];
+
+/** Hero desk preview — stacked planner cards (copy only) */
+export const HERO_DESK_PREVIEW = [
+  { id: "preview-note", title: "Ý tưởng sáng", lines: ["Viết outline trước", "Chuyển sang Todo khi rõ"], tone: "sand" },
+  { id: "preview-todo", title: "Hôm nay", lines: ["□ Gọi khách hàng", "□ Soạn báo cáo"], tone: "rose" },
+  { id: "preview-week", title: "Tuần 22", lines: ["T2 · Tập trung sâu", "T5 · Review tiến độ"], tone: "latte" },
+];
+
+/** Hero — Sui-style large headline, notes/planner voice */
+export const HERO_COPY = {
+  eyebrow: "MyNote · Planner",
+  headline: ["Nâng tầm cách bạn", "ghi chú &"],
+  headlineAccent: "lên kế hoạch",
+  subline:
+    "Ghi lại ý tưởng, xử lý việc cần làm và nhìn toàn cảnh tuần — giao diện ấm, typography lớn và chuyển động theo cuộn cuốn hút.",
+  primaryCta: "Tạo ghi chú ngay",
+  secondaryCta: "Xem Todo",
+  exploreHint: "Cuộn để khám phá",
+};
+
+/** Scroll-scrubbed mission band (Sui about mission block) */
+export const MISSION_COPY = {
+  intro: "Sứ mệnh của MyNote là",
+  lines: [
+    "giúp bạn ghi lại mọi ý tưởng",
+    "hoàn thành việc quan trọng",
+    "và lên kế hoạch tuần một cách bền vững",
+  ],
+  outro: "— thông qua ba module Ghi chú, Todo và Weekly Plan trong một giao diện gọn gàng.",
+};
+
+/** Principles section chrome */
+export const PRINCIPLES_COPY = {
+  ghostLabel: "nguyên tắc",
+  eyebrow: "Nguyên tắc",
+  title: "MyNote tồn tại để phục vụ nhịp làm việc hàng ngày của bạn",
+};
+
+/** Resources / features band (Sui “Dive deeper”) */
+export const RESOURCES_COPY = {
+  eyebrow: "Khám phá",
+  title: "Đi sâu hơn vào từng module",
+};
+
+/** Final CTA band */
+export const FINAL_CTA_COPY = {
+  title: "Sẵn sàng bắt đầu tuần mới?",
+  body: "Tạo ghi chú đầu tiên, thêm vài việc vào Todo, hoặc mở Weekly Plan — chỉ vài cú nhấp.",
+  primaryCta: "Bắt đầu miễn phí",
+  secondaryCta: "Mở Weekly Plan",
+};
+
 /** Anchor targets for the jump bar — order matches recommended reading flow */
 export const HOME_JUMP_LINKS = [
+  { sectionId: SECTION_IDS.mission, label: "Sứ mệnh" },
+  { sectionId: SECTION_IDS.principles, label: "Nguyên tắc" },
   { sectionId: SECTION_IDS.scenarios, label: "Giải pháp" },
-  { sectionId: SECTION_IDS.features, label: "Tính năng" },
-  { sectionId: SECTION_IDS.workflow, label: "Quy trình" },
+  { sectionId: SECTION_IDS.features, label: "Module" },
   { sectionId: SECTION_IDS.quickStart, label: "Bắt đầu" },
 ];
 

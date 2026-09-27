@@ -1,0 +1,3 @@
+# Files accidentally generated at the repository root.
+/node_modules/
+/yarn.lock

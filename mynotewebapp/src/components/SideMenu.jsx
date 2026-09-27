@@ -34,16 +34,11 @@ const navItems = [
   { to: "/weekly-plan", label: "Weekly Plan", icon: <FaCalendarAlt /> },
 ];
 
-const quickActions = [
-  { icon: <FaRegStickyNote />, title: "Ghi chú mới", link: "/create" },
-  { icon: <FaTasks />, title: "Todo mới", link: "/todo" },
-  { icon: <FaBookOpen />, title: "Tài liệu", link: "/docs" },
-  { icon: <FaUsers />, title: "Chia sẻ", link: "/share" },
-];
+
 
 function SideMenu() {
   const { user, logout } = useContext(AuthContext) || {};
-  const { openLogin, openRegister } = useAuthModal();
+  const { openLogin } = useAuthModal();
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);

@@ -1,37 +1,30 @@
-import { useRef } from "react";
-import AuroraBackground from "../components/AuroraBackground";
-import {
-  useHomeScrollProgress,
-  HeroSection,
-  SectionJumpBar,
-  MissionSection,
-  PrinciplesSection,
-  ProblemSolverSection,
-  FinalCTASection,
-} from "./home/HomeSections";
+import HomeHeader from "../components/home/HomeHeader";
+import HeroSection from "../components/home/HeroSection";
+import FeaturesSection from "../components/home/FeaturesSection";
+import WorkflowSection from "../components/home/WorkflowSection";
+import HomeClosing from "../components/home/HomeClosing";
+import styles from "./home/Home.module.css";
 
-/**
- * Marketing landing — planner / notebook layout.
- * Copy: `home/homeConstants.js` · Sections + motion hooks: `home/HomeSections.jsx` · CSS: `index.css` (.home-*)
- */
 export default function Home() {
-  const pageRef = useRef(null);
-  useHomeScrollProgress(pageRef);
-
   return (
-    <div
-      ref={pageRef}
-      className="home-page home-planner-bg min-h-screen relative overflow-x-hidden"
-    >
-      <div className="home-planner-spine" aria-hidden="true" />
-      <AuroraBackground intensity={0.42} className="opacity-45 dark:opacity-30" />
-      <SectionJumpBar />
-      <div className="home-content-layer max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
-        <HeroSection />
-        <MissionSection />
-        <PrinciplesSection />
-        <ProblemSolverSection />
-        <FinalCTASection />
+    <div className={styles.page}>
+      <a className={styles.skipLink} href="#home-content">
+        Đến nội dung chính
+      </a>
+      <div className={styles.container}>
+        <HomeHeader />
+        <main id="home-content">
+          <HeroSection />
+          <div className={styles.manifesto}>
+            <span>GHI LẠI.</span>
+            <span>SẮP XẾP.</span>
+            <span>THẢNH THƠI.</span>
+            <p>Bớt những tab đang mở — trong cả trình duyệt lẫn tâm trí.</p>
+          </div>
+          <FeaturesSection />
+          <WorkflowSection />
+        </main>
+        <HomeClosing />
       </div>
     </div>
   );

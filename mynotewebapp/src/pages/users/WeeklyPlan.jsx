@@ -143,7 +143,7 @@ function WeeklyPlan() {
   });
 
   // Animation refs
-  const [headerRef, headerInView] = useInView({ threshold: 0.1, once: true });
+  const [headerRef] = useInView({ threshold: 0.1, once: true });
   const [weeklyTableRef, weeklyTableInView] = useInView({ threshold: 0.1, once: true });
   const [toggleButtonRef, toggleButtonInView] = useInView({ threshold: 0.1, once: true });
 
@@ -296,7 +296,7 @@ function WeeklyPlan() {
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-rose/10 dark:border-gray-700 overflow-hidden">
             <div className="overflow-x-auto">
               <div className="grid grid-cols-7 min-w-[1200px]">
-                {CONSTANTS.WEEK_DAYS.map((day, index) => {
+                {CONSTANTS.WEEK_DAYS.map((day) => {
                   let dayTodos = getTodosByWeekDay(todos, day);
                   dayTodos = filterTodos(dayTodos, weeklyFilter);
                   dayTodos = sortTodosByPriority(dayTodos);
@@ -530,7 +530,7 @@ function WeeklyPlan() {
                       );
                     }
                     
-                    return focus.map((todo, index) => (
+                    return focus.map((todo) => (
                       <div 
                         key={todo.id} 
                         className={`p-3 rounded-xl border transition-all duration-300 hover:shadow-md ${

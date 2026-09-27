@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, Component } from "react";
+import { useState, useEffect, useRef, useCallback, Component } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 import { 
@@ -70,14 +70,11 @@ const BACKGROUND_CONFIG = {
 };
 
 // Helper functions for cleaner code
-const getFullscreenClasses = (baseClasses, fullscreenClasses) => (isFullscreen) => 
-  isFullscreen ? fullscreenClasses : baseClasses;
-
 const getResponsiveClasses = (config) => Object.values(config).join(' ');
 
 // Debug configuration
 const DEBUG_CONFIG = {
-  ENABLE_LOGGING: process.env.NODE_ENV === 'development',
+  ENABLE_LOGGING: import.meta.env.DEV,
   LOG_PREFIX: '[NoteForm]'
 };
 
@@ -101,7 +98,7 @@ class NoteFormErrorBoundary extends Component {
     this.state = { hasError: false, error: null, errorInfo: null };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError() {
     return { hasError: true };
   }
 
@@ -584,7 +581,6 @@ const FloatingActionBar = ({
   onSave, 
   hasUnsavedChanges,
   isFullscreen,
-  deviceType,
   lastSaved,
   isAutoSaving
 }) => (
@@ -690,45 +686,8 @@ function NoteFormComponent() {
   const contentRef = useRef(null);
   const autoSaveTimeoutRef = useRef(null);
 
-  // Auto-save functionality with better error handling
-  useEffect(() => {
-    try {
-      if (title || content) {
-        setHasUnsavedChanges(true);
-        debugLog('Content changed, setting unsaved changes', { titleLength: title.length, contentLength: content.length });
-        
-        // Clear existing timeout
-        if (autoSaveTimeoutRef.current) {
-          clearTimeout(autoSaveTimeoutRef.current);
-          debugLog('Cleared existing auto-save timeout');
-        }
-        
-        // Set new auto-save timeout
-        autoSaveTimeoutRef.current = setTimeout(() => {
-          debugLog('Auto-save timeout triggered');
-          handleAutoSave();
-        }, FORM_CONFIG.AUTO_SAVE_INTERVAL);
-        
-        debugLog('Auto-save timeout set', { interval: FORM_CONFIG.AUTO_SAVE_INTERVAL });
-      }
-    } catch (error) {
-      debugError('Error in auto-save effect', error);
-    }
-    
-    return () => {
-      try {
-        if (autoSaveTimeoutRef.current) {
-          clearTimeout(autoSaveTimeoutRef.current);
-          debugLog('Auto-save timeout cleared on cleanup');
-        }
-      } catch (error) {
-        debugError('Error clearing auto-save timeout', error);
-      }
-    };
-  }, [title, content]);
-
   // Auto-save function with comprehensive error handling
-  const handleAutoSave = async () => {
+  const handleAutoSave = useCallback(async () => {
     try {
       if (!title.trim() || !content.trim() || isLoading) {
         debugLog('Auto-save skipped', { 
@@ -774,7 +733,44 @@ function NoteFormComponent() {
       // Show error to user
       toast.error("Auto-save failed. Please save manually.");
     }
-  };
+  }, [title, content, isLoading]);
+
+  // Auto-save functionality with better error handling
+  useEffect(() => {
+    try {
+      if (title || content) {
+        setHasUnsavedChanges(true);
+        debugLog('Content changed, setting unsaved changes', { titleLength: title.length, contentLength: content.length });
+
+        // Clear existing timeout
+        if (autoSaveTimeoutRef.current) {
+          clearTimeout(autoSaveTimeoutRef.current);
+          debugLog('Cleared existing auto-save timeout');
+        }
+
+        // Set new auto-save timeout
+        autoSaveTimeoutRef.current = setTimeout(() => {
+          debugLog('Auto-save timeout triggered');
+          handleAutoSave();
+        }, FORM_CONFIG.AUTO_SAVE_INTERVAL);
+
+        debugLog('Auto-save timeout set', { interval: FORM_CONFIG.AUTO_SAVE_INTERVAL });
+      }
+    } catch (error) {
+      debugError('Error in auto-save effect', error);
+    }
+
+    return () => {
+      try {
+        if (autoSaveTimeoutRef.current) {
+          clearTimeout(autoSaveTimeoutRef.current);
+          debugLog('Auto-save timeout cleared on cleanup');
+        }
+      } catch (error) {
+        debugError('Error clearing auto-save timeout', error);
+      }
+    };
+  }, [title, content, handleAutoSave]);
 
   // Auto-focus on title input with error handling
   useEffect(() => {

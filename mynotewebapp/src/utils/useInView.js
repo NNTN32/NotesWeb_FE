@@ -45,9 +45,7 @@ export function useInView(opts = {}) {
     observer.observe(element);
 
     return () => {
-      try {
-        observer.unobserve(element);
-      } catch {}
+      observer.disconnect();
     };
   }, [root, rootMargin, threshold, once]);
 

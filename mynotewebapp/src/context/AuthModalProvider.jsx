@@ -1,14 +1,7 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-} from "react";
+import { AuthModalContext } from "./AuthModalContext";
+import { useCallback, useMemo, useState } from "react";
 
 /** @typedef {'login' | 'register'} AuthModalMode */
-
-const AuthModalContext = createContext(null);
 
 /**
  * Controls the global auth modal (login / register). Side menu and deep links
@@ -38,7 +31,7 @@ export function AuthModalProvider({ children }) {
       openRegister,
       close,
     }),
-    [mode, openLogin, openRegister, close]
+    [mode, openLogin, openRegister, close],
   );
 
   return (
@@ -46,12 +39,4 @@ export function AuthModalProvider({ children }) {
       {children}
     </AuthModalContext.Provider>
   );
-}
-
-export function useAuthModal() {
-  const ctx = useContext(AuthModalContext);
-  if (!ctx) {
-    throw new Error("useAuthModal must be used within AuthModalProvider");
-  }
-  return ctx;
 }

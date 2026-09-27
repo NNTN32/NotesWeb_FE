@@ -22,8 +22,8 @@ export default function AppRoutes() {
     >
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/auth/:mode" element={<AuthEntry />} />
         <Route element={<WorkspaceLayout />}>
-          <Route path="/auth/:mode" element={<AuthEntry />} />
           <Route path="/create" element={<NoteForm />} />
           <Route path="/todo" element={<Todo />} />
           <Route path="/weekly-plan" element={<WeeklyPlan />} />

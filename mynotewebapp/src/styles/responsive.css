@@ -1,0 +1,302 @@
+@media (max-width: 1200px) {
+  .workspace-page {
+    padding: 36px 28px 20px;
+  }
+  .ws-sidebar {
+    width: 210px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .ws-main {
+    margin-left: 210px;
+  }
+  .ws-footer {
+    margin-left: 28px;
+    margin-right: 28px;
+  }
+  .todo-layout {
+    grid-template-columns: minmax(0, 1fr) 220px;
+    gap: 18px;
+  }
+  .todo-layout--focus {
+    grid-template-columns: 1fr;
+  }
+  .day-slot {
+    grid-template-columns: 105px minmax(0, 1fr);
+    padding: 18px;
+    gap: 10px;
+  }
+  .task-summary {
+    padding: 20px;
+  }
+  .note-layout {
+    grid-template-columns: 205px minmax(0, 1fr);
+    gap: 18px;
+  }
+  .note-canvas {
+    padding: 20px 24px;
+  }
+  .auth-page-layout {
+    gap: 50px;
+  }
+}
+@media (max-width: 1000px) {
+  .ws-page-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .todo-layout {
+    grid-template-columns: 1fr;
+  }
+  .task-summary {
+    position: static;
+  }
+  .task-summary-counts {
+    padding-bottom: 12px;
+  }
+  .note-layout {
+    grid-template-columns: 1fr;
+  }
+  .note-library-list {
+    max-height: 170px;
+  }
+  .note-library-tip {
+    display: none;
+  }
+  .note-library-controls {
+    grid-template-columns: 150px 1fr;
+  }
+  .note-library-list:not(:has(.note-library-item)) .note-library-empty {
+    padding-top: 0;
+  }
+  .week-bottom {
+    grid-template-columns: 1fr;
+  }
+  .week-overview {
+    gap: 10px;
+  }
+  .week-overview > div {
+    padding: 17px;
+  }
+  .week-overview strong {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .auth-page-layout {
+    gap: 35px;
+    grid-template-columns: 1fr 390px;
+  }
+  .auth-story h2 {
+    font-size: 37px;
+  }
+}
+@media (max-width: 760px) {
+  .ws-sidebar {
+    transform: translateX(-100%);
+    width: 255px;
+    visibility: hidden;
+  }
+  .ws-sidebar--open {
+    transform: translateX(0);
+    visibility: visible;
+  }
+  .ws-sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: #17241965;
+    backdrop-filter: blur(3px);
+    z-index: 29;
+  }
+  .ws-mobile-only {
+    display: inline-flex;
+  }
+  .ws-mobile-bar {
+    display: flex;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    align-items: center;
+    gap: 15px;
+    padding: 10px 20px;
+    background: var(--ws-panel);
+    border-bottom: 1px solid var(--ws-line);
+  }
+  .ws-mobile-bar > span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: Georgia, serif;
+    font-weight: 700;
+    font-size: 22px;
+  }
+  .ws-main {
+    margin-left: 0;
+  }
+  .workspace-page {
+    padding: 29px 20px 15px;
+  }
+  .ws-page-header h1 {
+    font-size: 36px;
+  }
+  .ws-page-header {
+    margin-bottom: 28px;
+  }
+  .ws-eyebrow {
+    font-size: 8px;
+    letter-spacing: 1.4px;
+  }
+  .ws-description {
+    font-size: 12px;
+  }
+  .ws-footer {
+    margin-left: 20px;
+    margin-right: 20px;
+    flex-direction: column;
+    gap: 7px;
+    font-size: 9px;
+  }
+  .ws-toolbar {
+    gap: 15px;
+  }
+  .ws-date-nav {
+    gap: 3px;
+  }
+  .ws-date-nav h2 {
+    font-size: 13px;
+  }
+  .ws-date-nav .ws-text-button {
+    font-size: 10px;
+  }
+  .task-filters {
+    gap: 8px;
+  }
+  .ws-search {
+    flex-basis: 100%;
+  }
+  .task-filters > select {
+    flex: 1;
+    min-width: 0;
+    font-size: 11px;
+  }
+  .day-slot {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .day-slot-label {
+    align-items: center;
+  }
+  .day-slot-label > svg {
+    margin: 0;
+  }
+  .day-slot-label > div {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .day-slot-label small {
+    margin: 0 0 0 auto;
+  }
+  .ws-panel-heading {
+    padding: 18px;
+  }
+  .ws-panel-heading h2 {
+    font-size: 14px;
+  }
+  .task-summary {
+    padding: 24px;
+  }
+  .task-summary-counts {
+    grid-template-columns: 1fr 1fr;
+  }
+  .week-overview {
+    grid-template-columns: 1fr 1fr;
+  }
+  .week-overview > div:last-child {
+    grid-column: 1 / -1;
+  }
+  .week-overview strong {
+    font-size: 30px;
+    gap: 10px;
+  }
+  .week-overview span {
+    font-size: 8px;
+  }
+  .week-overview small {
+    font-size: 10px;
+  }
+  .week-board {
+    grid-template-columns: repeat(7, 180px);
+    min-height: 340px;
+  }
+  .week-bottom {
+    gap: 18px;
+  }
+  .ws-form-row {
+    grid-template-columns: 1fr;
+  }
+  .ws-dialog {
+    padding: 35px 22px 24px;
+  }
+  .ws-dialog h2 {
+    font-size: 27px;
+  }
+  .note-library-controls {
+    grid-template-columns: 125px minmax(0, 1fr);
+  }
+  .note-library .ws-panel-heading {
+    padding: 16px;
+  }
+  .note-canvas {
+    padding: 18px;
+  }
+  .workspace-theme .note-title {
+    font-size: 25px;
+  }
+  .note-canvas-footer {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .note-bottom-hint {
+    align-items: flex-start;
+    font-size: 9px;
+  }
+  .note-bottom-hint svg {
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+  .auth-page {
+    padding: 23px 20px;
+  }
+  .auth-page-layout {
+    display: block;
+    max-width: 440px;
+    margin-top: 32px;
+  }
+  .auth-story {
+    display: none;
+  }
+  .auth-page-form {
+    padding: 27px 23px;
+  }
+  .auth-page-top .ws-brand {
+    font-size: 24px;
+  }
+  .auth-form-content h1 {
+    font-size: 27px;
+  }
+  .auth-dialog {
+    padding: 32px 24px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .workspace-theme *,
+  .workspace-theme *::before,
+  .workspace-theme *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,3 +1,5 @@
+import RouteScrollReset from "./RouteScrollReset";
+import TasksProvider from "../context/TasksProvider";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "../context/AuthProvider";
 import { AuthModalProvider } from "../context/AuthModalProvider";
@@ -8,7 +10,10 @@ export default function AppProviders({ children }) {
     <ThemeProvider>
       <AuthProvider>
         <BrowserRouter>
-          <AuthModalProvider>{children}</AuthModalProvider>
+          <RouteScrollReset />
+          <AuthModalProvider>
+            <TasksProvider>{children}</TasksProvider>
+          </AuthModalProvider>
         </BrowserRouter>
       </AuthProvider>
     </ThemeProvider>

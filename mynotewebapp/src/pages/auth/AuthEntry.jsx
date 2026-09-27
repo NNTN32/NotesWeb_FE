@@ -1,34 +1,60 @@
-import { useEffect } from "react";
-import { Navigate, useParams } from "react-router-dom";
-import { useAuthModal } from "../../context/AuthModalContext";
-
-/**
- * `/auth/login` and `/auth/register`: opens the global auth modal and shows a
- * themed page background behind it (same layout column as other routes).
- */
+import { useId } from "react";
+import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
+import { FiArrowLeft, FiBookOpen } from "react-icons/fi";
+import AuthForm from "../../components/auth/AuthForm";
 export default function AuthEntry() {
-  const { mode: routeMode } = useParams();
-  const { openLogin, openRegister, close } = useAuthModal();
-
-  useEffect(() => {
-    if (routeMode === "login") openLogin();
-    else if (routeMode === "register") openRegister();
-
-    return () => {
-      close();
-    };
-  }, [routeMode, openLogin, openRegister, close]);
-
-  if (routeMode !== "login" && routeMode !== "register") {
-    return <Navigate to="/" replace />;
-  }
-
+  const { mode } = useParams();
+  const navigate = useNavigate();
+  const id = useId();
+  if (!["login", "register"].includes(mode)) return <Navigate to="/" replace />;
   return (
-    <div
-      className="auth-pattern-bg relative min-h-[calc(100vh-8rem)] w-full overflow-hidden"
-      aria-hidden
-    >
-      <div className="auth-entry-ambient-orb" />
-    </div>
+    <main className="workspace-theme auth-page">
+      <div className="auth-page-top">
+        <Link to="/" className="ws-brand">
+          <FiBookOpen />
+          MyNote.
+        </Link>
+        <Link to="/" className="ws-text-button">
+          <FiArrowLeft />
+          Về trang chủ
+        </Link>
+      </div>
+      <div className="auth-page-layout">
+        <aside className="auth-story">
+          <p className="ws-eyebrow">GHI LẠI. SẮP XẾP. THẢNH THƠI.</p>
+          <h2>
+            Một nơi để nghĩ.
+            <br />
+            <em>Một nhịp để sống.</em>
+          </h2>
+          <p>
+            Những ý tưởng nhỏ, những việc cần làm và cả kế hoạch còn dang dở.
+            Mọi thứ đều xứng đáng có một góc riêng.
+          </p>
+          <div className="auth-story-note">
+            <span>Gửi bạn,</span>
+            <h3>
+              Cứ bắt đầu.
+              <br />
+              Chậm cũng được.
+            </h3>
+            <p>Chỉ cần bắt đầu từ một điều nhỏ thôi.</p>
+            <span aria-hidden="true">✳</span>
+          </div>
+          <small>MyNote · Theo nhịp của bạn.</small>
+        </aside>
+        <section className="auth-page-form">
+          <AuthForm
+            key={mode}
+            mode={mode}
+            titleId={id}
+            onAuthenticated={() => navigate("/create", { replace: true })}
+            onSwitch={() =>
+              navigate(`/auth/${mode === "login" ? "register" : "login"}`)
+            }
+          />
+        </section>
+      </div>
+    </main>
   );
 }

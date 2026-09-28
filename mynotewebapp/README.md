@@ -41,6 +41,7 @@ src/
     notes.css              # Giao diện viết và thư viện
     auth.css               # Giao diện tài khoản
     ambient.css            # Chuyển động nền theo từng trang
+    interactions.css       # Chuyển động nút dùng chung, tinh chỉnh theo trang
     responsive.css         # Breakpoint và reduced motion
   utils/api/               # API xác thực hiện có
   index.css                # Tailwind, reset nhỏ và chuyển động mascot
@@ -59,6 +60,7 @@ Page chỉ điều phối. Logic ngày tháng, lọc, thống kê và chuyển �
 - Tài khoản: tông ấm và mascot, chung form cho trang riêng và modal.
 - Trang chủ, Ghi chú, Todo, Kế hoạch tuần và Tài khoản có nền động riêng qua `AmbientBackground` và biến thể trong `ambient.css`. Thêm trang mới bằng một biến thể CSS, không thêm timer hay logic animation vào page. Lớp này chỉ trang trí (`aria-hidden`, `pointer-events: none`); animation chỉ thay `transform`, tự dừng khi bật `prefers-reduced-motion`.
 - CSS workspace được giới hạn bằng `.workspace-theme` và các lớp theo feature. Thay token ở `workspace-base.css`; màu nhấn riêng nằm ở file của mỗi feature. Trang chủ giữ CSS Module riêng.
+- Hiệu ứng nút nằm trong `interactions.css` (workspace) và CSS Module của trang chủ. Chỉ chạy khi hover bằng chuột hoặc nhấn; các biến theo trang giữ đúng sắc thái riêng. `prefers-reduced-motion` loại bỏ chuyển động mà vẫn giữ trạng thái focus rõ ràng.
 - Dialog dùng `<dialog>.showModal()` để giữ focus và cô lập nền; Escape đóng và focus trở về phần tử mở.
 
 ## Dữ liệu và giới hạn

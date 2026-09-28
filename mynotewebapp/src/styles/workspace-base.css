@@ -238,8 +238,8 @@
   border-color: var(--ws-line);
   background: var(--ws-panel);
 }
-.ws-button:hover,
-.ws-secondary:hover {
+.ws-button:not(:disabled):hover,
+.ws-secondary:not(:disabled):hover {
   filter: brightness(0.94);
 }
 .ws-icon-button {

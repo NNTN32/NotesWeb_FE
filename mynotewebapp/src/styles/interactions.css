@@ -1,0 +1,103 @@
+/* One motion system, tuned through page-level tokens. */
+.workspace-theme {
+  --ws-motion-ease: cubic-bezier(0.2, 0.75, 0.25, 1);
+  --ws-motion-hover: translateY(-2px);
+  --ws-motion-shadow: color-mix(in srgb, var(--ws-accent) 20%, transparent);
+}
+
+.notes-page {
+  --ws-motion-hover: translateY(-2px) rotate(-0.6deg);
+}
+
+.todo-page {
+  --ws-motion-hover: translateY(-2px) scale(1.015);
+}
+
+.week-page {
+  --ws-motion-hover: translate(2px, -2px);
+}
+
+.workspace-theme :is(.ws-button, .ws-secondary, .auth-social button) {
+  transition:
+    transform 180ms var(--ws-motion-ease),
+    box-shadow 180ms var(--ws-motion-ease),
+    border-color 180ms var(--ws-motion-ease),
+    filter 180ms var(--ws-motion-ease);
+}
+
+.workspace-theme :is(.ws-button, .ws-secondary, .auth-social button) svg,
+.workspace-theme .task-add-inline svg {
+  transition: transform 180ms var(--ws-motion-ease);
+}
+
+.workspace-theme :is(.ws-icon-button, .ws-nav-link, .task-add-inline) {
+  transition:
+    transform 180ms var(--ws-motion-ease),
+    background-color 180ms var(--ws-motion-ease),
+    color 180ms var(--ws-motion-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .workspace-theme
+    :is(.ws-button, .ws-secondary, .auth-social button):not(:disabled):hover {
+    transform: var(--ws-motion-hover);
+    box-shadow: 0 8px 18px var(--ws-motion-shadow);
+  }
+
+  .workspace-theme .ws-secondary:not(:disabled):hover,
+  .workspace-theme .auth-social button:not(:disabled):hover {
+    border-color: var(--ws-accent);
+  }
+
+  .workspace-theme :is(.ws-button, .ws-secondary):not(:disabled):hover svg {
+    transform: translateY(-2px);
+  }
+
+  .workspace-theme .ws-icon-button:not(:disabled):hover {
+    transform: scale(1.08);
+  }
+
+  .workspace-theme .ws-nav-link:not(:disabled):hover {
+    transform: translateX(3px);
+  }
+
+  .workspace-theme .task-add-inline:not(:disabled):hover {
+    transform: translateX(3px);
+  }
+
+  .todo-page .task-add-inline:not(:disabled):hover svg {
+    transform: rotate(90deg);
+  }
+
+  .week-page .task-add-inline:not(:disabled):hover svg {
+    transform: rotate(45deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workspace-theme
+    :is(
+      .ws-button,
+      .ws-secondary,
+      .ws-icon-button,
+      .ws-nav-link,
+      .task-add-inline,
+      .auth-social button
+    ),
+  .workspace-theme :is(.ws-button, .ws-secondary, .task-add-inline) svg {
+    transform: none !important;
+  }
+}
+
+.workspace-theme
+  :is(
+    .ws-button,
+    .ws-secondary,
+    .ws-icon-button,
+    .ws-nav-link,
+    .task-add-inline,
+    .auth-social button
+  ):not(:disabled):active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: none;
+}

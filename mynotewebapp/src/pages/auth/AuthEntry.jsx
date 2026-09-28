@@ -2,6 +2,7 @@ import { useId } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { FiArrowLeft, FiBookOpen } from "react-icons/fi";
 import AuthForm from "../../components/auth/AuthForm";
+import AmbientBackground from "../../components/workspace/AmbientBackground";
 export default function AuthEntry() {
   const { mode } = useParams();
   const navigate = useNavigate();
@@ -9,6 +10,7 @@ export default function AuthEntry() {
   if (!["login", "register"].includes(mode)) return <Navigate to="/" replace />;
   return (
     <main className="workspace-theme auth-page">
+      <AmbientBackground variant="auth" />
       <div className="auth-page-top">
         <Link to="/" className="ws-brand">
           <FiBookOpen />

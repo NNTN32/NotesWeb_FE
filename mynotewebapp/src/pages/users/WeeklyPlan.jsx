@@ -13,6 +13,7 @@ import TaskCard from "../../components/tasks/TaskCard";
 import WeekBoard from "../../components/tasks/WeekBoard";
 import EmptyState from "../../components/workspace/EmptyState";
 import { useTaskView } from "../../features/tasks/useTaskView";
+import AmbientBackground from "../../components/workspace/AmbientBackground";
 import {
   dateKey,
   shiftDate,
@@ -36,6 +37,7 @@ export default function WeeklyPlan() {
   };
   return (
     <div className="workspace-page week-page">
+      <AmbientBackground variant="week" />
       <PageHeader
         eyebrow="KẾ HOẠCH TUẦN · NHÌN BỨC TRANH LỚN"
         title={

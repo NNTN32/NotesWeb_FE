@@ -15,6 +15,7 @@ import TaskSummary from "../../components/tasks/TaskSummary";
 import TaskEditor from "../../components/tasks/TaskEditor";
 import TaskFeedback from "../../components/tasks/TaskFeedback";
 import { useTaskView } from "../../features/tasks/useTaskView";
+import AmbientBackground from "../../components/workspace/AmbientBackground";
 import {
   dateKey,
   shiftDate,
@@ -36,6 +37,7 @@ export default function Todo() {
   };
   return (
     <div className="workspace-page todo-page">
+      <AmbientBackground variant="todo" />
       <PageHeader
         eyebrow="VIỆC CẦN LÀM · MỘT NGÀY CÓ CHỦ ĐÍCH"
         title={

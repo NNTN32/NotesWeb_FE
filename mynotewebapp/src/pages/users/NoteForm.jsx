@@ -5,6 +5,7 @@ import PageHeader from "../../components/workspace/PageHeader";
 import NoteLibrary from "../../components/notes/NoteLibrary";
 import NoteCanvas from "../../components/notes/NoteCanvas";
 import { useNoteEditor } from "../../features/notes/useNoteEditor";
+import AmbientBackground from "../../components/workspace/AmbientBackground";
 
 export default function NoteForm() {
   const editor = useNoteEditor();
@@ -51,6 +52,7 @@ export default function NoteForm() {
     <div
       className={`workspace-page notes-page ${focus ? "notes-page--focus" : ""}`}
     >
+      <AmbientBackground variant="notes" />
       <PageHeader
         eyebrow="GHI CHÚ · MỘT KHOẢNG TRỐNG ĐỂ NGHĨ"
         title={

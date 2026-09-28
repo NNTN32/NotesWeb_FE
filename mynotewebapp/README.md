@@ -23,7 +23,7 @@ src/
   components/
     home/                  # Section trang chủ
     layout/                # Khung làm việc, sidebar và footer
-    workspace/             # PageHeader, EmptyState, native dialog
+    workspace/             # PageHeader, EmptyState, native dialog, nền động trang
     tasks/                 # TaskCard, TaskEditor, bộ lọc, lịch ngày/tuần, thống kê
     notes/                 # Trang giấy và thư viện ghi chú
     auth/                  # Một AuthForm dùng cho login/register, page/modal
@@ -40,6 +40,7 @@ src/
     tasks.css              # Todo và lịch tuần
     notes.css              # Giao diện viết và thư viện
     auth.css               # Giao diện tài khoản
+    ambient.css            # Chuyển động nền theo từng trang
     responsive.css         # Breakpoint và reduced motion
   utils/api/               # API xác thực hiện có
   index.css                # Tailwind, reset nhỏ và chuyển động mascot
@@ -56,6 +57,7 @@ Page chỉ điều phối. Logic ngày tháng, lọc, thống kê và chuyển �
 - Todo: xanh sage, nhịp theo khung giờ, bộ lọc và danh sách tập trung.
 - Lịch tuần: lavender, tuần bắt đầu thứ Hai, bảy cột cuộn trong khung ở mobile.
 - Tài khoản: tông ấm và mascot, chung form cho trang riêng và modal.
+- Trang chủ, Ghi chú, Todo, Kế hoạch tuần và Tài khoản có nền động riêng qua `AmbientBackground` và biến thể trong `ambient.css`. Thêm trang mới bằng một biến thể CSS, không thêm timer hay logic animation vào page. Lớp này chỉ trang trí (`aria-hidden`, `pointer-events: none`); animation chỉ thay `transform`, tự dừng khi bật `prefers-reduced-motion`.
 - CSS workspace được giới hạn bằng `.workspace-theme` và các lớp theo feature. Thay token ở `workspace-base.css`; màu nhấn riêng nằm ở file của mỗi feature. Trang chủ giữ CSS Module riêng.
 - Dialog dùng `<dialog>.showModal()` để giữ focus và cô lập nền; Escape đóng và focus trở về phần tử mở.
 

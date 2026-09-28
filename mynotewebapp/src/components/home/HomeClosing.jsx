@@ -9,11 +9,11 @@ export default function HomeClosing() {
         <span className={styles.closingStar} aria-hidden="true">
           ✧
         </span>
-        <p className={styles.eyebrow}>TRANG GIẤY TIẾP THEO LÀ CỦA BẠN</p>
-        <h2 id="closing-title">Cho ý tưởng một nơi để bắt đầu.</h2>
-        <p>Một ghi chú hôm nay. Một ngày rõ ràng hơn ngày mai.</p>
+        <p className={styles.eyebrow}>THE NEXT PAGE IS YOURS</p>
+        <h2 id="closing-title">Give your ideas a place to begin.</h2>
+        <p>One note today. A clearer tomorrow.</p>
         <Link to="/create" className={styles.primaryButton}>
-          Viết trang đầu tiên <FiArrowRight />
+          Write your first page <FiArrowRight />
         </Link>
       </section>
       <footer className={styles.footer}>
@@ -21,7 +21,7 @@ export default function HomeClosing() {
           <FiBookOpen aria-hidden="true" />
           MyNote<span className={styles.brandDot}>.</span>
         </Link>
-        <p>Một không gian nhỏ. Dành riêng cho bạn.</p>
+        <p>A little space, just for you.</p>
         <span>© {new Date().getFullYear()} MyNote</span>
       </footer>
     </>

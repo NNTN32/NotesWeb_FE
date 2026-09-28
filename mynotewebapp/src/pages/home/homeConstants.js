@@ -1,81 +1,81 @@
 import { FiEdit3, FiCheckSquare, FiCalendar } from "react-icons/fi";
 
 export const HOME_LINKS = [
-  { href: "#features", label: "Không gian của bạn" },
-  { href: "#workflow", label: "Cách sử dụng" },
+  { href: "#features", label: "Your space" },
+  { href: "#workflow", label: "How it works" },
 ];
 
 export const MODULES = [
   {
     id: "notes",
     number: "01",
-    label: "Ghi chú",
+    label: "Notes",
     icon: FiEdit3,
-    title: "Một nơi cho mọi ý tưởng.",
+    title: "A place for every idea.",
     description:
-      "Một suy nghĩ bất chợt, một điều vừa học hay kế hoạch còn dang dở. Viết xuống để dành chỗ cho điều tiếp theo.",
+      "A passing thought, something you learned, or a plan still taking shape. Write it down and make room for what comes next.",
     to: "/create",
-    action: "Viết ghi chú",
+    action: "Write a note",
     tone: "peach",
     items: [
-      "Ý tưởng cho dự án mới",
-      "Những điều muốn thử",
-      "Một chút cảm hứng mỗi ngày",
+      "Ideas for a new project",
+      "Things you want to try",
+      "A little inspiration each day",
     ],
   },
   {
     id: "tasks",
     number: "02",
-    label: "Việc cần làm",
+    label: "To-dos",
     icon: FiCheckSquare,
-    title: "Từng việc nhỏ. Tiến bộ lớn.",
+    title: "Small tasks. Real progress.",
     description:
-      "Sắp xếp những điều cần làm và tập trung vào bước tiếp theo. Cảm giác đánh dấu hoàn thành luôn thật dễ chịu.",
+      "Organize what needs doing and focus on the next step. Checking something off feels good.",
     to: "/todo",
-    action: "Mở danh sách việc",
+    action: "Open your tasks",
     tone: "sage",
     items: [
-      "Chọn việc quan trọng nhất",
-      "Chia nhỏ để dễ bắt đầu",
-      "Ghi nhận mỗi bước tiến",
+      "Choose what matters most",
+      "Break it down to get started",
+      "Celebrate every step forward",
     ],
   },
   {
     id: "week",
     number: "03",
-    label: "Kế hoạch tuần",
+    label: "Weekly plan",
     icon: FiCalendar,
-    title: "Nhìn xa hơn một ngày.",
+    title: "Look beyond today.",
     description:
-      "Dành chỗ cho công việc, những cuộc hẹn và cả thời gian cho riêng bạn. Một tuần rõ ràng, một tâm trí nhẹ nhàng.",
+      "Make room for work, appointments, and time for yourself. A clearer week makes for a lighter mind.",
     to: "/weekly-plan",
-    action: "Lên kế hoạch tuần",
+    action: "Plan your week",
     tone: "lavender",
     items: [
-      "Nhìn toàn cảnh cả tuần",
-      "Phân bổ thời gian của bạn",
-      "Giữ khoảng trống để nghỉ ngơi",
+      "See your week at a glance",
+      "Make time for what matters",
+      "Leave space to rest",
     ],
   },
 ];
 
 export const WORKFLOW_STEPS = [
   {
-    title: "Ghi lại điều đang nghĩ",
-    body: "Bắt đầu bằng một ý tưởng. Chưa cần hoàn hảo, chỉ cần viết ra.",
+    title: "Capture what's on your mind",
+    body: "Start with an idea. It doesn't need to be perfect; just write it down.",
   },
   {
-    title: "Chọn điều cần làm",
-    body: "Biến những dự định thành từng việc nhỏ, rõ ràng và vừa sức.",
+    title: "Choose your next step",
+    body: "Turn intentions into small, clear, manageable tasks.",
   },
   {
-    title: "Tạo nhịp điệu riêng",
-    body: "Sắp xếp một tuần có chỗ cho cả mục tiêu và những khoảng nghỉ.",
+    title: "Find your own rhythm",
+    body: "Plan a week with room for both goals and breaks.",
   },
 ];
 
 export const PREVIEW_TASKS = [
-  { id: "read", label: "Đọc vài trang sách", done: true },
-  { id: "idea", label: "Phác thảo ý tưởng mới", done: false },
-  { id: "walk", label: "Đi dạo & nạp lại năng lượng", done: false },
+  { id: "read", label: "Read a few pages", done: true },
+  { id: "idea", label: "Sketch a new idea", done: false },
+  { id: "walk", label: "Take a walk and recharge", done: false },
 ];

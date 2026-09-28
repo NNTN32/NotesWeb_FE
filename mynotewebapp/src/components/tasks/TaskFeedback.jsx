@@ -8,9 +8,9 @@ export default function TaskFeedback({ error, deleted, onUndo }) {
       )}
       {deleted && (
         <div className="ws-notice" role="status">
-          Đã xóa “{deleted.text}”.
+          Deleted “{deleted.text}”.
           <button className="ws-text-button" onClick={onUndo}>
-            Hoàn tác
+            Undo
           </button>
         </div>
       )}

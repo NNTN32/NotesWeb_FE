@@ -9,15 +9,15 @@ export default function WorkflowSection() {
       aria-labelledby="workflow-title"
     >
       <div className={styles.workflowIntro}>
-        <p className={styles.eyebrow}>THEO NHỊP CỦA BẠN</p>
+        <p className={styles.eyebrow}>AT YOUR OWN PACE</p>
         <h2 id="workflow-title">
-          Không cần làm tất cả.
+          You don’t have to do it all.
           <br />
-          <em>Chỉ cần bắt đầu.</em>
+          <em>Just begin.</em>
         </h2>
         <p>
-          Một thói quen nhỏ mỗi ngày có thể tạo nên sự khác biệt. Hãy tìm nhịp
-          điệu phù hợp với bạn.
+          A small daily habit can make a difference. Find the rhythm that feels
+          right for you.
         </p>
         <span className={styles.flower} aria-hidden="true">
           ✳

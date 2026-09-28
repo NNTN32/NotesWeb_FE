@@ -8,29 +8,29 @@ export default function HeroSection() {
     <section className={styles.hero} aria-labelledby="hero-title">
       <div className={styles.heroCopy}>
         <p className={styles.eyebrow}>
-          <span className={styles.onlineDot} /> MỘT GÓC NHỎ CHO TÂM TRÍ
+          <span className={styles.onlineDot} /> A LITTLE ROOM FOR YOUR MIND
         </p>
         <h1 id="hero-title">
-          Ý tưởng gọn lại.
+          Ideas in one place.
           <br />
-          Ngày mới
+          A calmer day
           <br />
-          <em>thảnh thơi hơn.</em>
+          <em>starts here.</em>
         </h1>
         <p className={styles.heroDescription}>
-          Ghi lại điều bạn nghĩ, sắp xếp điều cần làm và dành chỗ cho những điều
-          quan trọng. Tất cả trong một không gian của riêng bạn.
+          Capture your thoughts, organize your tasks, and make room for what
+          matters. All in a space of your own.
         </p>
         <div className={styles.heroActions}>
           <Link to="/create" className={styles.primaryButton}>
-            Bắt đầu ghi chép <FiArrowRight />
+            Start writing <FiArrowRight />
           </Link>
           <a href="#features" className={styles.textButton}>
-            Khám phá MyNote <FiArrowDown />
+            Explore MyNote <FiArrowDown />
           </a>
         </div>
         <p className={styles.heroFootnote}>
-          <FiCheck /> Nhẹ nhàng để bắt đầu. Đơn giản để duy trì.
+          <FiCheck /> Easy to start. Simple to keep going.
         </p>
       </div>
       <PlannerPreview />

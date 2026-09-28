@@ -18,14 +18,12 @@ export default function AuthForm({ mode, titleId, onSwitch, onAuthenticated }) {
       <div className="auth-mascot">
         <ChibiMascot decorative size={76} />
       </div>
-      <p className="ws-eyebrow">MỘT GÓC NHỎ DÀNH CHO BẠN</p>
-      <h1 id={titleId}>
-        {isRegister ? "Bắt đầu một trang mới." : "Mừng bạn quay lại."}
-      </h1>
+      <p className="ws-eyebrow">A LITTLE SPACE FOR YOU</p>
+      <h1 id={titleId}>{isRegister ? "Start a new page." : "Welcome back."}</h1>
       <p className="ws-description">
         {isRegister
-          ? "Tạo tài khoản MyNote của bạn."
-          : "Đăng nhập và tiếp tục câu chuyện của bạn."}
+          ? "Create your MyNote account."
+          : "Sign in and pick up where you left off."}
       </p>
       {!isRegister && (
         <>
@@ -36,7 +34,7 @@ export default function AuthForm({ mode, titleId, onSwitch, onAuthenticated }) {
               onClick={() => submit({}, "google")}
             >
               <FaGoogle />
-              {pending === "google" ? "Đang kết nối…" : "Google"}
+              {pending === "google" ? "Connecting…" : "Google"}
             </button>
             <button
               type="button"
@@ -44,10 +42,10 @@ export default function AuthForm({ mode, titleId, onSwitch, onAuthenticated }) {
               onClick={() => submit({}, "apple")}
             >
               <FaApple />
-              {pending === "apple" ? "Đang kết nối…" : "Apple"}
+              {pending === "apple" ? "Connecting…" : "Apple"}
             </button>
           </div>
-          <div className="auth-divider">hoặc dùng email</div>
+          <div className="auth-divider">or use email</div>
         </>
       )}
       <form
@@ -63,9 +61,9 @@ export default function AuthForm({ mode, titleId, onSwitch, onAuthenticated }) {
             <AuthField
               id={`${id}-username`}
               name="username"
-              label="Tên hiển thị"
+              label="Display name"
               autoComplete="nickname"
-              placeholder="Bạn muốn được gọi là gì?"
+              placeholder="What should we call you?"
             />
           )}
           <AuthField
@@ -74,24 +72,24 @@ export default function AuthForm({ mode, titleId, onSwitch, onAuthenticated }) {
             label="Email"
             type="email"
             autoComplete="email"
-            placeholder="ban@example.com"
+            placeholder="you@example.com"
           />
           <AuthField
             id={`${id}-password`}
             name="password"
-            label="Mật khẩu"
+            label="Password"
             type="password"
             autoComplete={isRegister ? "new-password" : "current-password"}
-            placeholder="Nhập mật khẩu của bạn"
+            placeholder="Enter your password"
           />
           {isRegister && (
             <AuthField
               id={`${id}-confirm`}
               name="confirmPassword"
-              label="Xác nhận mật khẩu"
+              label="Confirm password"
               type="password"
               autoComplete="new-password"
-              placeholder="Nhập lại mật khẩu"
+              placeholder="Enter your password again"
             />
           )}
         </fieldset>
@@ -102,27 +100,27 @@ export default function AuthForm({ mode, titleId, onSwitch, onAuthenticated }) {
         )}
         <button className="ws-button" type="submit" disabled={!!pending}>
           {pending === "email"
-            ? "Đang xử lý…"
+            ? "Working…"
             : isRegister
-              ? "Tạo tài khoản"
-              : "Đăng nhập"}
+              ? "Create account"
+              : "Sign in"}
           <FiArrowRight />
         </button>
       </form>
       <p className="auth-switch">
-        {isRegister ? "Đã có tài khoản?" : "Chưa có tài khoản?"}{" "}
+        {isRegister ? "Already have an account?" : "New to MyNote?"}{" "}
         <button
           type="button"
           className="ws-text-button"
           disabled={!!pending}
           onClick={onSwitch}
         >
-          {isRegister ? "Đăng nhập" : "Đăng ký"}
+          {isRegister ? "Sign in" : "Sign up"}
         </button>
       </p>
       <p className="ws-storage-note auth-local-note">
-        Ghi chú và công việc hiện được lưu trên trình duyệt, chưa đồng bộ với
-        tài khoản.
+        Notes and tasks are currently stored in this browser and do not sync
+        with your account.
       </p>
     </div>
   );

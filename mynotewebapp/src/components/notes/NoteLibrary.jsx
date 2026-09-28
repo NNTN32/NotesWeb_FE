@@ -4,23 +4,23 @@ export default function NoteLibrary({ notes, activeId, onOpen, onNew }) {
   const [query, setQuery] = useState("");
   const filtered = notes.filter((note) =>
     `${note.title} ${note.content}`
-      .toLocaleLowerCase("vi")
-      .includes(query.toLocaleLowerCase("vi")),
+      .toLocaleLowerCase("en")
+      .includes(query.toLocaleLowerCase("en")),
   );
   return (
     <aside className="note-library ws-panel">
       <div className="ws-panel-heading">
-        <h2>Sổ ghi chép</h2>
-        <span>{notes.length} trang</span>
+        <h2>Notebook</h2>
+        <span>{notes.length} pages</span>
       </div>
       <div className="note-library-controls">
         <button className="ws-secondary" onClick={onNew}>
           <FiPlus />
-          Trang mới
+          New page
         </button>
         <input
-          aria-label="Tìm ghi chú"
-          placeholder="Tìm trong sổ…"
+          aria-label="Search notes"
+          placeholder="Search your notebook…"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
         />
@@ -44,17 +44,17 @@ export default function NoteLibrary({ notes, activeId, onOpen, onNew }) {
         ) : (
           <p className="note-library-empty">
             {query
-              ? "Chưa tìm thấy ghi chú phù hợp."
-              : "Những trang đã lưu sẽ ở đây. Mỗi ý tưởng đều có một chỗ riêng."}
+              ? "No matching notes found."
+              : "Saved pages will appear here. Every idea has a place."}
           </p>
         )}
       </div>
       <div className="note-library-tip">
         <span>✳</span>
         <p>
-          Viết cho mình trước.
+          Write for yourself first.
           <br />
-          Chỉnh sửa sau cũng được.
+          You can edit later.
         </p>
       </div>
     </aside>

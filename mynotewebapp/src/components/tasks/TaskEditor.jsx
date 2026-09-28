@@ -29,7 +29,7 @@ export default function TaskEditor({
   const submit = (event) => {
     event.preventDefault();
     if (!values.text.trim()) {
-      setError("Hãy nhập tên công việc.");
+      setError("Please enter a task name.");
       return;
     }
     saveTask({ ...values, text: values.text.trim() });
@@ -37,12 +37,14 @@ export default function TaskEditor({
   };
   return (
     <Modal titleId={id} onClose={onClose}>
-      <p className="ws-eyebrow">MỘT BƯỚC NHỎ TIẾP THEO</p>
-      <h2 id={id}>{task ? "Chỉnh sửa công việc" : "Dành thời gian cho…"}</h2>
-      <p className="ws-description">Rõ ràng một chút, nhẹ đầu hơn một chút.</p>
+      <p className="ws-eyebrow">ONE SMALL STEP FORWARD</p>
+      <h2 id={id}>{task ? "Edit task" : "Make time for…"}</h2>
+      <p className="ws-description">
+        A little clarity makes things feel lighter.
+      </p>
       <form onSubmit={submit} className="ws-form">
         <label>
-          Công việc
+          Task
           <input
             name="text"
             value={values.text}
@@ -50,12 +52,12 @@ export default function TaskEditor({
             maxLength={240}
             required
             autoFocus
-            placeholder="Điều bạn muốn hoàn thành"
+            placeholder="What would you like to get done?"
           />
         </label>
         <div className="ws-form-row">
           <label>
-            Ngày thực hiện
+            Date
             <input
               type="date"
               name="date"
@@ -65,7 +67,7 @@ export default function TaskEditor({
             />
           </label>
           <label>
-            Ưu tiên
+            Priority
             <select name="priority" value={values.priority} onChange={change}>
               {Object.entries(PRIORITIES).map(([key, value]) => (
                 <option key={key} value={key}>
@@ -76,7 +78,7 @@ export default function TaskEditor({
           </label>
         </div>
         <label>
-          Khoảng thời gian
+          Time block
           <select name="slot" value={values.slot} onChange={change}>
             {TIME_SLOTS.map((item) => (
               <option key={item.id} value={item.id}>
@@ -91,11 +93,11 @@ export default function TaskEditor({
           </p>
         )}
         <button className="ws-button" type="submit">
-          {task ? "Lưu thay đổi" : "Thêm công việc"}
+          {task ? "Save changes" : "Add task"}
           <FiArrowRight />
         </button>
         <p className="ws-storage-note">
-          Lưu trên trình duyệt này · Hiển thị trong cả Todo và Kế hoạch tuần.
+          Saved in this browser · Appears in both To-dos and Weekly plan.
         </p>
       </form>
     </Modal>

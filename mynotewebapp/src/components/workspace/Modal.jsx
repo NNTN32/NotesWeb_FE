@@ -43,7 +43,7 @@ export default function Modal({ children, titleId, onClose, className = "" }) {
       <button
         type="button"
         className="ws-icon-button ws-dialog-close"
-        aria-label="Đóng hộp thoại"
+        aria-label="Close dialog"
         onClick={onClose}
       >
         <FiX />

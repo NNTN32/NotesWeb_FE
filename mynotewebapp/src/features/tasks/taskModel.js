@@ -1,20 +1,25 @@
 export const PRIORITIES = {
-  high: { label: "Quan trọng", rank: 0 },
-  medium: { label: "Bình thường", rank: 1 },
-  low: { label: "Thư thả", rank: 2 },
+  high: { label: "High", rank: 0 },
+  medium: { label: "Medium", rank: 1 },
+  low: { label: "Low", rank: 2 },
 };
 export const TIME_SLOTS = [
-  { id: "early", label: "Sáng sớm", time: "06:00 – 09:00", icon: "sunrise" },
-  { id: "morning", label: "Buổi sáng", time: "09:00 – 12:00", icon: "sun" },
-  { id: "noon", label: "Buổi trưa", time: "12:00 – 14:00", icon: "sun" },
+  {
+    id: "early",
+    label: "Early morning",
+    time: "06:00 – 09:00",
+    icon: "sunrise",
+  },
+  { id: "morning", label: "Morning", time: "09:00 – 12:00", icon: "sun" },
+  { id: "noon", label: "Midday", time: "12:00 – 14:00", icon: "sun" },
   {
     id: "afternoon",
-    label: "Buổi chiều",
+    label: "Afternoon",
     time: "14:00 – 17:00",
     icon: "sunset",
   },
-  { id: "evening", label: "Buổi tối", time: "17:00 – 21:00", icon: "moon" },
-  { id: "night", label: "Đêm", time: "21:00 – 06:00", icon: "moon" },
+  { id: "evening", label: "Evening", time: "17:00 – 21:00", icon: "moon" },
+  { id: "night", label: "Night", time: "21:00 – 06:00", icon: "moon" },
 ];
 export function dateKey(date = new Date()) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
@@ -30,7 +35,7 @@ export function weekDates(key) {
   return Array.from({ length: 7 }, (_, index) => shiftDate(monday, index));
 }
 export function formatDate(key, options = { day: "numeric", month: "long" }) {
-  return new Date(`${key}T12:00:00`).toLocaleDateString("vi-VN", options);
+  return new Date(`${key}T12:00:00`).toLocaleDateString("en-US", options);
 }
 export function currentSlot(hour = new Date().getHours()) {
   if (hour < 6 || hour >= 21) return "night";
@@ -48,8 +53,8 @@ export function filterTasks(
     .filter(
       (task) =>
         task.text
-          .toLocaleLowerCase("vi")
-          .includes(query.trim().toLocaleLowerCase("vi")) &&
+          .toLocaleLowerCase("en")
+          .includes(query.trim().toLocaleLowerCase("en")) &&
         (priority === "all" || task.priority === priority) &&
         (status === "all" ||
           (status === "done" ? task.completed : !task.completed)),

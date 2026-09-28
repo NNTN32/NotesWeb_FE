@@ -19,11 +19,11 @@ export function useAuthSubmission({ mode, onAuthenticated }) {
       mode === "register" &&
       data.password !== data.confirmPassword
     ) {
-      setError("Mật khẩu xác nhận chưa khớp. Bạn kiểm tra lại nhé.");
+      setError("Passwords do not match. Please try again.");
       return;
     }
     if (!provider && mode === "register" && !data.username.trim()) {
-      setError("Vui lòng nhập tên hiển thị.");
+      setError("Please enter a display name.");
       return;
     }
     busy.current = true;
@@ -43,7 +43,7 @@ export function useAuthSubmission({ mode, onAuthenticated }) {
             });
       if (!response?.token && !response?.user)
         throw new Error(
-          "Máy chủ chưa trả về thông tin tài khoản. Vui lòng thử lại.",
+          "The server did not return account details. Please try again.",
         );
       if (response.token) localStorage.setItem("token", response.token);
       login(
@@ -58,7 +58,7 @@ export function useAuthSubmission({ mode, onAuthenticated }) {
       setError(
         typeof message === "string"
           ? message
-          : "Chưa thể kết nối tài khoản. Vui lòng thử lại sau.",
+          : "Could not connect to your account. Please try again later.",
       );
     } finally {
       busy.current = false;

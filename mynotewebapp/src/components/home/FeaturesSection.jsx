@@ -12,17 +12,17 @@ export default function FeaturesSection() {
     >
       <div className={styles.sectionHeading}>
         <div>
-          <p className={styles.eyebrow}>MỌI THỨ Ở ĐÚNG CHỖ</p>
+          <p className={styles.eyebrow}>EVERYTHING IN ITS PLACE</p>
           <h2 id="features-title">
-            Ba công cụ nhỏ.
+            Three simple tools.
             <br />
-            <em>Một ngày ngăn nắp hơn.</em>
+            <em>A more organized day.</em>
           </h2>
         </div>
         <p>
-          Từ ý tưởng đầu tiên đến kế hoạch cả tuần.
+          From your first idea to a full week of plans.
           <br />
-          MyNote cùng bạn đi từng bước.
+          MyNote helps you take it one step at a time.
         </p>
       </div>
       <div className={styles.featureGrid}>

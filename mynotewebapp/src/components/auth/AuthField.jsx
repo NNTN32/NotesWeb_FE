@@ -25,7 +25,7 @@ export default function AuthField({
         {type === "password" && (
           <button
             type="button"
-            aria-label={`${visible ? "Ẩn" : "Hiện"} ${label.toLocaleLowerCase("vi")}`}
+            aria-label={`${visible ? "Hide" : "Show"} ${label.toLocaleLowerCase("en")}`}
             aria-pressed={visible}
             className="ws-icon-button"
             onClick={() => setVisible(!visible)}

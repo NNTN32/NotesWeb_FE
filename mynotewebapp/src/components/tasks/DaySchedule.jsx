@@ -24,7 +24,7 @@ export default function DaySchedule({ tasks, isToday, onAdd, ...actions }) {
                 <h3>{slot.label}</h3>
                 <span>{slot.time}</span>
               </div>
-              {isToday && currentSlot() === slot.id && <small>Hiện tại</small>}
+              {isToday && currentSlot() === slot.id && <small>Now</small>}
             </div>
             <div className="day-slot-body">
               {items.map((task) => (
@@ -35,7 +35,9 @@ export default function DaySchedule({ tasks, isToday, onAdd, ...actions }) {
                 onClick={() => onAdd(slot.id)}
               >
                 <FiPlus />
-                {items.length ? "Thêm một việc" : "Dành chỗ cho một việc nhỏ"}
+                {items.length
+                  ? "Add another task"
+                  : "Make room for one small task"}
               </button>
             </div>
           </section>

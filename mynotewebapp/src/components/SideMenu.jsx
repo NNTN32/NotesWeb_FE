@@ -15,9 +15,9 @@ import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { useAuthModal } from "../context/AuthModalContext";
 const NAVIGATION = [
-  { to: "/create", label: "Sổ ghi chép", icon: FiEdit3 },
-  { to: "/todo", label: "Việc hôm nay", icon: FiCheckSquare },
-  { to: "/weekly-plan", label: "Kế hoạch tuần", icon: FiCalendar },
+  { to: "/create", label: "Notebook", icon: FiEdit3 },
+  { to: "/todo", label: "Today’s tasks", icon: FiCheckSquare },
+  { to: "/weekly-plan", label: "Weekly plan", icon: FiCalendar },
 ];
 export default function SideMenu({ mobileOpen, onClose }) {
   const { user, logout } = useAuth();
@@ -28,7 +28,7 @@ export default function SideMenu({ mobileOpen, onClose }) {
       {mobileOpen && (
         <button
           className="ws-sidebar-backdrop"
-          aria-label="Đóng điều hướng"
+          aria-label="Close navigation"
           onClick={onClose}
         />
       )}
@@ -44,13 +44,13 @@ export default function SideMenu({ mobileOpen, onClose }) {
           <button
             className="ws-icon-button ws-mobile-only"
             onClick={onClose}
-            aria-label="Đóng menu"
+            aria-label="Close menu"
           >
             <FiX />
           </button>
         </div>
-        <p className="ws-nav-label">KHÔNG GIAN CỦA BẠN</p>
-        <nav aria-label="Không gian làm việc">
+        <p className="ws-nav-label">YOUR SPACE</p>
+        <nav aria-label="Workspace">
           {NAVIGATION.map((item) => {
             const Icon = item.icon;
             return (
@@ -69,21 +69,21 @@ export default function SideMenu({ mobileOpen, onClose }) {
           })}
           <Link to="/" className="ws-nav-link ws-nav-home" onClick={onClose}>
             <FiHome />
-            Về trang chủ
+            Back to home
           </Link>
         </nav>
         <div className="ws-sidebar-note">
           <span>✳</span>
           <p>
-            Mỗi ngày một chút.
+            A little each day.
             <br />
-            Theo nhịp của bạn.
+            At your own pace.
           </p>
         </div>
         <div className="ws-sidebar-bottom">
           <button className="ws-nav-link" onClick={toggleTheme}>
             {theme === "light" ? <FiMoon /> : <FiSun />}
-            {theme === "light" ? "Giao diện tối" : "Giao diện sáng"}
+            {theme === "light" ? "Dark mode" : "Light mode"}
           </button>
           {user ? (
             <>
@@ -93,7 +93,7 @@ export default function SideMenu({ mobileOpen, onClose }) {
               </p>
               <button className="ws-nav-link" onClick={logout}>
                 <FiLogOut />
-                Đăng xuất
+                Sign out
               </button>
             </>
           ) : (
@@ -105,12 +105,10 @@ export default function SideMenu({ mobileOpen, onClose }) {
               }}
             >
               <FiUser />
-              Đăng nhập
+              Sign in
             </button>
           )}
-          <span className="ws-storage-note">
-            Ghi chú & công việc lưu cục bộ
-          </span>
+          <span className="ws-storage-note">Notes & tasks saved locally</span>
         </div>
       </aside>
     </>

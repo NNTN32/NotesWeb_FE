@@ -6,8 +6,8 @@ export default function TaskFilters({ filters, onChange }) {
       <label className="ws-search">
         <FiSearch aria-hidden="true" />
         <input
-          aria-label="Tìm công việc"
-          placeholder="Tìm một công việc…"
+          aria-label="Search tasks"
+          placeholder="Search tasks…"
           value={filters.query}
           onChange={(event) =>
             onChange({ ...filters, query: event.target.value })
@@ -15,13 +15,13 @@ export default function TaskFilters({ filters, onChange }) {
         />
       </label>
       <select
-        aria-label="Lọc ưu tiên"
+        aria-label="Filter by priority"
         value={filters.priority}
         onChange={(event) =>
           onChange({ ...filters, priority: event.target.value })
         }
       >
-        <option value="all">Mọi mức ưu tiên</option>
+        <option value="all">All priorities</option>
         {Object.entries(PRIORITIES).map(([key, value]) => (
           <option key={key} value={key}>
             {value.label}
@@ -29,15 +29,15 @@ export default function TaskFilters({ filters, onChange }) {
         ))}
       </select>
       <select
-        aria-label="Lọc trạng thái"
+        aria-label="Filter by status"
         value={filters.status}
         onChange={(event) =>
           onChange({ ...filters, status: event.target.value })
         }
       >
-        <option value="all">Mọi trạng thái</option>
-        <option value="open">Chưa hoàn thành</option>
-        <option value="done">Đã hoàn thành</option>
+        <option value="all">All statuses</option>
+        <option value="open">Open</option>
+        <option value="done">Completed</option>
       </select>
       {(filters.query ||
         filters.priority !== "all" ||
@@ -48,7 +48,7 @@ export default function TaskFilters({ filters, onChange }) {
             onChange({ query: "", priority: "all", status: "all" })
           }
         >
-          Xóa bộ lọc
+          Clear filters
         </button>
       )}
     </div>

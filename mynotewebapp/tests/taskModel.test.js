@@ -3,6 +3,7 @@ import { test } from "node:test";
 import {
   weekDates,
   shiftDate,
+  formatDate,
   currentSlot,
   filterTasks,
   taskStats,
@@ -21,6 +22,16 @@ test("Monday-based weeks span month and year boundaries", () => {
     "2027-01-03",
   ]);
   assert.equal(shiftDate("2024-03-01", -1), "2024-02-29");
+});
+test("dates use English labels", () => {
+  assert.equal(
+    formatDate("2026-09-28", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+    }),
+    "Monday, September 28",
+  );
 });
 test("time slots cover midnight and each boundary", () => {
   for (const [hour, expected] of [

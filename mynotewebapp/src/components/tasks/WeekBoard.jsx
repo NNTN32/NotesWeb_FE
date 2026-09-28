@@ -6,7 +6,7 @@ export default function WeekBoard({ dates, tasks, onAdd, ...actions }) {
     <div
       className="week-scroll"
       role="region"
-      aria-label="Lịch bảy ngày, cuộn ngang để xem"
+      aria-label="Seven-day calendar; scroll horizontally to explore"
       tabIndex={0}
     >
       <div className="week-board">
@@ -22,8 +22,8 @@ export default function WeekBoard({ dates, tasks, onAdd, ...actions }) {
                 <strong>{formatDate(date, { day: "2-digit" })}</strong>
                 <small>
                   {date === dateKey()
-                    ? "Hôm nay"
-                    : `${items.filter((task) => task.completed).length}/${items.length} hoàn thành`}
+                    ? "Today"
+                    : `${items.filter((task) => task.completed).length}/${items.length} complete`}
                 </small>
               </header>
               <div className="week-day-tasks">
@@ -32,18 +32,18 @@ export default function WeekBoard({ dates, tasks, onAdd, ...actions }) {
                 ))}
                 {!items.length && (
                   <p className="week-empty">
-                    Một chút khoảng trống
+                    A little open space
                     <br />
-                    cũng là một kế hoạch.
+                    is a plan, too.
                   </p>
                 )}
                 <button
                   className="task-add-inline"
-                  aria-label={`Thêm việc ngày ${date}`}
+                  aria-label={`Add task for ${formatDate(date, { weekday: "long", month: "long", day: "numeric" })}`}
                   onClick={() => onAdd(date)}
                 >
                   <FiPlus />
-                  Thêm việc
+                  Add task
                 </button>
               </div>
             </section>

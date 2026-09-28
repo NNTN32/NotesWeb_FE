@@ -8,7 +8,7 @@ export default function TaskCard({ task, onToggle, onEdit, onDelete }) {
           type="checkbox"
           checked={task.completed}
           onChange={() => onToggle(task.id)}
-          aria-label={`Hoàn thành: ${task.text}`}
+          aria-label={`Mark ${task.text} as ${task.completed ? "incomplete" : "complete"}`}
         />
       </label>
       <button className="task-copy" type="button" onClick={() => onEdit(task)}>
@@ -21,7 +21,7 @@ export default function TaskCard({ task, onToggle, onEdit, onDelete }) {
         <button
           className="ws-icon-button"
           type="button"
-          aria-label={`Sửa: ${task.text}`}
+          aria-label={`Edit ${task.text}`}
           onClick={() => onEdit(task)}
         >
           <FiEdit2 />
@@ -29,7 +29,7 @@ export default function TaskCard({ task, onToggle, onEdit, onDelete }) {
         <button
           className="ws-icon-button"
           type="button"
-          aria-label={`Xóa: ${task.text}`}
+          aria-label={`Delete ${task.text}`}
           onClick={() => onDelete(task)}
         >
           <FiTrash2 />

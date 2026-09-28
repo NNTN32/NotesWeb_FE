@@ -18,13 +18,13 @@ export default function WorkspaceLayout() {
       }}
     >
       <a className="ws-skip" href="#workspace-content">
-        Đến nội dung chính
+        Skip to main content
       </a>
       <header className="ws-mobile-bar">
         <button
           ref={toggleRef}
           className="ws-icon-button"
-          aria-label="Mở menu"
+          aria-label="Open menu"
           aria-expanded={mobileOpen}
           aria-controls="workspace-navigation"
           onClick={() => setMobileOpen(!mobileOpen)}
@@ -40,8 +40,8 @@ export default function WorkspaceLayout() {
       <main id="workspace-content" className="ws-main">
         <Outlet />
         <footer className="ws-footer">
-          <span>MyNote · Một không gian nhỏ, dành riêng cho bạn.</span>
-          <span>Ghi lại. Sắp xếp. Thảnh thơi.</span>
+          <span>MyNote · A little space, just for you.</span>
+          <span>Capture. Organize. Breathe.</span>
         </footer>
       </main>
     </div>

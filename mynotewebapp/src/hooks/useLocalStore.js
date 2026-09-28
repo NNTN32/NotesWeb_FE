@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-// Dữ liệu chỉ được ghi khi người dùng thay đổi, không ghi đè bản lỗi lúc khởi động.
+// Only write data after a user change; do not overwrite invalid data on startup.
 export function useLocalStore(key, initialValue, validate) {
   const [state, setState] = useState(() => {
     try {
@@ -13,7 +13,7 @@ export function useLocalStore(key, initialValue, validate) {
       return {
         value: initialValue,
         error:
-          "Không thể đọc dữ liệu đã lưu. Dữ liệu cũ chưa bị ghi đè; hãy sao lưu trước khi chỉnh sửa.",
+          "Saved data could not be read. It has not been overwritten; back it up before editing.",
       };
     }
   });
@@ -29,7 +29,7 @@ export function useLocalStore(key, initialValue, validate) {
         localStorage.setItem(key, JSON.stringify(value));
       } catch {
         error =
-          "Trình duyệt không thể lưu dữ liệu. Thay đổi hiện chỉ nằm trong bộ nhớ; hãy sao chép nội dung trước khi rời trang.";
+          "This browser cannot save your changes. They are only in memory; copy your content before leaving.";
       }
       current.current = value;
       setState({ value, error });
@@ -47,7 +47,7 @@ export function useLocalStore(key, initialValue, validate) {
         current.current = value;
         setState({ value, error: "" });
       } catch {
-        /* Bỏ qua dữ liệu không hợp lệ từ tab khác. */
+        /* Ignore invalid data from another tab. */
       }
     };
     window.addEventListener("storage", sync);

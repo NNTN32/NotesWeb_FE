@@ -39,19 +39,19 @@ export default function Todo() {
     <div className="workspace-page todo-page">
       <AmbientBackground variant="todo" />
       <PageHeader
-        eyebrow="VIỆC CẦN LÀM · MỘT NGÀY CÓ CHỦ ĐÍCH"
+        eyebrow="TO-DOS · A DAY WITH PURPOSE"
         title={
           <>
-            Từng việc nhỏ.
+            One small task.
             <br />
-            <em>Một ngày trọn vẹn.</em>
+            <em>A more intentional day.</em>
           </>
         }
-        description="Sắp xếp điều cần làm, dành tâm trí cho điều đang làm."
+        description="Organize what is next, then focus on what is now."
       >
         <button className="ws-button" onClick={() => view.setEditor({ date })}>
           <FiPlus />
-          Thêm công việc
+          Add task
         </button>
       </PageHeader>
       <TaskFeedback
@@ -63,13 +63,13 @@ export default function Todo() {
         <div className="ws-date-nav">
           <button
             className="ws-icon-button"
-            aria-label="Ngày trước"
+            aria-label="Previous day"
             onClick={() => setDate(shiftDate(date, -1))}
           >
             <FiChevronLeft />
           </button>
           <label>
-            <span className="sr-only">Chọn ngày</span>
+            <span className="sr-only">Choose date</span>
             <input
               type="date"
               required
@@ -81,13 +81,13 @@ export default function Todo() {
           </label>
           <button
             className="ws-icon-button"
-            aria-label="Ngày sau"
+            aria-label="Next day"
             onClick={() => setDate(shiftDate(date, 1))}
           >
             <FiChevronRight />
           </button>
           <button className="ws-text-button" onClick={() => setDate(dateKey())}>
-            Hôm nay
+            Today
           </button>
         </div>
         <button
@@ -96,7 +96,7 @@ export default function Todo() {
           onClick={() => setListMode(!listMode)}
         >
           {listMode ? <FiGrid /> : <FiList />}
-          {listMode ? "Theo khung giờ" : "Danh sách tập trung"}
+          {listMode ? "Time blocks" : "Focus list"}
         </button>
       </div>
       <TaskFilters filters={view.filters} onChange={view.setFilters} />
@@ -110,7 +110,9 @@ export default function Todo() {
                 month: "numeric",
               })}
             </h2>
-            <span>{visible.length} công việc</span>
+            <span>
+              {visible.length} {visible.length === 1 ? "task" : "tasks"}
+            </span>
           </div>
           {listMode ? (
             <div className="task-list">
@@ -120,8 +122,8 @@ export default function Todo() {
                 ))
               ) : (
                 <EmptyState
-                  title="Khoảng trống cho điều quan trọng"
-                  description="Thêm công việc hoặc thử thay đổi bộ lọc."
+                  title="Room for what matters"
+                  description="Add a task or adjust your filters."
                 />
               )}
             </div>

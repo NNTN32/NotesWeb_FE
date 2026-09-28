@@ -21,16 +21,16 @@ export default function NoteForm() {
   }, [focus]);
   const save = () => {
     if (!editor.draft.title.trim() || !editor.draft.content.trim()) {
-      toast.error("Nhập tiêu đề và một chút nội dung trước khi lưu nhé.");
+      toast.error("Add a title and some content before saving.");
       return;
     }
-    if (editor.save()) toast.success("Đã lưu vào sổ trên trình duyệt này.");
+    if (editor.save()) toast.success("Saved to your notebook in this browser.");
   };
   const beforeSwitch = (action) => {
     if (
       editor.dirty &&
       !window.confirm(
-        "Bản nháp đang mở chưa được đưa vào sổ. Chuyển trang sẽ thay thế bản nháp này. Bạn muốn tiếp tục?",
+        "This draft has not been added to your notebook. Opening another page will replace it. Continue?",
       )
     )
       return;
@@ -44,7 +44,7 @@ export default function NoteForm() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `${(editor.draft.title || "ghi-chu").replace(/[^\p{L}\p{N} _-]/gu, "").slice(0, 80)}.txt`;
+    link.download = `${(editor.draft.title || "note").replace(/[^\p{L}\p{N} _-]/gu, "").slice(0, 80)}.txt`;
     link.click();
     window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
@@ -54,15 +54,15 @@ export default function NoteForm() {
     >
       <AmbientBackground variant="notes" />
       <PageHeader
-        eyebrow="GHI CHÚ · MỘT KHOẢNG TRỐNG ĐỂ NGHĨ"
+        eyebrow="NOTES · SPACE TO THINK"
         title={
           <>
-            Cứ để ý tưởng
+            Let your ideas
             <br />
-            <em>tự nhiên thành lời.</em>
+            <em>find their words.</em>
           </>
         }
-        description="Không cần hoàn hảo. Chỉ cần là những điều bạn muốn giữ lại."
+        description="They do not need to be perfect. Just worth keeping."
       >
         <button
           className="ws-secondary"
@@ -70,7 +70,7 @@ export default function NoteForm() {
           onClick={download}
         >
           <FiDownload />
-          Tải bản .txt
+          Download .txt
         </button>
       </PageHeader>
       {editor.storageError && (
@@ -80,7 +80,7 @@ export default function NoteForm() {
       )}
       {deleted && (
         <div className="ws-notice" role="status">
-          Đã xóa “{deleted.title}”.
+          Deleted “{deleted.title}”.
           <button
             className="ws-text-button"
             onClick={() => {
@@ -88,7 +88,7 @@ export default function NoteForm() {
               setDeleted(null);
             }}
           >
-            Hoàn tác
+            Undo
           </button>
         </div>
       )}
@@ -103,7 +103,7 @@ export default function NoteForm() {
             }}
           >
             <FiTrash2 />
-            Xóa trang đang mở
+            Delete current page
           </button>
         </div>
       )}
@@ -131,8 +131,8 @@ export default function NoteForm() {
           />
           <p className="note-bottom-hint">
             <FiFeather />
-            Ghi chú và bản nháp lưu trên trình duyệt này. Tải bản .txt để giữ
-            một bản sao.
+            Notes and drafts are saved in this browser. Download a .txt file to
+            keep a copy.
           </p>
         </div>
       </div>

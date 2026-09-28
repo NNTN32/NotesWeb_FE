@@ -1,4 +1,4 @@
-/* Form tài khoản dùng cho cả trang riêng và modal. */
+/* Account form shared by the page and modal. */
 .auth-dialog {
   --ws-accent: #94654e;
   --ws-soft: #f2e7df;

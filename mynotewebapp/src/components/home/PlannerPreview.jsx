@@ -16,45 +16,43 @@ export default function PlannerPreview() {
   return (
     <div className={styles.previewScene}>
       <span className={styles.previewAnnotation}>
-        Một ngày nhẹ nhàng bắt đầu từ đây ↴
+        A gentler day begins here ↴
       </span>
       <div className={styles.previewPaper}>
         <div className={styles.paperTop}>
           <span>
-            <span className={styles.onlineDot} /> KHÔNG GIAN CỦA TÔI
+            <span className={styles.onlineDot} /> MY SPACE
           </span>
           <FiMoreHorizontal aria-hidden="true" />
         </div>
         <div className={styles.paperHeading}>
           <div>
-            <p>MỘT TRANG MỚI, MỘT KHỞI ĐẦU MỚI</p>
+            <p>A NEW PAGE, A FRESH START</p>
             <h2>
-              Chào ngày mới <FiSun aria-hidden="true" />
+              Hello, new day <FiSun aria-hidden="true" />
             </h2>
           </div>
         </div>
-        <p className={styles.paperIntro}>
-          Hôm nay, mình muốn dành thời gian cho…
-        </p>
+        <p className={styles.paperIntro}>Today, I want to make time for…</p>
         <div className={styles.previewNote}>
           <span className={styles.tape} aria-hidden="true" />
           <span className={styles.smallLabel}>
-            <FiFeather /> MỘT Ý TƯỞNG NHỎ
+            <FiFeather /> ONE SMALL IDEA
           </span>
           <h3>
-            Làm ít hơn,
+            Do less,
             <br />
-            nhưng có ý nghĩa hơn.
+            but make it count.
           </h3>
-          <p>Không cần vội. Cứ bắt đầu với điều quan trọng nhất.</p>
+          <p>No rush. Start with what matters most.</p>
           <span className={styles.noteSketch} aria-hidden="true">
             ✳
           </span>
         </div>
         <div className={styles.taskHeading}>
-          <h3>Ưu tiên hôm nay</h3>
+          <h3>Today’s priorities</h3>
           <span aria-live="polite">
-            {completed}/{tasks.length} hoàn thành
+            {completed}/{tasks.length} complete
           </span>
         </div>
         <div className={styles.previewTasks}>
@@ -84,8 +82,8 @@ export default function PlannerPreview() {
           ))}
         </div>
         <div className={styles.paperBottom}>
-          <span>BẢN XEM TRƯỚC · THỬ ĐÁNH DẤU MỘT VIỆC</span>
-          <Link to="/todo" aria-label="Mở danh sách việc của bạn">
+          <span>A PREVIEW · TRY CHECKING OFF A TASK</span>
+          <Link to="/todo" aria-label="Open your task list">
             <FiArrowUpRight />
           </Link>
         </div>
@@ -93,13 +91,13 @@ export default function PlannerPreview() {
       <div className={styles.floatingNote}>
         <span aria-hidden="true">✦</span>
         <div>
-          Chậm một chút.
+          Slow down a little.
           <br />
-          <strong>Rõ ràng hơn một chút.</strong>
+          <strong>Make things a little clearer.</strong>
         </div>
       </div>
       <span className={styles.previewCaption}>
-        Ít bộn bề hơn. Nhiều khoảng trống hơn.
+        Less clutter. More breathing room.
       </span>
     </div>
   );

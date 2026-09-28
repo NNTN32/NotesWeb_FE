@@ -1,4 +1,4 @@
-/* Biến giao diện dùng chung; mỗi trang có màu nhấn riêng. */
+/* Shared design tokens; each page has its own accent color. */
 .workspace-theme {
   --ws-bg: #f7f7f2;
   --ws-panel: #fffefa;

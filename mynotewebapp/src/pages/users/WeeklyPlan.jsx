@@ -39,15 +39,15 @@ export default function WeeklyPlan() {
     <div className="workspace-page week-page">
       <AmbientBackground variant="week" />
       <PageHeader
-        eyebrow="KẾ HOẠCH TUẦN · NHÌN BỨC TRANH LỚN"
+        eyebrow="WEEKLY PLAN · SEE THE BIG PICTURE"
         title={
           <>
-            Một tuần rõ ràng.
+            A clearer week.
             <br />
-            <em>Thêm chỗ cho chính mình.</em>
+            <em>More room for yourself.</em>
           </>
         }
-        description="Có thời gian cho mục tiêu. Có khoảng trống để thở."
+        description="Make time for your goals. Leave room to breathe."
       >
         <button
           className="ws-button"
@@ -58,7 +58,7 @@ export default function WeeklyPlan() {
           }
         >
           <FiPlus />
-          Lên kế hoạch
+          Add task
         </button>
       </PageHeader>
       <TaskFeedback
@@ -68,29 +68,29 @@ export default function WeeklyPlan() {
       />
       <div className="week-overview">
         <div>
-          <span>KẾ HOẠCH</span>
+          <span>PLANNED</span>
           <strong>
             {stats.total}
-            <small>công việc</small>
+            <small>tasks</small>
           </strong>
         </div>
         <div>
-          <span>ĐÃ HOÀN THÀNH</span>
+          <span>COMPLETED</span>
           <strong>
             {stats.completed}
-            <small>từng bước tiến</small>
+            <small>tasks</small>
           </strong>
         </div>
         <div>
-          <span>NHỊP ĐỘ TUẦN NÀY</span>
+          <span>THIS WEEK’S PACE</span>
           <strong>
             {stats.progress}
-            <small>% hoàn thành</small>
+            <small>% complete</small>
           </strong>
           <progress
             value={stats.completed}
             max={stats.total || 1}
-            aria-label="Tiến độ tuần"
+            aria-label="Weekly progress"
           />
         </div>
       </div>
@@ -98,7 +98,7 @@ export default function WeeklyPlan() {
         <div className="ws-date-nav">
           <button
             className="ws-icon-button"
-            aria-label="Tuần trước"
+            aria-label="Previous week"
             onClick={() => setAnchor(shiftDate(anchor, -7))}
           >
             <FiChevronLeft />
@@ -113,7 +113,7 @@ export default function WeeklyPlan() {
           </h2>
           <button
             className="ws-icon-button"
-            aria-label="Tuần sau"
+            aria-label="Next week"
             onClick={() => setAnchor(shiftDate(anchor, 7))}
           >
             <FiChevronRight />
@@ -122,10 +122,10 @@ export default function WeeklyPlan() {
             className="ws-text-button"
             onClick={() => setAnchor(dateKey())}
           >
-            Tuần này
+            This week
           </button>
         </div>
-        <span className="ws-storage-note">Tuần bắt đầu từ thứ Hai</span>
+        <span className="ws-storage-note">Weeks start on Monday</span>
       </div>
       <TaskFilters filters={view.filters} onChange={view.setFilters} />
       <WeekBoard
@@ -139,9 +139,9 @@ export default function WeeklyPlan() {
           <div className="ws-panel-heading">
             <h2>
               <FiTarget />
-              Ba điều đáng ưu tiên
+              Three things to prioritize
             </h2>
-            <span>Việc chưa hoàn thành</span>
+            <span>Open tasks</span>
           </div>
           {focus.length ? (
             <div className="week-focus">
@@ -151,17 +151,17 @@ export default function WeeklyPlan() {
             </div>
           ) : (
             <EmptyState
-              title="Chưa có việc cần ưu tiên"
-              description="Hãy dành tuần này cho những điều có ý nghĩa với bạn."
+              title="Nothing to prioritize yet"
+              description="Make this week about what matters to you."
             />
           )}
         </div>
         <aside className="week-reflection">
           <span aria-hidden="true">✧</span>
-          <h3>Đừng quên những khoảng nghỉ.</h3>
+          <h3>Remember to take breaks.</h3>
           <p>
-            Một tuần tốt không phải là một tuần kín lịch. Hãy để lại chỗ cho
-            những điều bất ngờ.
+            A good week does not have to be packed. Leave space for the
+            unexpected.
           </p>
         </aside>
       </section>

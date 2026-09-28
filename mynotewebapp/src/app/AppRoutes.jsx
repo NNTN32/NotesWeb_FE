@@ -16,7 +16,7 @@ export default function AppRoutes() {
           role="status"
           className="min-h-screen grid place-items-center bg-paper text-ink"
         >
-          Đang mở không gian của bạn…
+          Opening your space…
         </div>
       }
     >

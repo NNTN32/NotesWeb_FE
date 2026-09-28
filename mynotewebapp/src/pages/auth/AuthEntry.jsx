@@ -18,32 +18,32 @@ export default function AuthEntry() {
         </Link>
         <Link to="/" className="ws-text-button">
           <FiArrowLeft />
-          Về trang chủ
+          Back to home
         </Link>
       </div>
       <div className="auth-page-layout">
         <aside className="auth-story">
-          <p className="ws-eyebrow">GHI LẠI. SẮP XẾP. THẢNH THƠI.</p>
+          <p className="ws-eyebrow">CAPTURE. ORGANIZE. BREATHE.</p>
           <h2>
-            Một nơi để nghĩ.
+            A place to think.
             <br />
-            <em>Một nhịp để sống.</em>
+            <em>Room to live at your pace.</em>
           </h2>
           <p>
-            Những ý tưởng nhỏ, những việc cần làm và cả kế hoạch còn dang dở.
-            Mọi thứ đều xứng đáng có một góc riêng.
+            Small ideas, everyday tasks, and plans still taking shape.
+            Everything deserves a place of its own.
           </p>
           <div className="auth-story-note">
-            <span>Gửi bạn,</span>
+            <span>Dear you,</span>
             <h3>
-              Cứ bắt đầu.
+              Just begin.
               <br />
-              Chậm cũng được.
+              Take your time.
             </h3>
-            <p>Chỉ cần bắt đầu từ một điều nhỏ thôi.</p>
+            <p>One small step is enough to start.</p>
             <span aria-hidden="true">✳</span>
           </div>
-          <small>MyNote · Theo nhịp của bạn.</small>
+          <small>MyNote · At your own pace.</small>
         </aside>
         <section className="auth-page-form">
           <AuthForm

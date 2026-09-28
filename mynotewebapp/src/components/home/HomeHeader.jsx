@@ -22,13 +22,13 @@ export default function HomeHeader() {
 
   return (
     <header className={styles.header}>
-      <Link to="/" className={styles.brand} aria-label="MyNote — Trang chủ">
+      <Link to="/" className={styles.brand} aria-label="MyNote — Home">
         <FiBookOpen aria-hidden="true" /> MyNote
         <span className={styles.brandDot}>.</span>
       </Link>
       <nav
         id="home-navigation"
-        aria-label="Điều hướng trang chủ"
+        aria-label="Home navigation"
         className={`${styles.navigation} ${menuOpen ? styles.navigationOpen : ""}`}
         onKeyDown={(event) => {
           if (event.key === "Escape") {
@@ -53,14 +53,14 @@ export default function HomeHeader() {
           className={styles.iconButton}
           onClick={toggleTheme}
           aria-label={
-            theme === "light" ? "Bật giao diện tối" : "Bật giao diện sáng"
+            theme === "light" ? "Switch to dark mode" : "Switch to light mode"
           }
         >
           {theme === "light" ? <FiMoon /> : <FiSun />}
         </button>
         {user ? (
           <Link className={styles.headerLogin} to="/create">
-            Vào không gian <FiArrowUpRight />
+            Open your space <FiArrowUpRight />
           </Link>
         ) : (
           <button
@@ -68,7 +68,7 @@ export default function HomeHeader() {
             className={styles.headerLogin}
             onClick={openLogin}
           >
-            Đăng nhập <FiArrowUpRight />
+            Sign in <FiArrowUpRight />
           </button>
         )}
         <button
@@ -78,7 +78,7 @@ export default function HomeHeader() {
           onClick={() => setMenuOpen(!menuOpen)}
           aria-expanded={menuOpen}
           aria-controls="home-navigation"
-          aria-label={menuOpen ? "Đóng điều hướng" : "Mở điều hướng"}
+          aria-label={menuOpen ? "Close navigation" : "Open navigation"}
         >
           {menuOpen ? <FiX /> : <FiMenu />}
         </button>

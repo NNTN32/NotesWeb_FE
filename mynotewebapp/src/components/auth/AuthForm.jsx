@@ -1,30 +1,76 @@
-import { useId } from "react";
-import { FiArrowRight } from "react-icons/fi";
+import { useEffect, useId, useRef } from "react";
+import { Link } from "react-router-dom";
+import { FiArrowRight, FiLoader, FiHardDrive } from "react-icons/fi";
 import { FaApple, FaGoogle } from "react-icons/fa";
 import { useAuthSubmission } from "../../features/auth/useAuthSubmission";
 import AuthField from "./AuthField";
-import ChibiMascot from "../ChibiMascot";
+import AntiqueBook from "../ui/AntiqueBook";
 import "../../styles/workspace.css";
 
-export default function AuthForm({ mode, titleId, onSwitch, onAuthenticated }) {
+export default function AuthForm({
+  mode,
+  titleId,
+  onSwitch,
+  onAuthenticated,
+  onExplore,
+}) {
   const id = useId();
+  const content = useRef(null);
+  useEffect(() => {
+    // A newly selected form keeps keyboard focus inside the open dialog.
+    if (content.current?.closest("dialog")?.open)
+      content.current.querySelector("input")?.focus({ preventScroll: true });
+  }, []);
   const isRegister = mode === "register";
   const { submit, pending, error } = useAuthSubmission({
     mode,
     onAuthenticated,
   });
   return (
-    <div className="auth-form-content">
-      <div className="auth-mascot">
-        <ChibiMascot decorative size={76} />
+    <div
+      className={`auth-form-content ${isRegister ? "auth-form-content--register" : ""}`}
+      ref={content}
+    >
+      <header className="auth-heading">
+        <div className="auth-emblem" aria-hidden="true">
+          <AntiqueBook />
+        </div>
+        <p className="ws-eyebrow">MYNOTE · YOUR LITTLE CORNER</p>
+        <h1 id={titleId}>
+          {isRegister ? (
+            <>
+              Start a new <em>page.</em>
+            </>
+          ) : (
+            <>
+              Welcome <em>back.</em>
+            </>
+          )}
+        </h1>
+        <p className="ws-description">
+          {isRegister
+            ? "A little space to make your own."
+            : "Make yourself at home."}
+        </p>
+      </header>
+      <div className="auth-mode-switch" role="group" aria-label="Account mode">
+        <button
+          type="button"
+          aria-pressed={!isRegister}
+          disabled={!!pending}
+          onClick={() => isRegister && onSwitch()}
+        >
+          Sign in
+        </button>
+        <button
+          type="button"
+          aria-pressed={isRegister}
+          disabled={!!pending}
+          onClick={() => !isRegister && onSwitch()}
+        >
+          Sign up
+        </button>
       </div>
-      <p className="ws-eyebrow">A LITTLE SPACE FOR YOU</p>
-      <h1 id={titleId}>{isRegister ? "Start a new page." : "Welcome back."}</h1>
-      <p className="ws-description">
-        {isRegister
-          ? "Create your MyNote account."
-          : "Sign in and pick up where you left off."}
-      </p>
       {!isRegister && (
         <>
           <div className="auth-social">
@@ -54,6 +100,7 @@ export default function AuthForm({ mode, titleId, onSwitch, onAuthenticated }) {
           event.preventDefault();
           submit(Object.fromEntries(new FormData(event.currentTarget)));
         }}
+        aria-busy={!!pending}
         aria-describedby={error ? `${id}-error` : undefined}
       >
         <fieldset disabled={!!pending}>
@@ -80,7 +127,7 @@ export default function AuthForm({ mode, titleId, onSwitch, onAuthenticated }) {
             label="Password"
             type="password"
             autoComplete={isRegister ? "new-password" : "current-password"}
-            placeholder="Enter your password"
+            placeholder="Your password"
           />
           {isRegister && (
             <AuthField
@@ -89,7 +136,7 @@ export default function AuthForm({ mode, titleId, onSwitch, onAuthenticated }) {
               label="Confirm password"
               type="password"
               autoComplete="new-password"
-              placeholder="Enter your password again"
+              placeholder="Repeat password"
             />
           )}
         </fieldset>
@@ -98,29 +145,38 @@ export default function AuthForm({ mode, titleId, onSwitch, onAuthenticated }) {
             {error}
           </p>
         )}
-        <button className="ws-button" type="submit" disabled={!!pending}>
+        <button
+          className="ws-button auth-submit"
+          type="submit"
+          disabled={!!pending}
+        >
           {pending === "email"
             ? "Working…"
             : isRegister
               ? "Create account"
               : "Sign in"}
-          <FiArrowRight />
+          {pending === "email" ? (
+            <FiLoader className="auth-spinner" aria-hidden="true" />
+          ) : (
+            <FiArrowRight aria-hidden="true" />
+          )}
         </button>
       </form>
-      <p className="auth-switch">
-        {isRegister ? "Already have an account?" : "New to MyNote?"}{" "}
-        <button
-          type="button"
-          className="ws-text-button"
-          disabled={!!pending}
-          onClick={onSwitch}
-        >
-          {isRegister ? "Sign in" : "Sign up"}
-        </button>
+      <p className="sr-only" role="status" aria-atomic="true">
+        {pending ? "Connecting to your account…" : ""}
       </p>
-      <p className="ws-storage-note auth-local-note">
-        Notes and tasks are currently stored in this browser and do not sync
-        with your account.
+      <div className="auth-footnote">
+        <Link to="/create" onClick={onExplore}>
+          Begin with a note <FiArrowRight aria-hidden="true" />
+        </Link>
+        <span>No account needed to start.</span>
+      </div>
+      <p className="auth-local-note">
+        <FiHardDrive aria-hidden="true" />
+        <span>
+          Notes and tasks stay in this browser. Account sync is not available
+          yet.
+        </span>
       </p>
     </div>
   );

@@ -13,6 +13,7 @@ export default function AuthModal() {
         mode={mode}
         titleId={id}
         onAuthenticated={close}
+        onExplore={close}
         onSwitch={mode === "login" ? openRegister : openLogin}
       />
     </Modal>

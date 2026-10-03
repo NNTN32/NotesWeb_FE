@@ -1,83 +1,8 @@
 import { useEffect, useId, useRef, useState } from "react";
+import AntiqueBook from "./AntiqueBook";
 import { Link } from "react-router-dom";
 import { useMotion } from "../../context/MotionContext";
 import "../../styles/brand.css";
-
-/** Inline vector artwork stays crisp and shares the current page's palette. */
-function AntiqueBook() {
-  return (
-    <svg viewBox="0 0 48 48" fill="none" aria-hidden="true" focusable="false">
-      <g className="brand-book-pages">
-        <path
-          d="M10 10c5-2 9-1 14 2v28c-5-3-9-4-14-2V10Z"
-          fill="var(--brand-paper)"
-          stroke="currentColor"
-          strokeWidth="1.2"
-        />
-        <path
-          d="M24 12c5-3 9-4 14-2v28c-5-2-9-1-14 2V12Z"
-          fill="var(--brand-paper)"
-          stroke="currentColor"
-          strokeWidth="1.2"
-        />
-        <path
-          d="M14 17c3 0 5 1 7 2m-7 4c3 0 5 1 7 2m6-6c2-1 4-2 7-2m-7 8c2-1 4-2 7-2"
-          stroke="currentColor"
-          strokeWidth=".8"
-          opacity=".45"
-        />
-      </g>
-      <path
-        d="M12 9h21a3 3 0 0 1 3 3v28H13a4 4 0 0 1-4-4V13a4 4 0 0 1 3-4Z"
-        fill="var(--brand-paper)"
-        stroke="currentColor"
-        strokeWidth="1.4"
-      />
-      <path
-        d="M13 35h22m-22 3h22"
-        stroke="currentColor"
-        strokeWidth=".8"
-        opacity=".45"
-      />
-      <g className="brand-book-cover">
-        <path
-          d="M13 7h20a3 3 0 0 1 3 3v26H13a4 4 0 0 0-4 4V11a4 4 0 0 1 4-4Z"
-          fill="currentColor"
-        />
-        <path
-          d="M14 7v29"
-          stroke="var(--brand-gold)"
-          strokeWidth=".8"
-          opacity=".8"
-        />
-        <path
-          d="M17 11h15v21H17V11Z"
-          stroke="var(--brand-gold)"
-          strokeWidth=".8"
-        />
-        <path
-          d="M10 13h3m-3 5h3m-3 10h3m-3 5h3"
-          stroke="var(--brand-gold)"
-          strokeWidth="1.2"
-        />
-        <text
-          x="24.5"
-          y="27"
-          textAnchor="middle"
-          fill="var(--brand-gold)"
-          fontFamily="Georgia, serif"
-          fontSize="18"
-        >
-          N
-        </text>
-        <path
-          d="m24.5 12 1.5 1.5-1.5 1.5-1.5-1.5 1.5-1.5Z"
-          fill="var(--brand-gold)"
-        />
-      </g>
-    </svg>
-  );
-}
 
 export default function BrandLogo({ className = "", onNavigate }) {
   const [revealed, setRevealed] = useState(false);

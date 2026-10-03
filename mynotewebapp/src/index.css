@@ -89,3 +89,21 @@ body {
     animation: none !important;
   }
 }
+
+/* The user can pause motion independently of the operating system preference. */
+html[data-motion="quiet"] *,
+html[data-motion="quiet"] *::before,
+html[data-motion="quiet"] *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -16,7 +16,7 @@ const QUESTIONS = [
   ],
   [
     "Can I make the space a little quieter?",
-    "Use focus mode in your notebook, or switch to dark mode. MyNote also respects your device’s reduced-motion preference.",
+    "Turn on Quiet mode to pause animations, or use focus mode in your notebook. MyNote also respects your device’s reduced-motion preference.",
   ],
 ];
 export default function FaqSection() {

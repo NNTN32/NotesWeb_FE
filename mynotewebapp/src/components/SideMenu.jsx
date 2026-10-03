@@ -1,3 +1,4 @@
+import MotionToggle from "./motion/MotionToggle";
 import { NavLink, Link } from "react-router-dom";
 import {
   FiBookOpen,
@@ -74,6 +75,7 @@ export default function SideMenu({ mobileOpen, onClose }) {
           </p>
         </div>
         <div className="ws-sidebar-bottom">
+          <MotionToggle className="ws-nav-link" showLabel />
           <button className="ws-nav-link" onClick={toggleTheme}>
             {theme === "light" ? <FiMoon /> : <FiSun />}
             {theme === "light" ? "Dark mode" : "Light mode"}

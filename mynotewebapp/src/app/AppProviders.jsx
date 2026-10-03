@@ -1,3 +1,4 @@
+import MotionProvider from "../context/MotionProvider";
 import RouteScrollReset from "./RouteScrollReset";
 import TasksProvider from "../context/TasksProvider";
 import { BrowserRouter } from "react-router-dom";
@@ -7,15 +8,17 @@ import { ThemeProvider } from "../context/ThemeProvider";
 
 export default function AppProviders({ children }) {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <BrowserRouter>
-          <RouteScrollReset />
-          <AuthModalProvider>
-            <TasksProvider>{children}</TasksProvider>
-          </AuthModalProvider>
-        </BrowserRouter>
-      </AuthProvider>
-    </ThemeProvider>
+    <MotionProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <BrowserRouter>
+            <RouteScrollReset />
+            <AuthModalProvider>
+              <TasksProvider>{children}</TasksProvider>
+            </AuthModalProvider>
+          </BrowserRouter>
+        </AuthProvider>
+      </ThemeProvider>
+    </MotionProvider>
   );
 }

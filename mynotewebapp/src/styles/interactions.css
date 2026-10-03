@@ -5,15 +5,15 @@
 }
 
 .notes-page {
-  --ws-motion-hover: translateY(-2px) rotate(-0.6deg);
+  --ws-motion-hover: translateY(-1px);
 }
 
 .todo-page {
-  --ws-motion-hover: translateY(-2px) scale(1.015);
+  --ws-motion-hover: translateY(-1px);
 }
 
 .week-page {
-  --ws-motion-hover: translate(2px, -2px);
+  --ws-motion-hover: translateY(-1px);
 }
 
 .workspace-theme :is(.ws-button, .ws-secondary, .auth-social button) {
@@ -65,7 +65,7 @@
   }
 
   .todo-page .task-add-inline:not(:disabled):hover svg {
-    transform: rotate(90deg);
+    transform: scale(1.1);
   }
 
   .week-page .task-add-inline:not(:disabled):hover svg {
@@ -99,4 +99,21 @@
   ):not(:disabled):active {
   transform: translateY(1px) scale(0.98);
   box-shadow: none;
+}
+
+html[data-motion="quiet"]
+  .workspace-theme
+  :is(
+    .ws-button,
+    .ws-secondary,
+    .ws-icon-button,
+    .ws-nav-link,
+    .task-add-inline,
+    .auth-social button
+  ),
+html[data-motion="quiet"]
+  .workspace-theme
+  :is(.ws-button, .ws-secondary, .task-add-inline)
+  svg {
+  transform: none !important;
 }

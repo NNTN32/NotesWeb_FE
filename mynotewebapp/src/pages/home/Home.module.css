@@ -939,12 +939,17 @@
     gap: 12px;
   }
   .brand {
-    font-size: 24px;
+    font-size: 20px;
+  }
+  .iconButton {
+    width: 32px;
+    flex-shrink: 0;
   }
   .headerActions {
     gap: 4px;
   }
   .headerLogin {
+    white-space: nowrap;
     padding: 8px 10px;
     font-size: 11px;
     gap: 5px;
@@ -1145,5 +1150,27 @@
   .previewLink svg,
   .featureCopy > a svg {
     transform: none !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .brand {
+    font-size: 18px;
+    gap: 5px;
+  }
+  .iconButton {
+    width: 28px;
+  }
+  .headerActions {
+    gap: 2px;
+  }
+  .header {
+    gap: 5px;
+  }
+  .headerLogin {
+    padding-inline: 8px;
+  }
+  .headerLogin svg {
+    display: none;
   }
 }

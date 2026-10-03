@@ -151,3 +151,23 @@
     animation: none;
   }
 }
+
+/* Writing and planning surfaces settle immediately, preserving their palette. */
+.workspace-page .ambient__motif {
+  animation: none;
+  transform: rotate(var(--motif-rotate, 0deg));
+}
+.notes-page--focus .ambient {
+  visibility: hidden;
+}
+.workspace-page:focus-within .ambient__motif,
+.auth-page:focus-within .ambient__motif,
+.auth-page:focus-within .flow-decoration * {
+  animation-play-state: paused;
+}
+.auth-page:focus-within .chibi-mascot-container,
+.auth-page:focus-within .chibi-mascot-svg *,
+.auth-dialog:focus-within .chibi-mascot-container,
+.auth-dialog:focus-within .chibi-mascot-svg * {
+  animation-play-state: paused;
+}

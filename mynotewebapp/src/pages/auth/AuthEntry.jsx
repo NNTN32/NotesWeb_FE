@@ -1,3 +1,4 @@
+import MotionToggle from "../../components/motion/MotionToggle";
 import { useId } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { FiArrowLeft, FiBookOpen } from "react-icons/fi";
@@ -17,6 +18,7 @@ export default function AuthEntry() {
           <FiBookOpen />
           MyNote.
         </Link>
+        <MotionToggle className="ws-icon-button" />
         <Link to="/" className="ws-text-button">
           <FiArrowLeft />
           Back to home

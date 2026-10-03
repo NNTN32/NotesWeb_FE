@@ -32,7 +32,7 @@ src/
     notes/                 Pure note model and editor hook
     tasks/                 Pure date/filter/statistics model and view hook
     auth/                  Authentication submission and errors
-  context/                 Shared tasks, authentication, theme, auth modal
+  context/                 Shared tasks, authentication, theme, motion preferences, auth modal
   hooks/                   Local storage persistence and cross-tab updates
   pages/                   Compose components and feature state for each route
   pages/home/              Landing content data and scoped CSS Module
@@ -62,8 +62,9 @@ The layout takes cues from the reference at https://explee-staging.nudgen.net/: 
 - Use `PageSurface` for a workspace page and its ambient variant. Keep functional controls outside decorative layers.
 - Change shared geometry in `tokens.css`; keep feature colors in their feature stylesheet. Home uses a CSS Module.
 - Use `Reveal` for independent landing sections. It observes once, animates with the Web Animations API, and cleans up observers and listeners. Content remains available without animation support.
+- Workspace backgrounds stay still while writing or planning. Entrances last 280ms without staggered delays; landing reveals last 420ms. Successful saves and task completion get a single 260ms acknowledgement, never on initial render. Text feedback remains available with motion off.
 - Workspace entrances use CSS. Hover effects are limited to devices with a fine pointer; press feedback also works on touch.
-- Reduced-motion preferences stop decorative loops, entrances, and movement. Focus outlines remain visible. No animation library or scroll listener is required.
+- Quiet mode is available on Home, workspace navigation, and account pages; its local preference persists between visits. Device reduced-motion preferences always take priority. Both stop decorative loops, entrances, and movement. Focus outlines remain visible. No animation library or scroll listener is required.
 - Decorative SVGs and backgrounds are hidden from assistive technology and cannot intercept pointer events.
 - Native dialogs isolate the background, focus the first form field, close on Escape, and restore focus to the trigger.
 - The home preview is a demonstration; only workspace pages write to storage.
@@ -82,3 +83,9 @@ The layout takes cues from the reference at https://explee-staging.nudgen.net/: 
 `npm test` covers date boundaries, English date labels, time slots, filters, priority sorting, statistics, storage validation, and note mutations.
 
 For visual or interaction changes, check Home, Notes, To-dos, Weekly Plan, Sign in, and Sign up at desktop and mobile widths. Verify note save/reload, tasks shared between views, dialog focus/Escape, mobile navigation, dark mode, and reduced motion. Weekly overflow must stay inside the calendar region.
+
+## Motion review rationale
+
+Motion helps users recognize an action and see real progress. It does not guarantee repeat use; validate that with usability sessions and returning-user data. Avoid streak penalties, artificial urgency, repeated celebrations, and moving calls to action. Keep tasks reversible and the next step optional.
+
+References: [NN/g — purpose of animation](https://www.nngroup.com/articles/animation-purpose-ux/), [NN/g — duration](https://www.nngroup.com/articles/animation-duration/), [W3C — Pause, Stop, Hide](https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide).

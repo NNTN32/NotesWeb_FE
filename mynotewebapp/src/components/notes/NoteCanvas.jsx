@@ -1,4 +1,5 @@
-import { FiFeather, FiMaximize2, FiMinimize2 } from "react-icons/fi";
+import { useFeedbackMotion } from "../../hooks/useFeedbackMotion";
+import { FiCheck, FiFeather, FiMaximize2, FiMinimize2 } from "react-icons/fi";
 export default function NoteCanvas({
   draft,
   onChange,
@@ -8,6 +9,8 @@ export default function NoteCanvas({
   error,
   dirty,
 }) {
+  const feedback = useFeedbackMotion();
+  const saved = !!draft.id && !dirty && !error;
   const words = draft.content.trim()
     ? draft.content.trim().split(/\s+/u).length
     : 0;
@@ -30,7 +33,7 @@ export default function NoteCanvas({
       <form
         onSubmit={(event) => {
           event.preventDefault();
-          onSave();
+          if (onSave()) feedback.acknowledge();
         }}
       >
         <label className="sr-only" htmlFor="note-title">
@@ -73,8 +76,13 @@ export default function NoteCanvas({
                   : "Saved in this browser"}
           </span>
         </footer>
-        <button type="submit" className="ws-button note-save">
-          Save to notebook
+        <button
+          ref={feedback.ref}
+          type="submit"
+          className="ws-button note-save"
+        >
+          {saved && <FiCheck aria-hidden="true" />}
+          {saved ? "Saved to notebook" : "Save to notebook"}
         </button>
       </form>
     </section>

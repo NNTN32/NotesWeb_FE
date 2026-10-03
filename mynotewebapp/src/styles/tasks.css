@@ -407,3 +407,13 @@
 .task-card--done {
   background: color-mix(in srgb, var(--ws-soft) 45%, var(--ws-panel));
 }
+
+.task-action-feedback {
+  color: var(--ws-accent);
+  font-size: 12px;
+  margin: 0 0 16px;
+  overflow-wrap: anywhere;
+}
+.task-action-feedback:empty {
+  margin: 0;
+}

@@ -8,8 +8,10 @@ export function useTaskView() {
     status: "all",
   });
   const [editor, setEditor] = useState(null);
+  const [feedback, setFeedback] = useState("");
   const [deleted, setDeleted] = useState(null);
   const onDelete = (task) => {
+    setFeedback("");
     data.removeTask(task.id);
     setDeleted(task);
   };
@@ -19,6 +21,19 @@ export function useTaskView() {
   };
   return {
     ...data,
+    feedback,
+    toggleTask: (id) => {
+      const task = data.tasks.find((item) => item.id === id);
+      const saved = data.toggleTask(id);
+      setFeedback(
+        saved && task
+          ? task.completed
+            ? `“${task.text}” is back in your plan.`
+            : `“${task.text}” completed. One small step forward.`
+          : "",
+      );
+      return saved;
+    },
     filters,
     setFilters,
     editor,

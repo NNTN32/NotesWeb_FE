@@ -1,6 +1,9 @@
-export default function TaskFeedback({ error, deleted, onUndo }) {
+export default function TaskFeedback({ error, deleted, onUndo, feedback }) {
   return (
     <>
+      <p className="task-action-feedback" role="status" aria-atomic="true">
+        {feedback}
+      </p>
       {error && (
         <p role="alert" className="ws-error">
           {error}

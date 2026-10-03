@@ -54,6 +54,7 @@ export default function Todo() {
         </button>
       </PageHeader>
       <TaskFeedback
+        feedback={view.feedback}
         error={view.storageError}
         deleted={view.deleted}
         onUndo={view.undoDelete}

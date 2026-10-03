@@ -61,6 +61,7 @@ export default function WeeklyPlan() {
         </button>
       </PageHeader>
       <TaskFeedback
+        feedback={view.feedback}
         error={view.storageError}
         deleted={view.deleted}
         onUndo={view.undoDelete}

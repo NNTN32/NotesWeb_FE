@@ -197,3 +197,24 @@
 .auth-form-content > .ws-eyebrow {
   color: var(--ws-accent);
 }
+
+.auth-page-top > .ws-icon-button {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.auth-page-top > .ws-text-button {
+  white-space: nowrap;
+}
+@media (max-width: 380px) {
+  .auth-page-top {
+    gap: 8px;
+  }
+  .auth-page-top .ws-brand {
+    font-size: 21px;
+    gap: 6px;
+  }
+  .auth-page-top .ws-text-button {
+    font-size: 10px;
+    gap: 4px;
+  }
+}

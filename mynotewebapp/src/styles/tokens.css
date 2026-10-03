@@ -5,5 +5,5 @@
   --ui-shadow-panel: 0 8px 28px #29392306;
   --ui-motion-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   --ui-motion-fast: 180ms;
-  --ui-motion-enter: 520ms;
+  --ui-motion-enter: 280ms;
 }

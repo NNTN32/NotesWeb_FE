@@ -22,9 +22,9 @@ export default function NoteForm() {
   const save = () => {
     if (!editor.draft.title.trim() || !editor.draft.content.trim()) {
       toast.error("Add a title and some content before saving.");
-      return;
+      return false;
     }
-    if (editor.save()) toast.success("Saved to your notebook in this browser.");
+    return editor.save();
   };
   const beforeSwitch = (action) => {
     if (

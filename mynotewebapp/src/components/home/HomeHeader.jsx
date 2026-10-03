@@ -1,3 +1,4 @@
+import MotionToggle from "../motion/MotionToggle";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -48,6 +49,7 @@ export default function HomeHeader() {
         ))}
       </nav>
       <div className={styles.headerActions}>
+        <MotionToggle className={styles.iconButton} />
         <button
           type="button"
           className={styles.iconButton}

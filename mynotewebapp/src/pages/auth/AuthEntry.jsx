@@ -1,7 +1,8 @@
+import BrandLogo from "../../components/ui/BrandLogo";
 import MotionToggle from "../../components/motion/MotionToggle";
 import { useId } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
-import { FiArrowLeft, FiBookOpen } from "react-icons/fi";
+import { FiArrowLeft } from "react-icons/fi";
 import AuthForm from "../../components/auth/AuthForm";
 import FlowDecoration from "../../components/ui/FlowDecoration";
 import AmbientBackground from "../../components/workspace/AmbientBackground";
@@ -14,10 +15,7 @@ export default function AuthEntry() {
     <main className="workspace-theme auth-page">
       <AmbientBackground variant="auth" />
       <div className="auth-page-top">
-        <Link to="/" className="ws-brand">
-          <FiBookOpen />
-          MyNote.
-        </Link>
+        <BrandLogo />
         <MotionToggle className="ws-icon-button" />
         <Link to="/" className="ws-text-button">
           <FiArrowLeft />

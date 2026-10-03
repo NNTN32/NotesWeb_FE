@@ -1,6 +1,7 @@
+import BrandLogo from "../ui/BrandLogo";
 import { useRef, useState } from "react";
 import { Outlet } from "react-router-dom";
-import { FiMenu, FiBookOpen } from "react-icons/fi";
+import { FiMenu } from "react-icons/fi";
 import WorkspaceTopbar from "./WorkspaceTopbar";
 import SideMenu from "../SideMenu";
 import "../../styles/workspace.css";
@@ -32,10 +33,7 @@ export default function WorkspaceLayout() {
         >
           <FiMenu />
         </button>
-        <span>
-          <FiBookOpen />
-          MyNote.
-        </span>
+        <BrandLogo />
       </header>
       <SideMenu mobileOpen={mobileOpen} onClose={close} />
       <main id="workspace-content" className="ws-main">

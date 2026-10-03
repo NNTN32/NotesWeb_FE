@@ -1,14 +1,7 @@
+import BrandLogo from "./ui/BrandLogo";
 import MotionToggle from "./motion/MotionToggle";
 import { NavLink, Link } from "react-router-dom";
-import {
-  FiBookOpen,
-  FiHome,
-  FiMoon,
-  FiSun,
-  FiLogOut,
-  FiUser,
-  FiX,
-} from "react-icons/fi";
+import { FiHome, FiMoon, FiSun, FiLogOut, FiUser, FiX } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { useAuthModal } from "../context/AuthModalContext";
@@ -31,10 +24,7 @@ export default function SideMenu({ mobileOpen, onClose }) {
         className={`ws-sidebar ${mobileOpen ? "ws-sidebar--open" : ""}`}
       >
         <div className="ws-sidebar-brand">
-          <Link className="ws-brand" to="/" onClick={onClose}>
-            <FiBookOpen />
-            MyNote<span>.</span>
-          </Link>
+          <BrandLogo onNavigate={onClose} />
           <button
             className="ws-icon-button ws-mobile-only"
             onClick={onClose}

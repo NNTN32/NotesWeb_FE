@@ -1,14 +1,8 @@
+import BrandLogo from "../ui/BrandLogo";
 import MotionToggle from "../motion/MotionToggle";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  FiArrowUpRight,
-  FiBookOpen,
-  FiMenu,
-  FiMoon,
-  FiSun,
-  FiX,
-} from "react-icons/fi";
+import { FiArrowUpRight, FiMenu, FiMoon, FiSun, FiX } from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext";
 import { useAuthModal } from "../../context/AuthModalContext";
 import { useTheme } from "../../context/ThemeContext";
@@ -23,10 +17,7 @@ export default function HomeHeader() {
 
   return (
     <header className={styles.header}>
-      <Link to="/" className={styles.brand} aria-label="MyNote — Home">
-        <FiBookOpen aria-hidden="true" /> MyNote
-        <span className={styles.brandDot}>.</span>
-      </Link>
+      <BrandLogo className={styles.brand} />
       <nav
         id="home-navigation"
         aria-label="Home navigation"

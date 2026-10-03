@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { FiArrowRight, FiBookOpen } from "react-icons/fi";
+import { FiArrowRight } from "react-icons/fi";
+import BrandLogo from "../ui/BrandLogo";
 import Reveal from "../motion/Reveal";
 import styles from "../../pages/home/Home.module.css";
 
@@ -22,10 +23,7 @@ export default function HomeClosing() {
         </Link>
       </Reveal>
       <footer className={styles.footer}>
-        <Link to="/" className={styles.brand}>
-          <FiBookOpen aria-hidden="true" />
-          MyNote<span className={styles.brandDot}>.</span>
-        </Link>
+        <BrandLogo className={styles.brand} />
         <p>A little space, just for you.</p>
         <span>© {new Date().getFullYear()} MyNote</span>
       </footer>

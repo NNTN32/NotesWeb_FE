@@ -1,0 +1,101 @@
+/* A quiet, tactile book. The wordmark always reserves its full width. */
+.mynote-brand {
+  --brand-paper: #f7eddb;
+  --brand-gold: #e7c993;
+  --brand-accent: var(--accent, var(--ws-accent, #526547));
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  color: var(--ink, var(--ws-ink, #30392e));
+  font-family: Georgia, serif;
+  font-weight: 700;
+  font-size: 27px;
+  letter-spacing: -1px;
+  white-space: nowrap;
+}
+.brand-book {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 40px;
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: 11px;
+  background: var(--sage, var(--ws-soft, #eef1e8));
+  color: var(--brand-accent);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--ui-motion-fast) var(--ui-motion-ease);
+}
+.brand-book svg {
+  width: 38px;
+  height: 38px;
+  overflow: visible;
+}
+.brand-book-cover {
+  transform-origin: 12px 24px;
+}
+.brand-book-pages {
+  opacity: 0;
+  transform-origin: 24px 24px;
+}
+.brand-wordmark {
+  display: inline-block;
+  color: inherit;
+  text-decoration: none;
+  transform-origin: left center;
+}
+.mynote-brand[data-revealed="false"] .brand-wordmark {
+  visibility: hidden;
+  pointer-events: none;
+}
+.brand-period {
+  color: var(--brand-accent);
+}
+.mynote-brand :is(button, a):focus-visible {
+  outline: 2px solid var(--brand-accent);
+  outline-offset: 4px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .brand-book:hover {
+    background: color-mix(in srgb, var(--brand-accent) 16%, var(--brand-paper));
+  }
+}
+.brand-book:active {
+  background: color-mix(in srgb, var(--brand-accent) 23%, var(--brand-paper));
+}
+@media (max-width: 760px) {
+  .mynote-brand {
+    font-size: 22px;
+    gap: 6px;
+  }
+  .brand-book {
+    width: 30px;
+    height: 34px;
+  }
+  .brand-book svg {
+    width: 32px;
+    height: 32px;
+  }
+}
+@media (max-width: 380px) {
+  .mynote-brand {
+    font-size: 18px;
+    gap: 5px;
+  }
+  .brand-book {
+    width: 26px;
+    height: 30px;
+  }
+  .brand-book svg {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+.dark .mynote-brand {
+  --brand-gold: #34412e;
+  --brand-paper: #ddd2bd;
+}

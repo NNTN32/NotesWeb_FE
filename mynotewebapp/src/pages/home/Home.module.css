@@ -60,18 +60,6 @@
   font-weight: bold;
   letter-spacing: -1px;
 }
-.brand > svg {
-  width: 32px;
-  height: 32px;
-  padding: 5px;
-  border-radius: 9px;
-  background: var(--sage);
-  color: var(--accent);
-}
-.brandDot {
-  color: var(--accent);
-  margin-left: -8px;
-}
 .navigation,
 .headerActions {
   display: flex;

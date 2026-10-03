@@ -13,7 +13,7 @@ import TaskCard from "../../components/tasks/TaskCard";
 import WeekBoard from "../../components/tasks/WeekBoard";
 import EmptyState from "../../components/workspace/EmptyState";
 import { useTaskView } from "../../features/tasks/useTaskView";
-import AmbientBackground from "../../components/workspace/AmbientBackground";
+import PageSurface from "../../components/workspace/PageSurface";
 import {
   dateKey,
   shiftDate,
@@ -36,8 +36,7 @@ export default function WeeklyPlan() {
     onDelete: view.onDelete,
   };
   return (
-    <div className="workspace-page week-page">
-      <AmbientBackground variant="week" />
+    <PageSurface variant="week">
       <PageHeader
         eyebrow="WEEKLY PLAN · SEE THE BIG PICTURE"
         title={
@@ -168,6 +167,6 @@ export default function WeeklyPlan() {
       {view.editor && (
         <TaskEditor {...view.editor} onClose={() => view.setEditor(null)} />
       )}
-    </div>
+    </PageSurface>
   );
 }

@@ -1,9 +1,6 @@
 import { NavLink, Link } from "react-router-dom";
 import {
   FiBookOpen,
-  FiEdit3,
-  FiCheckSquare,
-  FiCalendar,
   FiHome,
   FiMoon,
   FiSun,
@@ -14,11 +11,7 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { useAuthModal } from "../context/AuthModalContext";
-const NAVIGATION = [
-  { to: "/create", label: "Notebook", icon: FiEdit3 },
-  { to: "/todo", label: "Today’s tasks", icon: FiCheckSquare },
-  { to: "/weekly-plan", label: "Weekly plan", icon: FiCalendar },
-];
+import { WORKSPACE_NAVIGATION } from "../app/navigation";
 export default function SideMenu({ mobileOpen, onClose }) {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
@@ -51,7 +44,7 @@ export default function SideMenu({ mobileOpen, onClose }) {
         </div>
         <p className="ws-nav-label">YOUR SPACE</p>
         <nav aria-label="Workspace">
-          {NAVIGATION.map((item) => {
+          {WORKSPACE_NAVIGATION.map((item) => {
             const Icon = item.icon;
             return (
               <NavLink

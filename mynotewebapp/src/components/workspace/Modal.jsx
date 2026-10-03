@@ -9,7 +9,11 @@ export default function Modal({ children, titleId, onClose, className = "" }) {
     const previous = document.activeElement;
     const overflow = document.body.style.overflow;
     dialog.showModal();
-    dialog.querySelector("[autofocus]")?.focus();
+    dialog
+      .querySelector(
+        "input:not([disabled]), textarea:not([disabled]), select:not([disabled])",
+      )
+      ?.focus();
     document.body.style.overflow = "hidden";
     return () => {
       dialog.close();

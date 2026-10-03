@@ -15,7 +15,7 @@ import TaskSummary from "../../components/tasks/TaskSummary";
 import TaskEditor from "../../components/tasks/TaskEditor";
 import TaskFeedback from "../../components/tasks/TaskFeedback";
 import { useTaskView } from "../../features/tasks/useTaskView";
-import AmbientBackground from "../../components/workspace/AmbientBackground";
+import PageSurface from "../../components/workspace/PageSurface";
 import {
   dateKey,
   shiftDate,
@@ -36,8 +36,7 @@ export default function Todo() {
     onDelete: view.onDelete,
   };
   return (
-    <div className="workspace-page todo-page">
-      <AmbientBackground variant="todo" />
+    <PageSurface variant="todo">
       <PageHeader
         eyebrow="TO-DOS · A DAY WITH PURPOSE"
         title={
@@ -141,6 +140,6 @@ export default function Todo() {
       {view.editor && (
         <TaskEditor {...view.editor} onClose={() => view.setEditor(null)} />
       )}
-    </div>
+    </PageSurface>
   );
 }

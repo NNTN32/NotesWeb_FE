@@ -5,7 +5,7 @@ import PageHeader from "../../components/workspace/PageHeader";
 import NoteLibrary from "../../components/notes/NoteLibrary";
 import NoteCanvas from "../../components/notes/NoteCanvas";
 import { useNoteEditor } from "../../features/notes/useNoteEditor";
-import AmbientBackground from "../../components/workspace/AmbientBackground";
+import PageSurface from "../../components/workspace/PageSurface";
 
 export default function NoteForm() {
   const editor = useNoteEditor();
@@ -49,10 +49,7 @@ export default function NoteForm() {
     window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
   return (
-    <div
-      className={`workspace-page notes-page ${focus ? "notes-page--focus" : ""}`}
-    >
-      <AmbientBackground variant="notes" />
+    <PageSurface variant="notes" className={focus ? "notes-page--focus" : ""}>
       <PageHeader
         eyebrow="NOTES · SPACE TO THINK"
         title={
@@ -136,6 +133,6 @@ export default function NoteForm() {
           </p>
         </div>
       </div>
-    </div>
+    </PageSurface>
   );
 }

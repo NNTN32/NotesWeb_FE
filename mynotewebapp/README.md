@@ -1,85 +1,84 @@
 # MyNote
 
-React 19 + Vite. Trang chủ, sổ ghi chép, Todo theo khung giờ, kế hoạch tuần và giao diện tài khoản.
+A calm place for notes, daily tasks, and weekly plans. Built with React 19 and Vite, with an English interface and warm paper, sage, and lavender palettes.
 
-## Phát triển
+## Development
 
 ```sh
 npm install
 npm run dev
-npm test
 npm run lint
+npm test
 npm run build
-npm run preview
 ```
 
-Dev server proxy `/api` tới `http://localhost:8081` (xem `vite.config.js`). Các luồng tài khoản cần backend này. Frontend không mô phỏng đăng nhập thành công.
+The dev server proxies `/api` to `http://localhost:8081` (`vite.config.js`). Account flows require that backend; the frontend does not simulate successful authentication.
 
-## Cấu trúc và trách nhiệm
+## Structure
 
 ```text
 src/
-  app/                     # Providers, routes lazy-load, reset cuộn khi chuyển trang
+  app/                     Providers, lazy routes, shared navigation, scroll reset
   components/
-    home/                  # Section trang chủ
-    layout/                # Khung làm việc, sidebar và footer
-    workspace/             # PageHeader, EmptyState, native dialog, nền động trang
-    tasks/                 # TaskCard, TaskEditor, bộ lọc, lịch ngày/tuần, thống kê
-    notes/                 # Trang giấy và thư viện ghi chú
-    auth/                  # Một AuthForm dùng cho login/register, page/modal
+    home/                  Landing sections, interactive preview, FAQ
+    layout/                Workspace shell and breadcrumb/date bar
+    workspace/             PageSurface, PageHeader, dialog, empty state, ambient canvas
+    motion/                Reveal: isolated scroll entrance enhancement
+    ui/                    Shared decorative connection illustration
+    notes/                 Notebook library and writing canvas
+    tasks/                 Schedule, cards, filters, editor, weekly board, summary
+    auth/                  Shared account form for page and modal
   features/
-    tasks/                 # Model ngày/tuần, lọc/sắp xếp, hook điều phối giao diện
-    notes/                 # Model ghi chú và hook điều phối editor
-    auth/                  # Gọi API xác thực, trạng thái gửi và lỗi
-  context/                 # Context/hook .js tách khỏi provider .jsx
-  hooks/                   # useLocalStore: đọc/ghi và đồng bộ giữa các tab
-  pages/                   # Ghép component và state giao diện theo route
+    notes/                 Pure note model and editor hook
+    tasks/                 Pure date/filter/statistics model and view hook
+    auth/                  Authentication submission and errors
+  context/                 Shared tasks, authentication, theme, auth modal
+  hooks/                   Local storage persistence and cross-tab updates
+  pages/                   Compose components and feature state for each route
+  pages/home/              Landing content data and scoped CSS Module
   styles/
-    workspace.css          # Entry import các nhóm style bên dưới
-    workspace-base.css     # Token, khung ứng dụng và UI dùng chung
-    tasks.css              # Todo và lịch tuần
-    notes.css              # Giao diện viết và thư viện
-    auth.css               # Giao diện tài khoản
-    ambient.css            # Chuyển động nền theo từng trang
-    interactions.css       # Chuyển động nút dùng chung, tinh chỉnh theo trang
-    responsive.css         # Breakpoint và reduced motion
-  utils/api/               # API xác thực hiện có
-  index.css                # Tailwind, reset nhỏ và chuyển động mascot
-  pages/home/              # Nội dung và CSS Module của trang chủ
+    tokens.css             Shared radius, shadow, and motion timing
+    workspace.css          Ordered entry point for workspace styles
+    workspace-base.css     Shared controls and layout
+    notes.css              Notebook palette and editor layout
+    tasks.css              Daily schedule and lavender weekly calendar
+    auth.css               Warm account page and form
+    ambient.css            Grid, light washes, and page palette variants
+    flow.css               Decorative paths and floating icon nodes
+    interactions.css       Hover/press feedback
+    page-motion.css        One-time workspace and dialog entrances
+    responsive.css         Workspace breakpoints and reduced motion
+  utils/api/               Existing authentication API integration
 
-tests/                     # Node test runner, không cần thư viện test bổ sung
+tests/                     Node test runner; no extra test dependency
 ```
 
-Page chỉ điều phối. Logic ngày tháng, lọc, thống kê và chuyển đổi dữ liệu nằm trong model thuần để kiểm thử riêng. Component dùng lại nằm trong `components`; state dùng chung giữa Todo và Weekly Plan nằm trong `TasksProvider`.
+Pages compose the interface. Data transformations stay in pure feature models. Shared task state lives in `TasksProvider`, so the daily and weekly views remain consistent. Navigation labels and routes are defined once in `app/navigation.js`.
 
-## Thiết kế
+## Design and motion
 
-- Ghi chú: giấy ấm, màu đất, dòng kẻ và chế độ tập trung.
-- Todo: xanh sage, nhịp theo khung giờ, bộ lọc và danh sách tập trung.
-- Lịch tuần: lavender, tuần bắt đầu thứ Hai, bảy cột cuộn trong khung ở mobile.
-- Tài khoản: tông ấm và mascot, chung form cho trang riêng và modal.
-- Trang chủ, Ghi chú, Todo, Kế hoạch tuần và Tài khoản có nền động riêng qua `AmbientBackground` và biến thể trong `ambient.css`. Thêm trang mới bằng một biến thể CSS, không thêm timer hay logic animation vào page. Lớp này chỉ trang trí (`aria-hidden`, `pointer-events: none`); animation chỉ thay `transform`, tự dừng khi bật `prefers-reduced-motion`.
-- CSS workspace được giới hạn bằng `.workspace-theme` và các lớp theo feature. Thay token ở `workspace-base.css`; màu nhấn riêng nằm ở file của mỗi feature. Trang chủ giữ CSS Module riêng.
-- Hiệu ứng nút nằm trong `interactions.css` (workspace) và CSS Module của trang chủ. Chỉ chạy khi hover bằng chuột hoặc nhấn; các biến theo trang giữ đúng sắc thái riêng. `prefers-reduced-motion` loại bỏ chuyển động mà vẫn giữ trạng thái focus rõ ràng.
-- Dialog dùng `<dialog>.showModal()` để giữ focus và cô lập nền; Escape đóng và focus trở về phần tử mở.
+The layout takes cues from the reference at https://explee-staging.nudgen.net/: a centered serif hero, faint grid, connected icon nodes, a product preview, bento cards, and guided steps. MyNote keeps its own copy, local-first behavior, warm paper surfaces, and feature colors.
 
-## Dữ liệu và giới hạn
+- Use `PageSurface` for a workspace page and its ambient variant. Keep functional controls outside decorative layers.
+- Change shared geometry in `tokens.css`; keep feature colors in their feature stylesheet. Home uses a CSS Module.
+- Use `Reveal` for independent landing sections. It observes once, animates with the Web Animations API, and cleans up observers and listeners. Content remains available without animation support.
+- Workspace entrances use CSS. Hover effects are limited to devices with a fine pointer; press feedback also works on touch.
+- Reduced-motion preferences stop decorative loops, entrances, and movement. Focus outlines remain visible. No animation library or scroll listener is required.
+- Decorative SVGs and backgrounds are hidden from assistive technology and cannot intercept pointer events.
+- Native dialogs isolate the background, focus the first form field, close on Escape, and restore focus to the trigger.
+- The home preview is a demonstration; only workspace pages write to storage.
 
-- `mynote.tasks.v1`: công việc dùng chung cho Todo và Weekly Plan. Không nạp dữ liệu mẫu 2024 của giao diện cũ.
-- `mynote.notes.v1`: bản nháp hiện tại và sổ ghi chú. Bản nháp được lưu khi nhập; “Lưu vào sổ” tạo/cập nhật trang. Có tải `.txt` để giữ bản sao.
-- Tất cả dữ liệu này nằm trong localStorage **của trình duyệt**, không đồng bộ tài khoản/server. Đăng xuất không xóa sổ và công việc cục bộ; giao diện nêu rõ điều này.
-- Trạng thái lưu chỉ báo thành công khi ghi localStorage thành công. Lỗi đọc/ghi được hiển thị; dữ liệu lỗi không bị tự động ghi đè khi khởi động. Thay đổi tiếp theo của người dùng sẽ lưu bộ dữ liệu đang hiển thị, vì vậy cần sao lưu bản cũ trước nếu thấy lỗi đọc.
-- Xóa có hoàn tác lần gần nhất trong phiên của trang; thông tin hoàn tác không giữ sau reload/chuyển trang.
-- API `/auth/login`, `/auth/register`, `/auth/oauth/:provider` giữ nguyên. Token được gửi qua interceptor và xóa khi đăng xuất. Chưa bổ sung endpoint khôi phục phiên `/me`.
+## Data and limits
 
-## Xác minh
+- `mynote.tasks.v1`: tasks shared by the daily and weekly views.
+- `mynote.notes.v1`: current draft and saved notebook pages. Typing saves the draft; **Save to notebook** creates or updates a page. Download `.txt` to keep a copy.
+- Notes and tasks live in this browser’s local storage. They do not sync to another device or an account. Signing out does not erase them.
+- Success is reported only after a successful storage write. Invalid stored data is not overwritten on startup. Back up unreadable data before editing.
+- Deletion supports undo for the most recently deleted item while its page remains open.
+- Authentication endpoints remain `/auth/login`, `/auth/register`, and `/auth/oauth/:provider`. A session restoration endpoint has not been added.
 
-`npm test` kiểm tra tuần qua ranh giới năm/tháng, năm nhuận, khung giờ, bộ lọc/sắp xếp không mutate, thống kê, validation dữ liệu lưu, lưu/cập nhật/xóa ghi chú.
+## Verification
 
-Kiểm tra trình duyệt:
+`npm test` covers date boundaries, English date labels, time slots, filters, priority sorting, statistics, storage validation, and note mutations.
 
-1. Thêm việc, reload, chuyển qua lịch tuần; hoàn thành/sửa/xóa/hoàn tác.
-2. Chuyển ngày và tuần, kiểm tra bộ lọc và chế độ danh sách.
-3. Nhập bản nháp, reload, lưu vào sổ, mở lại, focus mode và Escape, xóa/hoàn tác.
-4. Mobile 390px: mở/đóng sidebar, bảng tuần cuộn trong khung, form không tràn ngang.
-5. Đăng nhập/đăng ký: kiểm tra required fields, mật khẩu xác nhận, hiện/ẩn mật khẩu, Escape/focus trong modal. Kiểm tra thành công API cần backend và tài khoản thử nghiệm.
+For visual or interaction changes, check Home, Notes, To-dos, Weekly Plan, Sign in, and Sign up at desktop and mobile widths. Verify note save/reload, tasks shared between views, dialog focus/Escape, mobile navigation, dark mode, and reduced motion. Weekly overflow must stay inside the calendar region.

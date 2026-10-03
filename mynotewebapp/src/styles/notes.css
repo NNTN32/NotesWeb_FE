@@ -18,6 +18,7 @@
 }
 .note-library .ws-panel-heading {
   padding: 19px;
+  background: var(--ws-soft);
 }
 .note-library-controls {
   padding: 17px;
@@ -38,8 +39,9 @@
   display: flex;
   gap: 10px;
   padding: 14px 9px;
-  border-radius: 7px;
+  border-radius: var(--ui-radius-sm);
   text-align: left;
+  transition: background-color var(--ui-motion-fast);
 }
 .note-library-item > svg {
   color: var(--ws-accent);
@@ -94,9 +96,9 @@
 .note-canvas {
   background: var(--ws-panel);
   border: 1px solid var(--ws-line);
-  border-radius: 9px;
+  border-radius: var(--ui-radius-panel);
   padding: 23px 35px 30px;
-  box-shadow: 0 8px 30px #4b3e2110;
+  box-shadow: 0 12px 35px #4b3e2110;
 }
 .note-canvas-toolbar {
   display: flex;
@@ -112,6 +114,10 @@
   font-size: 8px;
   letter-spacing: 1.5px;
   color: var(--ws-accent);
+  padding: 6px 9px;
+  border: 1px solid var(--ws-line);
+  border-radius: 30px;
+  background: var(--ws-soft);
 }
 .workspace-theme .note-title {
   border: 0;
@@ -151,6 +157,7 @@
 }
 .note-save {
   width: 100%;
+  border-radius: 12px;
 }
 .note-bottom-hint {
   display: flex;

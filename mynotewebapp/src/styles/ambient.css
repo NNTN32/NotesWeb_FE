@@ -1,19 +1,18 @@
-/* Shared, decorative page layer. Only transform and opacity animate. */
+/* Decorative canvas. Variant tokens keep palettes separate from rendering. */
 .home-ambient-host,
 .workspace-page,
 .auth-page {
   position: relative;
   isolation: isolate;
 }
-
 .ambient-content,
 .workspace-page > :not(.ambient),
 .auth-page > :not(.ambient) {
   position: relative;
   z-index: 1;
 }
-
 .ambient {
+  --ambient-color: #8ba476;
   position: absolute;
   inset: 0;
   z-index: 0;
@@ -21,281 +20,132 @@
   pointer-events: none;
   contain: paint;
 }
-
+.ambient--notes {
+  --ambient-color: #c6997c;
+}
+.ambient--todo {
+  --ambient-color: #8ba476;
+}
+.ambient--week {
+  --ambient-color: #b09ac6;
+}
+.ambient--auth {
+  --ambient-color: #c3a287;
+}
 .ambient__wash,
 .ambient__pattern {
   position: absolute;
   inset: 0;
 }
-
-.ambient__pattern {
-  opacity: 0.5;
+.ambient__wash {
+  background:
+    radial-gradient(
+      ellipse at 90% 4%,
+      color-mix(in srgb, var(--ambient-color) 18%, transparent),
+      transparent 38%
+    ),
+    radial-gradient(
+      ellipse at 2% 74%,
+      color-mix(in srgb, var(--ambient-color) 8%, transparent),
+      transparent 30%
+    );
 }
-
+.ambient__pattern {
+  background-image:
+    linear-gradient(
+      color-mix(in srgb, var(--ambient-color) 12%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--ambient-color) 12%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 64px 64px;
+  mask-image: linear-gradient(#000, transparent 65%);
+  opacity: 0.6;
+}
+.ambient--home .ambient__pattern {
+  max-height: 1050px;
+}
+.ambient--home .ambient__wash {
+  background:
+    radial-gradient(ellipse 50% 600px at 88% 3%, #dce8cf88, transparent),
+    radial-gradient(ellipse 45% 500px at 5% 22%, #efddcd44, transparent);
+}
 .ambient__motif {
   position: absolute;
   display: block;
-  width: var(--motif-size, 120px);
-  height: var(--motif-size, 120px);
-  opacity: var(--motif-opacity, 0.23);
-  animation: ambientDrift var(--motif-duration, 28s) ease-in-out infinite
+  width: var(--motif-size, 110px);
+  height: var(--motif-size, 110px);
+  border: 1px solid var(--ambient-color);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--ambient-color) 12%, transparent);
+  opacity: 0.1;
+  animation: ambientDrift var(--motif-duration, 32s) ease-in-out infinite
     alternate;
   animation-delay: var(--motif-delay, 0s);
 }
-
-@keyframes ambientDrift {
-  from {
-    transform: translate3d(0, 0, 0) rotate(var(--motif-rotate, 0deg));
-  }
-  to {
-    transform: translate3d(var(--motif-x, 20px), var(--motif-y, -28px), 0)
-      rotate(calc(var(--motif-rotate, 0deg) + 7deg));
-  }
+.ambient__motif--one {
+  top: 6%;
+  right: 5%;
+  --motif-size: 110px;
+  --motif-rotate: 12deg;
 }
-
-/* Home: warm paper, drifting note outlines and a quiet dotted field. */
-.ambient--home .ambient__wash {
-  background:
-    radial-gradient(circle at 93% 10%, #dce7d345, transparent 29%),
-    radial-gradient(circle at 4% 78%, #e7d9c847, transparent 30%);
-}
-.ambient--home .ambient__pattern {
-  background-image: radial-gradient(#6d846a24 1px, transparent 1px);
-  background-size: 28px 28px;
-  mask-image: linear-gradient(90deg, transparent, #000 65%);
-}
-.ambient--home .ambient__motif {
-  border-radius: 4px;
-  border: 1px solid #a8b495;
-  background: #e7eddf;
-  box-shadow: 4px 7px 0 #9cad8530;
-}
-.ambient--home .ambient__motif--one {
-  top: 10%;
-  left: 78%;
-  --motif-size: 90px;
-  --motif-rotate: 8deg;
-  --motif-duration: 34s;
-}
-.ambient--home .ambient__motif--two {
+.ambient__motif--two {
   top: 48%;
-  left: -35px;
-  --motif-size: 105px;
-  --motif-rotate: -10deg;
+  left: -40px;
+  --motif-size: 100px;
+  --motif-rotate: -12deg;
   --motif-duration: 39s;
   --motif-delay: -12s;
 }
-.ambient--home .ambient__motif--three {
-  top: 82%;
-  left: 86%;
-  --motif-size: 120px;
-  --motif-rotate: 13deg;
-  --motif-duration: 46s;
-  --motif-delay: -19s;
-}
-
-/* Notes: a ruled sheet with slow, warm paper scraps at its edges. */
-.ambient--notes .ambient__wash {
-  background:
-    radial-gradient(circle at 92% 7%, #d6a88930, transparent 25%),
-    radial-gradient(circle at 4% 72%, #eac9aa27, transparent 34%);
-}
-.ambient--notes .ambient__pattern {
-  background: repeating-linear-gradient(
-    transparent 0,
-    transparent 40px,
-    #b9957423 41px,
-    transparent 42px
-  );
-  mask-image: linear-gradient(
-    90deg,
-    #0005,
-    transparent 18%,
-    transparent 82%,
-    #0005
-  );
-}
-.ambient--notes .ambient__motif {
-  border: 1px solid #bb8f7450;
-  border-radius: 3px;
-  background: linear-gradient(135deg, #f6d6be, #f4e8d8);
-  box-shadow: 5px 6px 0 #c39c8430;
-}
-.ambient--notes .ambient__motif--one {
-  top: 4%;
-  right: 5%;
-  --motif-size: 84px;
-  --motif-rotate: 12deg;
-  --motif-duration: 31s;
-}
-.ambient--notes .ambient__motif--two {
-  top: 44%;
-  left: -28px;
-  --motif-size: 88px;
-  --motif-rotate: -13deg;
-  --motif-duration: 36s;
-  --motif-delay: -9s;
-}
-.ambient--notes .ambient__motif--three {
-  top: 84%;
+.ambient__motif--three {
+  top: 85%;
   right: 12%;
-  --motif-size: 55px;
-  --motif-rotate: 9deg;
-  --motif-duration: 42s;
-  --motif-delay: -18s;
-}
-
-/* Todo: calm sage circles that suggest small steps through the day. */
-.ambient--todo .ambient__wash {
-  background:
-    radial-gradient(circle at 92% 12%, #c8d9b647, transparent 30%),
-    radial-gradient(circle at 2% 90%, #d7e4c946, transparent 31%);
-}
-.ambient--todo .ambient__pattern {
-  background-image: radial-gradient(#78906735 1px, transparent 1px);
-  background-size: 32px 32px;
-  mask-image: linear-gradient(90deg, transparent 60%, #0009);
-}
-.ambient--todo .ambient__motif {
-  border: 1px solid #7d9c6a;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    transparent 45%,
-    #bdd3ae60 46%,
-    transparent 48%
-  );
-}
-.ambient--todo .ambient__motif--one {
-  top: 4%;
-  right: 3%;
-  --motif-size: 170px;
-  --motif-duration: 38s;
-}
-.ambient--todo .ambient__motif--two {
-  top: 42%;
-  left: -55px;
-  --motif-size: 120px;
-  --motif-duration: 32s;
-  --motif-delay: -15s;
-}
-.ambient--todo .ambient__motif--three {
-  top: 81%;
-  right: 12%;
-  --motif-size: 80px;
+  --motif-size: 70px;
+  --motif-rotate: 8deg;
   --motif-duration: 43s;
-  --motif-delay: -23s;
-}
-
-/* Week: a faint calendar grid and lavender orbital rings. */
-.ambient--week .ambient__wash {
-  background:
-    radial-gradient(circle at 88% 5%, #cfc4dd55, transparent 34%),
-    radial-gradient(circle at 6% 86%, #d8d0e445, transparent 32%);
-}
-.ambient--week .ambient__pattern {
-  background-image:
-    linear-gradient(#9c89b127 1px, transparent 1px),
-    linear-gradient(90deg, #9c89b127 1px, transparent 1px);
-  background-size: 76px 76px;
-  mask-image: linear-gradient(90deg, transparent 48%, #0008);
-}
-.ambient--week .ambient__motif {
-  border: 1px solid #a893bf;
-  border-radius: 50%;
-  box-shadow: inset 0 0 0 16px #bba8d01b;
-}
-.ambient--week .ambient__motif--one {
-  top: 3%;
-  right: 4%;
-  --motif-size: 180px;
-  --motif-duration: 40s;
-}
-.ambient--week .ambient__motif--two {
-  top: 55%;
-  left: -70px;
-  --motif-size: 145px;
-  --motif-duration: 47s;
-  --motif-delay: -12s;
-}
-.ambient--week .ambient__motif--three {
-  top: 86%;
-  right: 13%;
-  --motif-size: 105px;
-  --motif-duration: 35s;
   --motif-delay: -20s;
 }
-
-/* Auth: softly floating invitation cards, behind both the story and form. */
-.ambient--auth .ambient__wash {
-  background:
-    radial-gradient(circle at 4% 8%, #edd5c94d, transparent 32%),
-    radial-gradient(circle at 94% 84%, #e9d3bb4d, transparent 30%);
+.ambient--home .ambient__motif {
+  display: none;
 }
-.ambient--auth .ambient__pattern {
-  background-image: radial-gradient(#a7836d36 1px, transparent 1px);
-  background-size: 31px 31px;
-  mask-image: linear-gradient(
-    90deg,
-    #0006,
-    transparent 42%,
-    transparent 68%,
-    #0006
-  );
+.ambient--todo .ambient__motif,
+.ambient--week .ambient__motif {
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: inset 0 0 0 14px
+    color-mix(in srgb, var(--ambient-color) 10%, transparent);
 }
-.ambient--auth .ambient__motif {
-  border: 1px solid #bb9276;
-  border-radius: 5px;
-  background: #f0d9c965;
-  box-shadow: 5px 7px 0 #a67e6430;
+@keyframes ambientDrift {
+  from {
+    transform: translate(0, 0) rotate(var(--motif-rotate, 0deg));
+  }
+  to {
+    transform: translate(15px, -22px)
+      rotate(calc(var(--motif-rotate, 0deg) + 7deg));
+  }
 }
-.ambient--auth .ambient__motif--one {
-  top: 10%;
-  left: 3%;
-  --motif-size: 112px;
-  --motif-rotate: -12deg;
-  --motif-duration: 33s;
-}
-.ambient--auth .ambient__motif--two {
-  top: 70%;
-  right: 4%;
-  --motif-size: 80px;
-  --motif-rotate: 9deg;
-  --motif-duration: 37s;
-  --motif-delay: -9s;
-}
-.ambient--auth .ambient__motif--three {
-  top: 88%;
-  left: 43%;
-  --motif-size: 48px;
-  --motif-rotate: 14deg;
-  --motif-duration: 43s;
-  --motif-delay: -18s;
-}
-
 .dark .ambient__wash {
-  opacity: 0.45;
+  opacity: 0.25;
 }
 .dark .ambient__pattern {
-  opacity: 0.19;
+  opacity: 0.18;
 }
 .dark .ambient__motif {
-  opacity: 0.1;
+  opacity: 0.07;
 }
-
 @media (max-width: 760px) {
   .ambient__motif--two,
   .ambient__motif--three {
     display: none;
   }
-  .ambient__motif--one {
-    opacity: 0.1;
-  }
   .ambient__pattern {
-    opacity: 0.2;
+    background-size: 44px 44px;
+    opacity: 0.4;
   }
 }
-
 @media (prefers-reduced-motion: reduce) {
   .ambient__motif {
     animation: none;

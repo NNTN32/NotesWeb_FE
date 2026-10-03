@@ -8,7 +8,7 @@
     padding-right: 16px;
   }
   .ws-main {
-    margin-left: 210px;
+    margin-left: 230px;
   }
   .ws-footer {
     margin-left: 28px;
@@ -38,6 +38,9 @@
   }
   .auth-page-layout {
     gap: 50px;
+  }
+  .ws-topbar {
+    padding-inline: 28px;
   }
 }
 @media (max-width: 1000px) {
@@ -93,13 +96,14 @@
 }
 @media (max-width: 760px) {
   .ws-sidebar {
-    transform: translateX(-100%);
+    transform: translateX(calc(-100% - 14px));
     width: 255px;
+    inset: 10px auto 10px 10px;
     visibility: hidden;
   }
   .ws-sidebar--open {
-    transform: translateX(0);
     visibility: visible;
+    transform: translateX(0);
   }
   .ws-sidebar-backdrop {
     display: block;
@@ -142,6 +146,7 @@
   }
   .ws-page-header {
     margin-bottom: 28px;
+    padding: 8px 0 12px;
   }
   .ws-eyebrow {
     font-size: 8px;
@@ -159,6 +164,7 @@
   }
   .ws-toolbar {
     gap: 15px;
+    padding: 12px;
   }
   .ws-date-nav {
     gap: 3px;
@@ -189,6 +195,7 @@
   }
   .day-slot-label > svg {
     margin: 0;
+    padding: 6px;
   }
   .day-slot-label > div {
     display: flex;
@@ -289,6 +296,20 @@
   }
   .auth-dialog {
     padding: 32px 24px;
+  }
+  .ws-topbar {
+    padding: 15px 20px;
+    font-size: 10px;
+  }
+  .ws-topbar-date {
+    font-size: 9px;
+  }
+  .ws-page-header .ws-eyebrow {
+    font-size: 7px;
+    letter-spacing: 0.7px;
+  }
+  .auth-story .flow-decoration {
+    display: none;
   }
 }
 @media (prefers-reduced-motion: reduce) {

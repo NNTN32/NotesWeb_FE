@@ -43,6 +43,7 @@
   gap: 16px;
   padding: 23px;
   border-bottom: 1px solid var(--ws-line);
+  padding-block: 26px;
 }
 .day-slot:last-child {
   border: 0;
@@ -57,9 +58,14 @@
   gap: 10px;
 }
 .day-slot-label > svg {
-  margin-top: 4px;
   color: var(--ws-accent);
   font-size: 17px;
+  box-sizing: content-box;
+  padding: 8px;
+  border: 1px solid var(--ws-line);
+  border-radius: 10px;
+  background: var(--ws-panel);
+  margin-top: 0;
 }
 .day-slot-label h3 {
   font-size: 12px;
@@ -88,9 +94,13 @@
   gap: 10px;
   border: 1px solid var(--ws-line);
   background: var(--ws-panel);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 13px;
   min-width: 0;
+  box-shadow: 0 2px 5px #29392304;
+  transition:
+    border-color 180ms,
+    background-color 180ms;
 }
 .task-check {
   display: inline-flex;
@@ -162,8 +172,10 @@
   gap: 8px;
   font-size: 10px;
   color: var(--ws-muted);
-  padding: 11px 7px;
   text-align: left;
+  border: 1px dashed var(--ws-line);
+  border-radius: 9px;
+  padding: 10px;
 }
 .task-add-inline:hover {
   color: var(--ws-accent);
@@ -172,6 +184,7 @@
   padding: 25px;
   position: sticky;
   top: 24px;
+  background: linear-gradient(160deg, var(--ws-panel), var(--ws-soft));
 }
 .task-progress-number {
   font-family: Georgia, serif;
@@ -199,7 +212,7 @@
   width: 100%;
   height: 5px;
   border: 0;
-  border-radius: 10px;
+  border-radius: 14px;
   overflow: hidden;
   background: var(--ws-line);
   accent-color: var(--ws-accent);
@@ -260,24 +273,26 @@
 .week-overview > div {
   border: 1px solid var(--ws-line);
   background: var(--ws-panel);
-  border-radius: 9px;
+  border-radius: var(--ui-radius-panel);
   padding: 18px 24px;
+  box-shadow: var(--ui-shadow-panel);
 }
 .week-overview > div:last-child {
   background: var(--ws-soft);
 }
 .week-overview span {
-  font-size: 9px;
   letter-spacing: 1.2px;
-  color: var(--ws-muted);
+  color: var(--ws-accent);
+  font-size: 8px;
 }
 .week-overview strong {
   display: flex;
   align-items: baseline;
   gap: 12px;
   font-family: Georgia, serif;
-  font-size: 36px;
   font-weight: 400;
+  font-size: 42px;
+  margin-top: 8px;
 }
 .week-overview small {
   font-family: Arial, sans-serif;
@@ -287,12 +302,12 @@
 .week-scroll {
   overflow-x: auto;
   border: 1px solid var(--ws-line);
-  border-radius: 10px;
+  border-radius: 14px;
   background: var(--ws-panel);
 }
 .week-board {
   display: grid;
-  grid-template-columns: repeat(7, minmax(155px, 1fr));
+  grid-template-columns: repeat(7, minmax(128px, 1fr));
   min-height: 400px;
 }
 .week-day {
@@ -372,7 +387,8 @@
 .week-reflection {
   background: var(--ws-soft);
   padding: 25px;
-  border-radius: 10px;
+  border: 1px solid var(--ws-line);
+  border-radius: var(--ui-radius-panel);
 }
 .week-reflection > span {
   font-size: 37px;
@@ -387,4 +403,7 @@
 .week-reflection p {
   font-size: 12px;
   color: var(--ws-muted);
+}
+.task-card--done {
+  background: color-mix(in srgb, var(--ws-soft) 45%, var(--ws-panel));
 }

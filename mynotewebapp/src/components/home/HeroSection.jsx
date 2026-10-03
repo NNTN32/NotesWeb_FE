@@ -1,39 +1,42 @@
 import { Link } from "react-router-dom";
-import { FiArrowRight, FiArrowDown, FiCheck } from "react-icons/fi";
+import { FiArrowRight, FiArrowDown, FiCheck, FiFeather } from "react-icons/fi";
 import PlannerPreview from "./PlannerPreview";
+import Reveal from "../motion/Reveal";
+import FlowDecoration from "../ui/FlowDecoration";
 import styles from "../../pages/home/Home.module.css";
 
 export default function HeroSection() {
   return (
     <section className={styles.hero} aria-labelledby="hero-title">
-      <div className={styles.heroCopy}>
+      <Reveal className={styles.heroCopy}>
         <p className={styles.eyebrow}>
-          <span className={styles.onlineDot} /> A LITTLE ROOM FOR YOUR MIND
+          <FiFeather /> A LITTLE ROOM FOR YOUR MIND
         </p>
         <h1 id="hero-title">
-          Ideas in one place.
-          <br />
-          A calmer day
-          <br />
-          <em>starts here.</em>
+          All your thoughts.
+          <br />A little more <em>space.</em>
         </h1>
         <p className={styles.heroDescription}>
-          Capture your thoughts, organize your tasks, and make room for what
-          matters. All in a space of your own.
+          Capture an idea. Make a little progress. Find your rhythm.
+          <br className={styles.desktopBreak} /> Notes, to-dos, and weekly plans
+          — together in a space that feels like you.
         </p>
         <div className={styles.heroActions}>
           <Link to="/create" className={styles.primaryButton}>
-            Start writing <FiArrowRight />
+            Open your notebook <FiArrowRight />
           </Link>
           <a href="#features" className={styles.textButton}>
-            Explore MyNote <FiArrowDown />
+            Take a look around <FiArrowDown />
           </a>
         </div>
         <p className={styles.heroFootnote}>
-          <FiCheck /> Easy to start. Simple to keep going.
+          <FiCheck /> Your pace. Your space. No account needed to begin.
         </p>
-      </div>
-      <PlannerPreview />
+        <FlowDecoration />
+      </Reveal>
+      <Reveal delay={120}>
+        <PlannerPreview />
+      </Reveal>
     </section>
   );
 }

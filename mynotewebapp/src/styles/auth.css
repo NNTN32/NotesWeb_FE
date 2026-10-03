@@ -41,8 +41,9 @@
   font-size: 12px;
   padding: 11px;
   border: 1px solid var(--ws-line);
-  border-radius: 7px;
+  border-radius: var(--ui-radius-sm);
   background: var(--ws-panel);
+  box-shadow: 0 2px 4px #40322005;
 }
 .auth-divider {
   display: flex;
@@ -106,6 +107,8 @@
   gap: 20px;
   max-width: 1200px;
   margin: auto;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--ws-line);
 }
 .auth-page-layout {
   display: grid;
@@ -117,7 +120,7 @@
 }
 .auth-story h2 {
   font-family: Georgia, serif;
-  font-size: 47px;
+  font-size: 54px;
   line-height: 1.2;
   letter-spacing: -1.6px;
   font-weight: 400;
@@ -133,7 +136,8 @@
   position: relative;
   background: var(--ws-soft);
   border: 1px solid var(--ws-line);
-  transform: rotate(-3deg);
+  transform: rotate(-2deg);
+  border-radius: 14px;
   padding: 32px;
   max-width: 330px;
   margin: 40px 0;
@@ -167,14 +171,29 @@
   color: var(--ws-muted);
 }
 .auth-page-form {
-  padding: 30px 34px;
+  padding: 38px 36px;
   border: 1px solid var(--ws-line);
-  border-radius: 16px;
+  border-radius: 22px;
   background: var(--ws-panel);
-  box-shadow: 0 12px 50px #40322009;
+  box-shadow: 0 22px 65px #40322012;
 }
 
 .auth-field {
   display: grid;
   gap: 8px;
+}
+
+.auth-story {
+  position: relative;
+}
+.auth-story > :not(.flow-decoration) {
+  position: relative;
+  z-index: 1;
+}
+.auth-story .flow-decoration {
+  bottom: -90px;
+  opacity: 0.65;
+}
+.auth-form-content > .ws-eyebrow {
+  color: var(--ws-accent);
 }

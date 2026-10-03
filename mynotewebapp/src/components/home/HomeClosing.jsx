@@ -1,11 +1,16 @@
 import { Link } from "react-router-dom";
 import { FiArrowRight, FiBookOpen } from "react-icons/fi";
+import Reveal from "../motion/Reveal";
 import styles from "../../pages/home/Home.module.css";
 
 export default function HomeClosing() {
   return (
     <>
-      <section className={styles.closing} aria-labelledby="closing-title">
+      <Reveal
+        as="section"
+        className={styles.closing}
+        aria-labelledby="closing-title"
+      >
         <span className={styles.closingStar} aria-hidden="true">
           ✧
         </span>
@@ -15,7 +20,7 @@ export default function HomeClosing() {
         <Link to="/create" className={styles.primaryButton}>
           Write your first page <FiArrowRight />
         </Link>
-      </section>
+      </Reveal>
       <footer className={styles.footer}>
         <Link to="/" className={styles.brand}>
           <FiBookOpen aria-hidden="true" />

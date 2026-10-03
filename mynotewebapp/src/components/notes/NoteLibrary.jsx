@@ -11,7 +11,9 @@ export default function NoteLibrary({ notes, activeId, onOpen, onNew }) {
     <aside className="note-library ws-panel">
       <div className="ws-panel-heading">
         <h2>Notebook</h2>
-        <span>{notes.length} pages</span>
+        <span>
+          {notes.length} {notes.length === 1 ? "page" : "pages"}
+        </span>
       </div>
       <div className="note-library-controls">
         <button className="ws-secondary" onClick={onNew}>

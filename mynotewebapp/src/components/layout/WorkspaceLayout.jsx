@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { FiMenu, FiBookOpen } from "react-icons/fi";
+import WorkspaceTopbar from "./WorkspaceTopbar";
 import SideMenu from "../SideMenu";
 import "../../styles/workspace.css";
 export default function WorkspaceLayout() {
@@ -38,6 +39,7 @@ export default function WorkspaceLayout() {
       </header>
       <SideMenu mobileOpen={mobileOpen} onClose={close} />
       <main id="workspace-content" className="ws-main">
+        <WorkspaceTopbar />
         <Outlet />
         <footer className="ws-footer">
           <span>MyNote · A little space, just for you.</span>

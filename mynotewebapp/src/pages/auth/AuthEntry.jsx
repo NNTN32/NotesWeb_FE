@@ -2,6 +2,7 @@ import { useId } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { FiArrowLeft, FiBookOpen } from "react-icons/fi";
 import AuthForm from "../../components/auth/AuthForm";
+import FlowDecoration from "../../components/ui/FlowDecoration";
 import AmbientBackground from "../../components/workspace/AmbientBackground";
 export default function AuthEntry() {
   const { mode } = useParams();
@@ -44,6 +45,7 @@ export default function AuthEntry() {
             <span aria-hidden="true">✳</span>
           </div>
           <small>MyNote · At your own pace.</small>
+          <FlowDecoration />
         </aside>
         <section className="auth-page-form">
           <AuthForm

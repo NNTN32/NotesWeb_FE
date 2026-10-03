@@ -2,6 +2,7 @@ import HomeHeader from "../components/home/HomeHeader";
 import HeroSection from "../components/home/HeroSection";
 import FeaturesSection from "../components/home/FeaturesSection";
 import WorkflowSection from "../components/home/WorkflowSection";
+import FaqSection from "../components/home/FaqSection";
 import HomeClosing from "../components/home/HomeClosing";
 import AmbientBackground from "../components/workspace/AmbientBackground";
 import styles from "./home/Home.module.css";
@@ -25,6 +26,7 @@ export default function Home() {
           </div>
           <FeaturesSection />
           <WorkflowSection />
+          <FaqSection />
         </main>
         <HomeClosing />
       </div>

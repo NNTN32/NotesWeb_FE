@@ -1,0 +1,97 @@
+.flow-decoration {
+  position: absolute;
+  inset: auto -60px 20px;
+  height: 230px;
+  pointer-events: none;
+  color: var(--accent, var(--ws-accent, #526547));
+}
+.flow-decoration > svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.flow-decoration > svg path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+  opacity: 0.13;
+}
+.flow-decoration .flow-decoration__signal {
+  stroke-dasharray: 6 430;
+  opacity: 0.5;
+  animation: flowSignal 7s linear infinite;
+}
+.flow-node {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid currentColor;
+  border-color: color-mix(in srgb, currentColor 15%, transparent);
+  border-radius: 10px;
+  background: var(--surface, var(--ws-panel, #fffefa));
+  box-shadow: 0 4px 12px #29392308;
+  animation: flowFloat 5s ease-in-out infinite alternate;
+}
+.flow-node--1 {
+  left: 10%;
+  top: 8%;
+  color: #9a654e;
+}
+.flow-node--2 {
+  left: 17%;
+  top: 42%;
+  color: #526547;
+  animation-delay: -2s;
+}
+.flow-node--3 {
+  left: 8%;
+  top: 76%;
+  color: #88739e;
+  animation-delay: -3s;
+}
+.flow-node--4 {
+  right: 10%;
+  top: 8%;
+  color: #526547;
+  animation-delay: -1s;
+}
+.flow-node--5 {
+  right: 17%;
+  top: 42%;
+  color: #88739e;
+  animation-delay: -4s;
+}
+.flow-node--6 {
+  right: 8%;
+  top: 76%;
+  color: #b18b4f;
+  animation-delay: -2s;
+}
+@keyframes flowSignal {
+  to {
+    stroke-dashoffset: -872;
+  }
+}
+@keyframes flowFloat {
+  to {
+    transform: translateY(-7px) rotate(4deg);
+  }
+}
+@media (max-width: 760px) {
+  .flow-decoration {
+    inset-inline: -20px;
+    opacity: 0.45;
+  }
+  .flow-node {
+    width: 27px;
+    height: 27px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .flow-decoration *,
+  .flow-node {
+    animation: none !important;
+  }
+}

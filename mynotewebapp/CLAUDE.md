@@ -7,11 +7,11 @@
 
 ## Code Style & Guidelines
 - **Framework**: React (Functional Components).
-- **Styling**: Tailwind CSS (Utility Classes are preferred).
+- **Styling**: Shared design tokens in `src/styles/tokens.css`; feature styles in `src/styles`; Home uses a CSS Module. Reuse existing styles before adding utilities.
 - **Icons**: Use Lucide React or React Icons (if available).
 - **Language**: 
     - Code (variables, functions): English.
-    - CComments and UI: Vietnamese.
+    - Comments and UI: English.
 - **Project Structure**: 
     - New components are placed in `src/components`.
     - New pages are placed in `src/pages`.

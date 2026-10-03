@@ -1,8 +1,7 @@
 /* One motion system, tuned through page-level tokens. */
 .workspace-theme {
-  --ws-motion-ease: cubic-bezier(0.2, 0.75, 0.25, 1);
+  --ws-motion-ease: var(--ui-motion-ease);
   --ws-motion-hover: translateY(-2px);
-  --ws-motion-shadow: color-mix(in srgb, var(--ws-accent) 20%, transparent);
 }
 
 .notes-page {
@@ -41,7 +40,7 @@
   .workspace-theme
     :is(.ws-button, .ws-secondary, .auth-social button):not(:disabled):hover {
     transform: var(--ws-motion-hover);
-    box-shadow: 0 8px 18px var(--ws-motion-shadow);
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--ws-accent) 20%, transparent);
   }
 
   .workspace-theme .ws-secondary:not(:disabled):hover,
@@ -70,7 +69,7 @@
   }
 
   .week-page .task-add-inline:not(:disabled):hover svg {
-    transform: rotate(45deg);
+    transform: scale(1.12);
   }
 }
 

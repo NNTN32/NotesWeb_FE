@@ -15,6 +15,10 @@ npm run preview
 
 Dev server proxy `/api` tới `http://localhost:8081` (xem `vite.config.js`). Các luồng tài khoản cần backend này. Frontend không mô phỏng đăng nhập thành công.
 
+## Deploy production
+
+Xem [cấu hình Dokploy và kết quả review](deploy/DOKPLOY.md). Dockerfile build bundle bằng Yarn lockfile và phục vụ qua Nginx; runtime cần `API_UPSTREAM` và network kết nối backend.
+
 ## Cấu trúc và trách nhiệm
 
 ```text

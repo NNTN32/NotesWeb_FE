@@ -2,9 +2,10 @@
 
 ## Kết quả review
 
-- Kiểm tra ngày 05/10/2026 trên máy OrbStack `nntn-vps`: Docker Swarm có Dokploy và 5 service backend/hạ tầng; **chưa có service FE đang chạy**. App FE đã tạo nhưng chưa deploy (nếu có) vẫn cần đối chiếu trên dashboard.
+- Kiểm tra ngày 05/10/2026 trên máy OrbStack `nntn-vps`: ban đầu Docker Swarm và dashboard có Dokploy cùng 5 service backend/hạ tầng, chưa có app FE. Đã tạo/build/deploy `fe` trong `Nn_NotesWebApp / production`, service `nnnoteswebapp-fe-yqegwe`.
 - Dashboard ban đầu trả Cloudflare 502. Log `cloudflared` ghi `connection refused` tới origin port 3000. Sau đó Dokploy healthy và domain mở được trang đăng nhập; chưa thay đổi tunnel/server.
 - Backend live: `nnnoteswebapp-notesserver-oubfhi`, port `8081`, overlay network `NN-network`, image `nntn/notes-app:latest`.
+- Frontend live: **https://nhannotes.id.vn**, healthy; trang chủ và deep link `/todo` đã render qua HTTPS. Các deep link khác và `/healthz` đã kiểm tra trong container. Proxy GET `/api/auth/login` nhận 403 từ backend; đây không phải kiểm thử đăng nhập thành công.
 - Repo FE trước thay đổi này không có Dockerfile. Vite dev proxy `/api` không chạy trong bundle production; cần proxy ingress/server hoặc cấu hình API origin.
 - Backend Compose local tại `Desktop/NotesWebApp/notesWeb/docker-compose.yml` có `notes-app`, Postgres, Redis, Kafka, RabbitMQ; không có service FE. Đây là file local, chưa chứng minh stack đang deploy giống file này.
 
@@ -12,12 +13,13 @@
 
 | Trường | Giá trị |
 | --- | --- |
-| Application name | `fe` — kiểm tra app có sẵn trước khi tạo để tránh duplicate |
+| Application name | `fe`, application ID `8fELziSraH6PTTo6FS2OB` |
 | Git repository | `NNTN32/NotesWeb_FE` |
-| Branch | Branch chứa cấu hình deploy này sau khi push; không dùng commit chưa có trên remote |
-| Build path / context | `/mynotewebapp` |
+| Branch | `codex/dokploy-fe`; build triển khai ban đầu từ commit `5b42cae` |
+| Git Build Path | `/` |
+| Docker Context Path | `mynotewebapp` |
 | Build type | Dockerfile |
-| Dockerfile path | `Dockerfile` trong build context |
+| Dockerfile path | `mynotewebapp/Dockerfile` tính từ Git Build Path |
 | Container port | `80` |
 | Health check | `/healthz` |
 | Runtime environment | `API_UPSTREAM=http://nnnoteswebapp-notesserver-oubfhi:8081` khi FE cùng `NN-network` |
@@ -25,6 +27,26 @@
 `API_UPSTREAM` bắt buộc, không chứa slash cuối hoặc path. Tên `notes-app` chỉ dùng được khi FE và BE cùng network và DNS alias đó có thật. Không dùng `localhost:8081` trong container FE vì localhost trỏ về chính FE. Nếu BE nằm ở app/network khác, cấu hình network chung hoặc origin HTTPS reachable trước khi deploy.
 
 Proxy giữ nguyên URI: `/api/auth/login` → backend `/api/auth/login`. Không tự strip `/api`. Các API notes/todo trong backend có prefix khác và chưa được FE tích hợp; cấu hình này không sửa contract auth hoặc tự đồng bộ dữ liệu localStorage.
+
+## Routing và vận hành live
+
+```mermaid
+flowchart LR
+    Browser[Browser HTTPS] --> Edge[Cloudflare nhannotes.id.vn]
+    Edge --> Tunnel[NhanNguyenServer tunnel]
+    Tunnel --> Connector[cloudflared]
+    Connector -->|notes-fe-ingress :80| FE[fe / Nginx]
+    FE -->|static + SPA fallback| Bundle[dist]
+    FE -->|NN-network /api :8081| BE[Notes_Server]
+```
+
+- DNS apex là proxied CNAME tới tunnel hiện có; tunnel hostname `nhannotes.id.vn` route trực tiếp tới `http://nnnoteswebapp-fe-yqegwe:80`. Domain được quản lý ở Cloudflare Tunnel, không phải Traefik/Dokploy Domains.
+- Swarm Settings → Network của FE lưu cả `NN-network` và `notes-fe-ingress`. Container `cloudflared` được nối vào network riêng `notes-fe-ingress`; FE không publish host port.
+- Update policy FE: parallelism 1, `start-first`, failure action `rollback`, monitor 120 giây. Image có healthcheck `/healthz`; kiểm tra service hội tụ 1/1 healthy sau reload/deploy.
+- Environment editor phải bỏ chế độ che/khóa trước khi nhập. Lưu `API_UPSTREAM`, tắt Create Environment File và reload/deploy để áp dụng runtime environment. Không thêm credential vào bundle.
+- Kết nối Docker network của `cloudflared` giữ qua restart container; **khi recreate connector phải nối lại `notes-fe-ingress`** (hoặc khai báo external network này trong Compose quản lý connector). Không đưa tunnel token vào Git.
+- Git provider hiện không có GitHub integration. Khi muốn tự deploy qua push, cấu hình webhook trong repository; giữ webhook URL như credential, không ghi vào docs. Nếu chưa cấu hình webhook, dùng Deploy trên Dokploy.
+- Rollback code bằng commit/image đã kiểm chứng rồi Deploy; rollback public routing bằng cấu hình tunnel/DNS trước thay đổi. Không xóa volume dữ liệu khi rollback.
 
 ## Build và xác minh
 

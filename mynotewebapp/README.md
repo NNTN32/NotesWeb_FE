@@ -14,6 +14,10 @@ npm run build
 
 The dev server proxies `/api` to `http://localhost:8081` (`vite.config.js`). Account flows require that backend; the frontend does not simulate successful authentication.
 
+## Production deployment
+
+See [Dokploy configuration and operating checks](deploy/DOKPLOY.md). The Dockerfile builds with the Yarn lockfile and serves the bundle through Nginx. Set the runtime `API_UPSTREAM` and attach the backend network. Production follows the repository's `main` branch.
+
 ## Structure
 
 ```text

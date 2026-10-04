@@ -1,7 +1,6 @@
 import { useEffect, useId, useRef } from "react";
 import { Link } from "react-router-dom";
 import { FiArrowRight, FiLoader, FiHardDrive } from "react-icons/fi";
-import { FaApple, FaGoogle } from "react-icons/fa";
 import { useAuthSubmission } from "../../features/auth/useAuthSubmission";
 import AuthField from "./AuthField";
 import AntiqueBook from "../ui/AntiqueBook";
@@ -50,7 +49,7 @@ export default function AuthForm({
         <p className="ws-description">
           {isRegister
             ? "A little space to make your own."
-            : "Make yourself at home."}
+            : "Make yourself at home. Sign in with your username."}
         </p>
       </header>
       <div className="auth-mode-switch" role="group" aria-label="Account mode">
@@ -71,29 +70,6 @@ export default function AuthForm({
           Sign up
         </button>
       </div>
-      {!isRegister && (
-        <>
-          <div className="auth-social">
-            <button
-              type="button"
-              disabled={!!pending}
-              onClick={() => submit({}, "google")}
-            >
-              <FaGoogle />
-              {pending === "google" ? "Connecting…" : "Google"}
-            </button>
-            <button
-              type="button"
-              disabled={!!pending}
-              onClick={() => submit({}, "apple")}
-            >
-              <FaApple />
-              {pending === "apple" ? "Connecting…" : "Apple"}
-            </button>
-          </div>
-          <div className="auth-divider">or use email</div>
-        </>
-      )}
       <form
         className="ws-form"
         onSubmit={(event) => {
@@ -104,23 +80,23 @@ export default function AuthForm({
         aria-describedby={error ? `${id}-error` : undefined}
       >
         <fieldset disabled={!!pending}>
+          <AuthField
+            id={`${id}-username`}
+            name="username"
+            label="Username"
+            autoComplete="username"
+            placeholder="Your username"
+          />
           {isRegister && (
             <AuthField
-              id={`${id}-username`}
-              name="username"
-              label="Display name"
-              autoComplete="nickname"
-              placeholder="What should we call you?"
+              id={`${id}-email`}
+              name="email"
+              label="Email"
+              type="email"
+              autoComplete="email"
+              placeholder="you@example.com"
             />
           )}
-          <AuthField
-            id={`${id}-email`}
-            name="email"
-            label="Email"
-            type="email"
-            autoComplete="email"
-            placeholder="you@example.com"
-          />
           <AuthField
             id={`${id}-password`}
             name="password"

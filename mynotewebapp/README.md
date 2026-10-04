@@ -12,7 +12,7 @@ npm test
 npm run build
 ```
 
-The dev server proxies `/api` to `http://localhost:8081` (`vite.config.js`). Account flows require that backend; the frontend does not simulate successful authentication.
+The dev server proxies `/api` to `http://localhost:8081` (`vite.config.js`). Set `API_PROXY_TARGET` in the shell to override the development upstream (for example a separate local test server). Account flows require that backend; the frontend does not simulate successful authentication.
 
 ## Production deployment
 
@@ -80,11 +80,11 @@ The layout takes cues from the reference at https://explee-staging.nudgen.net/: 
 - Notes and tasks live in this browser’s local storage. They do not sync to another device or an account. Signing out does not erase them.
 - Success is reported only after a successful storage write. Invalid stored data is not overwritten on startup. Back up unreadable data before editing.
 - Deletion supports undo for the most recently deleted item while its page remains open.
-- Authentication endpoints remain `/auth/login`, `/auth/register`, and `/auth/oauth/:provider`. A session restoration endpoint has not been added.
+- Account auth follows the real asynchronous backend contract: username login, bounded result polling, register then sign in, HttpOnly-cookie refresh, and server logout. Access tokens remain in memory. Google/Apple are unavailable until BE adds OAuth. See [API contract and sync prerequisites](docs/API_CONTRACT.md).
 
 ## Verification
 
-`npm test` covers date boundaries, English date labels, time slots, filters, priority sorting, statistics, storage validation, and note mutations.
+`npm test` covers asynchronous auth, cancellation, session metadata, date boundaries, English date labels, time slots, filters, priority sorting, statistics, storage validation, and note mutations.
 
 For visual or interaction changes, check Home, Notes, To-dos, Weekly Plan, Sign in, and Sign up at desktop and mobile widths. Verify note save/reload, tasks shared between views, dialog focus/Escape, mobile navigation, dark mode, and reduced motion. Weekly overflow must stay inside the calendar region.
 
@@ -96,6 +96,6 @@ References: [NN/g — purpose of animation](https://www.nngroup.com/articles/ani
 
 ## Brand interaction
 
-`BrandLogo` is shared by Home, workspace navigation, the mobile bar, and account pages. Its antique book and gold quill with inkwell are inline SVG. The book button replays one 900ms cover/page gesture and a 620ms masked wordmark reveal. Initially only the book is visible. Clicking it reveals the wordmark as a separate Home link; a second click retracts it toward the book with a 480ms curved mask and a subtle book compression. Its width is reserved to prevent navigation shifts; until revealed it is hidden from assistive technology and keyboard focus. Without animation support the reveal happens immediately. Quiet mode keeps only the book visible, hides any revealed wordmark, and ignores book activation. Device reduced motion skips the animation but still allows an immediate wordmark reveal when Quiet mode is off. Rapid toggles capture the current wordmark frame before cancelling the previous sequence; unmount and preference changes clean up active animations. Change the artwork in `components/ui/BrandLogo.jsx` and its palette/geometry in `styles/brand.css`.
+`BrandLogo` is shared by Home, workspace navigation, the mobile bar, and account pages. Its antique book and gold quill with inkwell are inline SVG. The book button replays one 900ms cover/page gesture and a 620ms masked wordmark reveal. Initially only the book is visible. Clicking it reveals the wordmark as a separate Home link; a second click retracts it toward the book with a 480ms curved mask and a subtle book compression. Its width is reserved to prevent navigation shifts; until revealed it is hidden from assistive technology and keyboard focus. Without animation support the reveal happens immediately. Quiet mode keeps only the book visible, hides any revealed wordmark, and ignores book activation. Device reduced motion skips the animation but still allows an immediate wordmark reveal when Quiet mode is off. Rapid toggles capture the current wordmark frame before cancelling the previous sequence; unmount and preference changes clean up active animations. Change the artwork in `components/ui/AntiqueBook.jsx` and its palette/geometry in `styles/brand.css`.
 
-The account dialog and dedicated account pages share a compact sage form, antique-book emblem, mode selector, and 220ms form entrance. Mode switches focus the first field inside an open dialog; native Escape and focus restoration remain in `Modal`. Users can start a local notebook directly from either form. Authentication requests still use the existing backend.
+The account dialog and dedicated account pages share a compact sage form, antique-book emblem, mode selector, and 220ms form entrance. Mode switches focus the first field inside an open dialog; native Escape and focus restoration remain in `Modal`. Users can start a local notebook directly from either form. Authentication follows the contract in `docs/API_CONTRACT.md`; sign-in uses username instead of email.

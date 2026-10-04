@@ -79,3 +79,11 @@ Chạy từ `mynotewebapp`. Trong Docker production, nối network backend phù 
 - [Dokploy domains và container port](https://docs.dokploy.com/docs/core/domains)
 - [Vite static deployment](https://vite.dev/guide/static-deploy.html)
 - [Docker Swarm service updates và rollback](https://docs.docker.com/reference/cli/docker/service/update/)
+
+## Auth integration update — 2026-10-05
+
+FE now uses username sign-in with bounded polling of the queued result, register then sign in, in-memory access tokens, cookie session restoration/renewal, and server logout. Google/Apple have been removed because the BE does not provide those routes. See [API contract](../docs/API_CONTRACT.md) for exact requests/responses and BE gaps. Notes/Tasks remain local pending a lossless sync contract.
+
+Production Nginx enforces `Secure`, `HttpOnly`, `SameSite=Lax` for `rotation_secret`. Serve public auth over HTTPS; the direct BE endpoint should also configure secure cookies. Do not put a token in frontend build environment variables.
+
+Validation before deployment: ESLint, 18 Node tests, Vite build, Docker build, image SPA deep links/health/missing asset, proxy response and cookie flags. Browser smoke test with a separate local mock API confirmed login polling, reload restoration and logout. This is not real-account verification against the production BE.

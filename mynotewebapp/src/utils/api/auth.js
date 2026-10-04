@@ -1,34 +1,23 @@
-import axios from "../axiosConfig";
+import client from "../axiosConfig.js";
+import { createAuthApi } from "../../features/auth/authApi.js";
+import { sessionFromToken, setSession } from "../../features/auth/session.js";
 
-/**
- * @param {{ email: string, password: string }} credentials
- */
-export async function loginUser(credentials) {
-  const response = await axios.post("/auth/login", credentials);
-  return response.data;
+export const authApi = createAuthApi(client);
+let refreshRequest;
+let generation = 0;
+export function invalidateSession() {
+  generation++;
+  setSession(null);
 }
-
-/**
- * OAuth / social sign-in — backend: `POST /auth/oauth/:provider`
- * @param {"google" | "apple"} provider
- */
-export async function loginWithSocialProvider(provider) {
-  const response = await axios.post(`/auth/oauth/${provider}`);
-  return response.data;
+export function refreshSession() {
+  if (!refreshRequest) {
+    const started = generation;
+    refreshRequest = authApi.refresh().then(({ accessToken }) => {
+      if (started !== generation) return null;
+      const session = sessionFromToken(accessToken);
+      setSession(session);
+      return session;
+    }).finally(() => { refreshRequest = null; });
+  }
+  return refreshRequest;
 }
-
-export async function registerUser({ email, username, password }) {
-  // Always default role to USER per requirement
-  const payload = {
-    email,
-    username,
-    password,
-    role: "USER"
-  };
-
-  const response = await axios.post("/auth/register", payload);
-  return response.data;
-}
-
-
-

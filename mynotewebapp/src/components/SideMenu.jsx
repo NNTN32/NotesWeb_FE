@@ -7,7 +7,7 @@ import { useTheme } from "../context/ThemeContext";
 import { useAuthModal } from "../context/AuthModalContext";
 import { WORKSPACE_NAVIGATION } from "../app/navigation";
 export default function SideMenu({ mobileOpen, onClose }) {
-  const { user, logout } = useAuth();
+  const { user, logout, restoring, signingOut, sessionError } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { openLogin } = useAuthModal();
   return (
@@ -76,23 +76,25 @@ export default function SideMenu({ mobileOpen, onClose }) {
                 <FiUser />
                 {user.name || user.username || user.email}
               </p>
-              <button className="ws-nav-link" onClick={logout}>
+              <button className="ws-nav-link" onClick={logout} disabled={signingOut}>
                 <FiLogOut />
-                Sign out
+                {signingOut ? "Signing out…" : "Sign out"}
               </button>
             </>
           ) : (
             <button
               className="ws-nav-link"
+              disabled={restoring}
               onClick={() => {
                 onClose();
                 openLogin();
               }}
             >
               <FiUser />
-              Sign in
+              {restoring ? "Checking session…" : "Sign in"}
             </button>
           )}
+          {sessionError && <p className="ws-error" role="alert">{sessionError}</p>}
           <span className="ws-storage-note">Notes & tasks saved locally</span>
         </div>
       </aside>

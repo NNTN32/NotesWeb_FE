@@ -5,8 +5,12 @@ COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
 COPY . .
 RUN yarn build
+ARG REVISION=local
+RUN node -e 'const fs=require("node:fs"); const revision=process.argv[1]; if (!/^(local|[a-f0-9]{40})$/.test(revision)) process.exit(1); fs.writeFileSync("dist/version.json", JSON.stringify({revision})+"\n")' "$REVISION"
 
 FROM nginx:stable-alpine AS runtime
+ARG REVISION=local
+LABEL org.opencontainers.image.revision=$REVISION
 RUN apk add --no-cache ca-certificates
 COPY deploy/default.conf.template /etc/nginx/templates/default.conf.template
 COPY deploy/15-validate-api-upstream.sh /docker-entrypoint.d/15-validate-api-upstream.sh

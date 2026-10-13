@@ -1,4 +1,5 @@
-FROM node:22-alpine AS build
+# The Vite bundle is platform-independent; run Node natively rather than under QEMU.
+FROM --platform=$BUILDPLATFORM node:22-alpine AS build
 WORKDIR /app
 RUN corepack enable && corepack prepare yarn@1.22.22 --activate
 COPY package.json yarn.lock ./

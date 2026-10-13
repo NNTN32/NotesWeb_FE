@@ -47,7 +47,7 @@ src/
   hooks/                   useLocalStore: validated localStorage + cross-tab sync
   lib/                     Framework-free helpers (httpClient, download)
   pages/                   Thin route components that compose features
-  styles/                  tokens → base → components → layout → motion (imported once in main.jsx)
+  styles/                  tokens → base → components → layout → backdrop → motion (imported once in main.jsx)
 tests/                     node:test, no extra dependencies
 ```
 
@@ -92,6 +92,23 @@ Motion confirms what just happened and where things went; it never decorates. Ev
 - State changes use `transition`; mount/unmount uses the utilities. Never add `@keyframes` outside `motion.css`.
 - Never remount an input while the user types (e.g. Notes keys the editor by an open counter, not by note id).
 - `prefers-reduced-motion` sets distances/scales to zero and shortens durations, so everything becomes a short fade; the skeleton shimmer stops.
+
+### Ambient backdrop
+
+Every page sits on a "paper and ink" backdrop: slow-drifting ink washes, a stationery pattern and static paper grain. Each page has its own character.
+
+| Variant | Palette | Pattern | Motion |
+| --- | --- | --- | --- |
+| `home` | sage, amber, lavender | dot grid | 48s drift |
+| `auth` | sage, amber | dots around the form | 48s drift |
+| `notes` | warm amber | ruled lines (notebook) | 2× slower, faint |
+| `tasks` | sage, sky | planner dot grid | 48s drift |
+
+- `components/layout/Backdrop.jsx` renders the layers (`aria-hidden`, no pointer events, fixed behind content). `AppShell` picks the variant from `backdrop` in `app/navigation.js`; Home and Auth pass theirs directly.
+- `styles/backdrop.css` defines the look: a variant only sets custom properties (`--blob-1..3`, `--backdrop-intensity`, `--pattern-*`). Tints live in `tokens.css` with dark-mode values.
+- `styles/motion.css` ("Ambient") defines the movement: transform-only, 48–96s alternating loops; the palette eases between pages via `@property`.
+- It pauses when the tab is hidden (`usePageVisible`), while any text field has focus, and entirely under `prefers-reduced-motion`.
+- To add a page: add a `.backdrop--<name>` block and set `backdrop: "<name>"` on its navigation entry.
 
 ## Data
 

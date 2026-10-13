@@ -55,6 +55,19 @@
   from { opacity: 0; transform: rotate(var(--motion-rotate)) scale(var(--motion-scale)); }
 }
 
+/* Ambient drift: long, alternating, transform-only loops for backdrop blobs */
+@keyframes motion-drift-1 {
+  to { transform: translate3d(12vw, 8vh, 0) scale(1.15); }
+}
+
+@keyframes motion-drift-2 {
+  to { transform: translate3d(-10vw, 12vh, 0) scale(0.9); }
+}
+
+@keyframes motion-drift-3 {
+  to { transform: translate3d(8vw, -10vh, 0) scale(1.1); }
+}
+
 @keyframes motion-shimmer {
   from { background-position: 100% 0; }
   to { background-position: -100% 0; }
@@ -127,6 +140,36 @@
 
 @media (prefers-reduced-motion: reduce) {
   .skeleton {
+    animation: none;
+  }
+}
+
+/*
+ * Ambient backdrop motion (see backdrop.css for its look).
+ * Pauses when the tab is hidden, while the user types, and under reduced motion.
+ */
+.backdrop__blob--1 { animation: motion-drift-1 var(--duration-ambient) ease-in-out infinite alternate; }
+.backdrop__blob--2 { animation: motion-drift-2 calc(var(--duration-ambient) * 1.3) ease-in-out infinite alternate; }
+.backdrop__blob--3 { animation: motion-drift-3 calc(var(--duration-ambient) * 1.15) ease-in-out infinite alternate; }
+
+/* Page-to-page palette change eases instead of snapping. */
+.backdrop {
+  transition-property: --blob-1, --blob-2, --blob-3, --backdrop-intensity;
+  transition-duration: calc(var(--duration-slow) * 3);
+  transition-timing-function: var(--ease-out);
+}
+
+.backdrop--notes .backdrop__blob {
+  animation-duration: calc(var(--duration-ambient) * 2);
+}
+
+.backdrop[data-paused] .backdrop__blob,
+body:has(input:focus, textarea:focus) .backdrop__blob {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop__blob {
     animation: none;
   }
 }

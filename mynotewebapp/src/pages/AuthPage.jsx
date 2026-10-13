@@ -2,6 +2,7 @@ import { useId } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import Logo from "../components/ui/Logo";
 import Animate from "../components/ui/Animate";
+import Backdrop from "../components/layout/Backdrop";
 import AuthForm from "../features/auth/components/AuthForm";
 import { ROUTES } from "../app/routes";
 
@@ -15,6 +16,7 @@ export default function AuthPage() {
 
   return (
     <main className="auth-page">
+      <Backdrop variant="auth" />
       <Animate name="rise" className="auth-page__card">
         <div className="auth-page__logo">
           <Logo />

@@ -5,11 +5,16 @@ import Sidebar from "./Sidebar";
 import Logo from "../ui/Logo";
 import IconButton from "../ui/IconButton";
 import Animate from "../ui/Animate";
+import Backdrop from "./Backdrop";
+import { WORKSPACE_NAVIGATION } from "../../app/navigation";
 
 /** Layout for workspace pages: sidebar navigation + routed page content. */
 export default function AppShell() {
   const { pathname } = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const backdrop = WORKSPACE_NAVIGATION.find(
+    (item) => item.to === pathname,
+  )?.backdrop;
   const menuButton = useRef(null);
   const closeMenu = () => setMenuOpen(false);
 
@@ -23,6 +28,7 @@ export default function AppShell() {
         }
       }}
     >
+      <Backdrop variant={backdrop} />
       <a className="skip-link" href="#main-content">
         Skip to main content
       </a>

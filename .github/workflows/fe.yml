@@ -121,9 +121,13 @@ jobs:
           DIGEST: ${{ steps.build.outputs.digest }}
         run: |
           mkdir -p reports
+          docker buildx imagetools inspect --raw "$IMAGE@$DIGEST" > reports/manifest.json
           for platform in linux/amd64 linux/arm64; do
-            docker pull --platform "$platform" "$IMAGE@$DIGEST"
-            node mynotewebapp/scripts/ci/smoke-image.mjs "$IMAGE@$DIGEST" "$GITHUB_SHA" "$platform" | tee "reports/smoke-${platform#linux/}.json"
+            architecture="${platform#linux/}"
+            platform_digest=$(jq -er --arg arch "$architecture" \
+              '.manifests[] | select(.platform.os == "linux" and .platform.architecture == $arch) | .digest' reports/manifest.json)
+            docker pull --platform "$platform" "$IMAGE@$platform_digest"
+            node mynotewebapp/scripts/ci/smoke-image.mjs "$IMAGE@$platform_digest" "$GITHUB_SHA" "$platform" | tee "reports/smoke-$architecture.json"
           done
       - name: Record tested release
         id: release

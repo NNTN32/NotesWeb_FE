@@ -2,57 +2,64 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
   INITIAL_NOTES,
-  saveDraft,
+  editDraft,
   removeNote,
-  isDraftDirty,
+  restoreNote,
+  searchNotes,
+  noteTitle,
   validNotes,
+  wordCount,
 } from "../src/features/notes/noteModel.js";
 
-test("saving a draft trims the title and preserves content", () => {
-  const original = {
-    notes: [],
-    draft: { id: null, title: "  Ý tưởng  ", content: "Dòng đầu\nDòng sau\n" },
-  };
-  const result = saveDraft(original, "note-1", "2026-09-27T00:00:00Z");
-  assert.equal(result.notes[0].title, "Ý tưởng");
-  assert.equal(result.notes[0].content, original.draft.content);
-  assert.equal(original.notes.length, 0);
-  assert.equal(isDraftDirty(result), false);
-  assert.equal(validNotes(result), true);
+const meta = (id, updatedAt = "2026-10-13T00:00:00Z") => ({ id, updatedAt });
+
+test("the first edit saves a new note at the top of the list", () => {
+  const store = editDraft(INITIAL_NOTES, { title: "Ý tưởng" }, meta("n1"));
+  assert.equal(store.draft.id, "n1");
+  assert.deepEqual(store.notes.map((note) => note.id), ["n1"]);
+  assert.equal(validNotes(store), true);
+  assert.equal(INITIAL_NOTES.notes.length, 0, "input is not mutated");
 });
-test("editing an existing note updates it without duplicates", () => {
-  const initial = saveDraft(
-    { notes: [], draft: { id: null, title: "Tiêu đề", content: "Nội dung" } },
-    "n1",
-    "2026-09-27",
-  );
-  const editing = {
-    ...initial,
-    draft: { ...initial.draft, content: "Đã sửa" },
-  };
-  assert.equal(isDraftDirty(editing), true);
-  const saved = saveDraft(editing, "unused-new-id", "2026-09-28");
-  assert.equal(saved.notes.length, 1);
-  assert.equal(saved.notes[0].id, "n1");
-  assert.equal(saved.notes[0].content, "Đã sửa");
+
+test("later edits update the same note and move it to the top", () => {
+  let store = editDraft(INITIAL_NOTES, { title: "A" }, meta("a", "1"));
+  store = editDraft({ ...store, draft: { id: null, title: "", content: "" } }, { title: "B" }, meta("b", "2"));
+  store = editDraft({ ...store, draft: store.notes[1] }, { content: "more" }, meta("unused", "3"));
+  assert.deepEqual(store.notes.map((note) => note.id), ["a", "b"]);
+  assert.equal(store.notes[0].content, "more");
+  assert.equal(store.notes[0].updatedAt, "3");
 });
-test("removing the active note clears its draft but leaves other drafts alone", () => {
-  const store = saveDraft(
-    { notes: [], draft: { id: null, title: "Tiêu đề", content: "Nội dung" } },
-    "n1",
-    "2026-09-27",
-  );
-  assert.deepEqual(removeNote(store, "n1"), INITIAL_NOTES);
-  const otherDraft = { id: null, title: "Bản nháp mới", content: "Chưa lưu" };
-  assert.deepEqual(
-    removeNote({ ...store, draft: otherDraft }, "n1").draft,
-    otherDraft,
-  );
+
+test("clearing every field removes the note instead of keeping a blank page", () => {
+  const saved = editDraft(INITIAL_NOTES, { title: "Temp" }, meta("t"));
+  const cleared = editDraft(saved, { title: "  " }, meta("unused"));
+  assert.equal(cleared.notes.length, 0);
+  assert.equal(editDraft(INITIAL_NOTES, { title: " " }, meta("x")).notes.length, 0);
 });
-test("blank drafts do not create saved notes and malformed stores are rejected", () => {
-  assert.equal(saveDraft(INITIAL_NOTES, "n1", "now"), INITIAL_NOTES);
-  assert.equal(isDraftDirty(INITIAL_NOTES), false);
-  assert.equal(validNotes(INITIAL_NOTES), true);
+
+test("remove and restore keep chronological order", () => {
+  let store = editDraft(INITIAL_NOTES, { title: "Old" }, meta("old", "2026-01-01"));
+  store = editDraft({ ...store, draft: { id: null, title: "", content: "" } }, { title: "New" }, meta("new", "2026-02-01"));
+  const old = store.notes[1];
+  const removed = removeNote(store, "old");
+  assert.deepEqual(removed.notes.map((note) => note.id), ["new"]);
+  assert.equal(removed.draft.id, "new", "other open note stays open");
+  assert.deepEqual(restoreNote(removed, old).notes.map((note) => note.id), ["new", "old"]);
+  assert.equal(restoreNote(store, old), store, "restoring twice is a no-op");
+  assert.equal(removeNote(store, "new").draft.id, null, "removing the open note clears the editor");
+});
+
+test("helpers: search, title fallback, word count and validation", () => {
+  const notes = [
+    { id: "1", title: "Báo cáo", content: "quý 3", updatedAt: "1" },
+    { id: "2", title: "", content: "Shopping list", updatedAt: "2" },
+  ];
+  assert.deepEqual(searchNotes(notes, " BÁO ").map((n) => n.id), ["1"]);
+  assert.deepEqual(searchNotes(notes, "shopping").map((n) => n.id), ["2"]);
+  assert.equal(searchNotes(notes, ""), notes);
+  assert.equal(noteTitle(notes[1]), "Untitled");
+  assert.equal(wordCount("  one two\nthree "), 3);
+  assert.equal(wordCount(""), 0);
   assert.equal(validNotes({ notes: [null], draft: {} }), false);
   assert.equal(validNotes(null), false);
 });

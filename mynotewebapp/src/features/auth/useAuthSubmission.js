@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { useAuth } from "../../context/AuthContext";
-import { authApi } from "../../utils/api/auth";
+import { useAuth } from "./AuthContext";
+import { authApi } from "./authService";
 
 export function useAuthSubmission({ mode, onAuthenticated }) {
   const { login } = useAuth();

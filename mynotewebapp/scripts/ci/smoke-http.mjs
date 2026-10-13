@@ -13,7 +13,7 @@ export async function smoke(baseUrl, revision, { mock = false } = {}) {
   assert.match(version.headers.get('cache-control') || '', /no-cache/);
   assert.equal((await version.json()).revision, revision, 'deployed revision');
   let html;
-  for (const path of ['/', '/create', '/todo', '/weekly-plan', '/auth/login']) {
+  for (const path of ['/', '/notes', '/tasks', '/create', '/todo', '/auth/login']) {
     const response = await request(path);
     assert.equal(response.status, 200, path);
     assert.match(response.headers.get('content-type') || '', /text\/html/);

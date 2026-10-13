@@ -65,6 +65,32 @@ export function filterTasks(
         PRIORITIES[a.priority].rank - PRIORITIES[b.priority].rank,
     );
 }
+/** Builds a new task with sensible defaults; the provider assigns the id. */
+export function createTask({
+  text,
+  date = dateKey(),
+  slot = currentSlot(),
+  priority = "medium",
+}) {
+  return { text: text.trim(), date, slot, priority };
+}
+/** Groups tasks by time of day, keeping slot order and skipping empty slots. */
+export function groupBySlot(tasks) {
+  return TIME_SLOTS.map((slot) => ({
+    slot,
+    tasks: tasks.filter((task) => task.slot === slot.id),
+  })).filter((group) => group.tasks.length);
+}
+/** "Oct 12 – 18, 2026", or "Dec 28, 2026 – Jan 3, 2027" across years. */
+export function formatWeekRange(dates) {
+  const first = new Date(`${dates[0]}T12:00:00`);
+  const last = new Date(`${dates.at(-1)}T12:00:00`);
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).formatRange(first, last);
+}
 export function taskStats(tasks) {
   const completed = tasks.filter((task) => task.completed).length;
   return {

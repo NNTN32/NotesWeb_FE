@@ -1,39 +1,42 @@
 import { lazy, Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
-import Home from "../pages/Home";
-import WorkspaceLayout from "../components/layout/WorkspaceLayout";
+import HomePage from "../pages/HomePage";
+import AppShell from "../components/layout/AppShell";
+import { ROUTES } from "./routes";
 
-const AuthEntry = lazy(() => import("../pages/auth/AuthEntry"));
-const NoteForm = lazy(() => import("../pages/users/NoteForm"));
-const Todo = lazy(() => import("../pages/users/Todo"));
-const WeeklyPlan = lazy(() => import("../pages/users/WeeklyPlan"));
+const AuthPage = lazy(() => import("../pages/AuthPage"));
+const NotesPage = lazy(() => import("../pages/NotesPage"));
+const TasksPage = lazy(() => import("../pages/TasksPage"));
+
+/** Old URLs stay valid so bookmarks keep working after the redesign. */
+const LEGACY_REDIRECTS = [
+  ["/create", ROUTES.notes],
+  ["/todo", `${ROUTES.tasks}?view=day`],
+  ["/weekly-plan", `${ROUTES.tasks}?view=week`],
+  ["/login", ROUTES.auth("login")],
+  ["/register", ROUTES.auth("register")],
+];
 
 export default function AppRoutes() {
   return (
     <Suspense
       fallback={
-        <div
-          role="status"
-          className="min-h-screen grid place-items-center bg-paper text-ink"
-        >
-          Opening your space…
-        </div>
+        <p role="status" className="empty">
+          Loading…
+        </p>
       }
     >
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/auth/:mode" element={<AuthEntry />} />
-        <Route element={<WorkspaceLayout />}>
-          <Route path="/create" element={<NoteForm />} />
-          <Route path="/todo" element={<Todo />} />
-          <Route path="/weekly-plan" element={<WeeklyPlan />} />
+        <Route path={ROUTES.home} element={<HomePage />} />
+        <Route path="/auth/:mode" element={<AuthPage />} />
+        <Route element={<AppShell />}>
+          <Route path={ROUTES.notes} element={<NotesPage />} />
+          <Route path={ROUTES.tasks} element={<TasksPage />} />
         </Route>
-        <Route path="/login" element={<Navigate to="/auth/login" replace />} />
-        <Route
-          path="/register"
-          element={<Navigate to="/auth/register" replace />}
-        />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {LEGACY_REDIRECTS.map(([from, to]) => (
+          <Route key={from} path={from} element={<Navigate to={to} replace />} />
+        ))}
+        <Route path="*" element={<Navigate to={ROUTES.home} replace />} />
       </Routes>
     </Suspense>
   );

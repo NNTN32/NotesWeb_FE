@@ -1,0 +1,130 @@
+.notes-layout {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.notes-page--focus .notes-layout {
+  grid-template-columns: minmax(0, 720px);
+  justify-content: center;
+}
+
+/* List */
+.note-list {
+  position: sticky;
+  top: var(--space-5);
+  display: grid;
+  gap: var(--space-3);
+}
+
+.note-list__items {
+  display: grid;
+  gap: 2px;
+  max-height: calc(100vh - 200px);
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.note-list__item {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  text-align: left;
+}
+
+.note-list__item:hover {
+  background: var(--color-surface-muted);
+}
+
+.note-list__item[aria-current="true"] {
+  background: var(--color-accent-soft);
+}
+
+.note-list__item strong,
+.note-list__item span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.note-list__item strong {
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.note-list__item span {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+
+/* Editor */
+.note-editor {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 160px);
+  padding: var(--space-4) var(--space-6) var(--space-6);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.note-editor__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin: 0 calc(var(--space-4) * -1) var(--space-4) 0;
+}
+
+.note-editor__actions {
+  display: flex;
+}
+
+.note-editor__title,
+.note-editor__content {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+}
+
+.note-editor__title {
+  margin-bottom: var(--space-4);
+  font-family: var(--font-serif);
+  font-size: var(--text-xl);
+}
+
+.note-editor__content {
+  flex: 1;
+  min-height: 320px;
+  resize: none;
+  font-size: var(--text-md);
+  line-height: 1.75;
+}
+
+@media (max-width: 860px) {
+  .notes-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .note-list {
+    position: static;
+  }
+
+  .note-list__items {
+    max-height: 220px;
+  }
+
+  .note-editor {
+    min-height: 60vh;
+    padding: var(--space-3) var(--space-4) var(--space-4);
+  }
+}

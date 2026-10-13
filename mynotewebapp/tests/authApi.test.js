@@ -70,8 +70,8 @@ test("refresh and logout use cookie endpoints; malformed refresh is rejected", a
 });
 
 test("session refresh is shared and cannot restore an invalidated session", async () => {
-  const { default: client } = await import("../src/utils/axiosConfig.js");
-  const { refreshSession, invalidateSession } = await import("../src/utils/api/auth.js");
+  const { default: client } = await import("../src/lib/httpClient.js");
+  const { refreshSession, invalidateSession } = await import("../src/features/auth/authService.js");
   const { getSession } = await import("../src/features/auth/session.js");
   const originalAdapter = client.defaults.adapter;
   let resolve;

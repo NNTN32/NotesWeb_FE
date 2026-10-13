@@ -1,3 +1,9 @@
+import Animate from "./Animate";
+
 export default function EmptyState({ children }) {
-  return <p className="empty">{children}</p>;
+  return (
+    <Animate as="p" name="fade" className="empty">
+      {children}
+    </Animate>
+  );
 }

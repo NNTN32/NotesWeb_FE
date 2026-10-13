@@ -15,5 +15,6 @@
 - Context: `XContext.js` (context + hook) and `XProvider.jsx` (provider) are separate files.
 - Styling: plain CSS. Use tokens from `src/styles/tokens.css`; never hard-code colors. Global primitives live in `styles/components.css`; feature CSS lives beside the feature. BEM-style class names.
 - Icons: `react-icons/fi` (Feather). Icon-only buttons must use `IconButton` with a `label`.
-- UI and code in English. Keep the interface minimal: one title per page, no decorative copy or animation.
+- UI and code in English. Keep the interface minimal: one title per page, no decorative copy.
+- Motion: use tokens + `styles/motion.css` utilities via `<Animate>`, `ENTER`/`EXIT` from `lib/motion.js`, `useExitAnimation`, `useNewItems`. `@keyframes` only in `motion.css`; animate transform/opacity only; respect reduced motion (see README "Motion").
 - Every new UI must work at 360px width and in dark mode.

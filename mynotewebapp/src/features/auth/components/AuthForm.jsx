@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ROUTES } from "../../../app/routes";
 import { useAuthSubmission } from "../useAuthSubmission";
 import AuthField from "./AuthField";
+import { ENTER } from "../../../lib/motion";
 import "../auth.css";
 
 const COPY = {
@@ -32,7 +33,10 @@ export default function AuthForm({
   const root = useRef(null);
   const isRegister = mode === "register";
   const copy = COPY[mode];
-  const { submit, pending, error } = useAuthSubmission({ mode, onAuthenticated });
+  const { submit, pending, error } = useAuthSubmission({
+    mode,
+    onAuthenticated,
+  });
 
   useEffect(() => {
     // When switching modes inside the dialog, keep focus on the first field.
@@ -41,7 +45,7 @@ export default function AuthForm({
   }, []);
 
   return (
-    <div className="auth-form" ref={root}>
+    <div className={`auth-form ${ENTER.fade}`} ref={root}>
       <h2 id={titleId} className="auth-form__title">
         {copy.title}
       </h2>

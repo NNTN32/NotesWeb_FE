@@ -1,0 +1,139 @@
+/*
+ * Motion library — the ONLY place that defines @keyframes.
+ *
+ * Usage:
+ *   - Enter animations: add `motion-<name>` (via <Animate name="…">), they play once on mount.
+ *   - Exit animations: `data-exiting` + `motion-exit-<name>`, driven by useExitAnimation().
+ *   - Stagger: set `--motion-delay` inline (e.g. style={{ "--motion-delay": "60ms" }}).
+ *   - State changes (hover, checked, open): use `transition` with the duration/ease tokens.
+ *
+ * Distances and scales come from tokens, so prefers-reduced-motion turns every
+ * movement into a short fade without touching this file.
+ */
+
+@keyframes motion-fade-in {
+  from { opacity: 0; }
+}
+
+@keyframes motion-fade-out {
+  to { opacity: 0; }
+}
+
+@keyframes motion-rise {
+  from { opacity: 0; transform: translateY(var(--motion-distance)); }
+}
+
+@keyframes motion-scale-in {
+  from { opacity: 0; transform: scale(var(--motion-scale)); }
+}
+
+@keyframes motion-scale-out {
+  to { opacity: 0; transform: scale(var(--motion-scale)); }
+}
+
+@keyframes motion-slide-from-right {
+  from { opacity: 0; transform: translateX(calc(var(--motion-distance) * 2)); }
+}
+
+@keyframes motion-slide-from-left {
+  from { opacity: 0; transform: translateX(calc(var(--motion-distance) * -2)); }
+}
+
+@keyframes motion-slide-up-in {
+  from { opacity: 0; transform: translateY(calc(var(--motion-distance) * 2)); }
+}
+
+@keyframes motion-slide-down-out {
+  to { opacity: 0; transform: translateY(calc(var(--motion-distance) * 2)); }
+}
+
+@keyframes motion-collapse {
+  to { opacity: 0; transform: translateX(calc(var(--motion-distance) * -2)); }
+}
+
+@keyframes motion-turn-in {
+  from { opacity: 0; transform: rotate(var(--motion-rotate)) scale(var(--motion-scale)); }
+}
+
+@keyframes motion-shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: -100% 0; }
+}
+
+/* Enter utilities (one per keyframe, all share the same timing contract) */
+[class*="motion-"] {
+  animation-delay: var(--motion-delay, 0ms);
+  animation-fill-mode: both;
+}
+
+.motion-fade { animation: motion-fade-in var(--duration-base) var(--ease-out); }
+.motion-rise { animation: motion-rise var(--duration-slow) var(--ease-out); }
+.motion-scale { animation: motion-scale-in var(--duration-base) var(--ease-out); }
+.motion-from-right { animation: motion-slide-from-right var(--duration-base) var(--ease-out); }
+.motion-from-left { animation: motion-slide-from-left var(--duration-base) var(--ease-out); }
+.motion-slide-up { animation: motion-slide-up-in var(--duration-base) var(--ease-out); }
+.motion-turn { animation: motion-turn-in var(--duration-slow) var(--ease-spring); }
+
+/* Exit utilities (shorter, ease-in). Applied together with [data-exiting]. */
+[data-exiting].motion-exit-fade { animation: motion-fade-out var(--duration-fast) var(--ease-in) forwards; }
+[data-exiting].motion-exit-scale { animation: motion-scale-out var(--duration-fast) var(--ease-in) forwards; }
+[data-exiting].motion-exit-collapse { animation: motion-collapse var(--duration-fast) var(--ease-in) forwards; }
+[data-exiting].motion-exit-slide-down { animation: motion-slide-down-out var(--duration-fast) var(--ease-in) forwards; }
+
+/* Dialog: <dialog> and its ::backdrop animate together */
+.modal[open] { animation: motion-scale-in var(--duration-base) var(--ease-out); }
+.modal[open]::backdrop { animation: motion-fade-in var(--duration-base) var(--ease-out); }
+.modal[data-exiting] { animation: motion-scale-out var(--duration-fast) var(--ease-in) forwards; }
+.modal[data-exiting]::backdrop { animation: motion-fade-out var(--duration-fast) var(--ease-in) forwards; }
+
+/* Toasts (react-toastify cssTransition class names, see components/ui/toastTransition.js) */
+.toast-enter { animation: motion-slide-up-in var(--duration-base) var(--ease-out) both; }
+.toast-exit { animation: motion-slide-down-out var(--duration-fast) var(--ease-in) forwards; }
+
+/* Press feedback for every clickable primitive */
+.btn,
+.icon-btn,
+.nav-link,
+.segmented button {
+  transition-property: background, border-color, color, transform, opacity;
+  transition-duration: var(--duration-fast);
+  transition-timing-function: var(--ease-out);
+}
+
+.btn:active:not(:disabled),
+.icon-btn:active:not(:disabled),
+.nav-link:active,
+.segmented button:active {
+  transform: scale(var(--motion-press-scale));
+  transition-duration: var(--duration-instant);
+}
+
+.page-loader {
+  animation: motion-fade-in var(--duration-base) var(--ease-out) 200ms both;
+}
+
+/* Loading placeholder; appears only after a short delay to avoid flashes */
+.skeleton {
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+      90deg,
+      var(--color-surface-muted) 30%,
+      var(--color-line) 50%,
+      var(--color-surface-muted) 70%
+    )
+    0 0 / 200% 100%;
+  animation: motion-shimmer 1.4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}
+
+/* Theme switch cross-fade (View Transitions API, progressive enhancement) */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--duration-slow);
+  animation-timing-function: var(--ease-out);
+}

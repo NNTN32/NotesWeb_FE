@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import EmptyState from "../../../components/ui/EmptyState";
+import { useNewItems } from "../../../hooks/useNewItems";
+import { ENTER } from "../../../lib/motion";
 import { noteTitle, searchNotes } from "../noteModel";
 
 const dateFormat = new Intl.DateTimeFormat("en-US", {
@@ -11,6 +13,7 @@ const dateFormat = new Intl.DateTimeFormat("en-US", {
 export default function NoteList({ notes, activeId, onOpen }) {
   const [query, setQuery] = useState("");
   const results = searchNotes(notes, query);
+  const isNew = useNewItems(notes.map((note) => note.id));
 
   return (
     <aside className="note-list" aria-label="All notes">
@@ -28,7 +31,10 @@ export default function NoteList({ notes, activeId, onOpen }) {
       {results.length ? (
         <ul className="note-list__items">
           {results.map((note) => (
-            <li key={note.id}>
+            <li
+              key={note.id}
+              className={isNew(note.id) ? ENTER.rise : undefined}
+            >
               <button
                 type="button"
                 className="note-list__item"
@@ -48,7 +54,9 @@ export default function NoteList({ notes, activeId, onOpen }) {
           ))}
         </ul>
       ) : (
-        <EmptyState>{query ? "No matching notes." : "No notes yet."}</EmptyState>
+        <EmptyState>
+          {query ? "No matching notes." : "No notes yet."}
+        </EmptyState>
       )}
     </aside>
   );

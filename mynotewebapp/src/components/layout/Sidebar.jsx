@@ -3,6 +3,7 @@ import { FiLogIn, FiLogOut, FiX } from "react-icons/fi";
 import Logo from "../ui/Logo";
 import IconButton from "../ui/IconButton";
 import ThemeToggle from "../ui/ThemeToggle";
+import { ENTER } from "../../lib/motion";
 import { WORKSPACE_NAVIGATION } from "../../app/navigation";
 import { useAuth } from "../../features/auth/AuthContext";
 import { useAuthModal } from "../../features/auth/AuthModalContext";
@@ -16,12 +17,15 @@ export default function Sidebar({ open, onClose }) {
       {open && (
         <button
           type="button"
-          className="sidebar__backdrop"
+          className={`sidebar__backdrop ${ENTER.fade}`}
           aria-label="Close menu"
           onClick={onClose}
         />
       )}
-      <aside id="app-sidebar" className={`sidebar ${open ? "sidebar--open" : ""}`}>
+      <aside
+        id="app-sidebar"
+        className={`sidebar ${open ? "sidebar--open" : ""}`}
+      >
         <div className="sidebar__top">
           <Logo onClick={onClose} />
           <IconButton

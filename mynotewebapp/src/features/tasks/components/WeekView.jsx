@@ -2,19 +2,27 @@ import { FiPlus } from "react-icons/fi";
 import IconButton from "../../../components/ui/IconButton";
 import { dateKey, formatDate } from "../taskModel";
 import TaskItem from "./TaskItem";
+import { useNewItems } from "../../../hooks/useNewItems";
+import { staggerStyle } from "../../../lib/motion";
 
 export default function WeekView({ dates, tasks, actions }) {
   const today = dateKey();
+  const isNew = useNewItems(tasks.map((task) => task.id));
   return (
     <div className="week-view" role="region" aria-label="Week" tabIndex={0}>
-      {dates.map((date) => {
+      {dates.map((date, index) => {
         const items = tasks.filter((task) => task.date === date);
         const done = items.filter((task) => task.completed).length;
         return (
           <section
             key={date}
-            className={`week-day ${date === today ? "week-day--today" : ""}`}
-            aria-label={formatDate(date, { weekday: "long", month: "long", day: "numeric" })}
+            className={`week-day motion-rise ${date === today ? "week-day--today" : ""}`}
+            style={staggerStyle(index)}
+            aria-label={formatDate(date, {
+              weekday: "long",
+              month: "long",
+              day: "numeric",
+            })}
           >
             <header className="week-day__header">
               <span>{formatDate(date, { weekday: "short" })}</span>
@@ -30,6 +38,7 @@ export default function WeekView({ dates, tasks, actions }) {
                 <TaskItem
                   key={task.id}
                   task={task}
+                  isNew={isNew(task.id)}
                   onToggle={actions.toggle}
                   onEdit={actions.edit}
                 />

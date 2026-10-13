@@ -66,11 +66,16 @@
   border-radius: var(--radius-md);
   background: var(--color-surface);
   text-decoration: none;
-  transition: border-color var(--transition);
+  transition:
+    border-color var(--duration-base) var(--ease-out),
+    transform var(--duration-base) var(--ease-out);
 }
 
-.home__feature:hover {
-  border-color: var(--color-accent);
+@media (hover: hover) {
+  .home__feature:hover {
+    border-color: var(--color-accent);
+    transform: translateY(calc(var(--motion-distance) * -0.25));
+  }
 }
 
 .home__feature svg {

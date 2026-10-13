@@ -2,16 +2,18 @@ import { currentSlot, dateKey, groupBySlot, taskStats } from "../taskModel";
 import EmptyState from "../../../components/ui/EmptyState";
 import QuickAdd from "./QuickAdd";
 import TaskItem from "./TaskItem";
+import { useNewItems } from "../../../hooks/useNewItems";
 
 export default function DayView({ date, dayTasks, visibleTasks, actions }) {
   const stats = taskStats(dayTasks);
   const isToday = date === dateKey();
   const groups = groupBySlot(visibleTasks);
+  const isNew = useNewItems(dayTasks.map((task) => task.id));
 
   return (
     <section className="day-view" aria-label="Tasks for the day">
       {stats.total > 0 && (
-        <div className="day-view__progress">
+        <div className="day-view__progress" aria-live="polite">
           <span className="muted">
             {stats.completed} of {stats.total} done
           </span>
@@ -39,6 +41,7 @@ export default function DayView({ date, dayTasks, visibleTasks, actions }) {
                 <TaskItem
                   key={task.id}
                   task={task}
+                  isNew={isNew(task.id)}
                   onToggle={actions.toggle}
                   onEdit={actions.edit}
                   onDelete={actions.remove}
@@ -49,7 +52,9 @@ export default function DayView({ date, dayTasks, visibleTasks, actions }) {
         ))
       ) : (
         <EmptyState>
-          {dayTasks.length ? "No tasks match your filters." : "Nothing planned yet."}
+          {dayTasks.length
+            ? "No tasks match your filters."
+            : "Nothing planned yet."}
         </EmptyState>
       )}
     </section>

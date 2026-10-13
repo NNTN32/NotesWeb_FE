@@ -19,7 +19,10 @@ function fixture(status = 'done', smokeError = false) {
     if (url.pathname.endsWith('deployment.all')) data = started
       ? [{ title: config.releaseId, status, deploymentId: 'new' }]
       : [{ title: 'unrelated old success', status: 'done', deploymentId: 'old' }];
-    return { ok: true, json: async () => data };
+    return { ok: true, json: async () => {
+      if (options.body) throw new SyntaxError('Unexpected end of JSON input');
+      return data;
+    } };
   } }, smoked: () => smoked };
 }
 test('deploy pins digest, waits for this deployment and observes smoke for 120 seconds', async () => {

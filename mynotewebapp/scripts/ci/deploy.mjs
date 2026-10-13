@@ -19,6 +19,11 @@ export async function deploy(config, { fetcher = fetch, pause = delay, smokeChec
     });
     // Do not print server responses: they can contain credentials or environment values.
     assert.ok(response.ok, `Dokploy ${route.split('?')[0]}: HTTP ${response.status}`);
+    // Mutation endpoints may return 200/204 without a JSON body.
+    if (body) {
+      await response.body?.cancel();
+      return;
+    }
     return response.json();
   };
   const query = `applicationId=${encodeURIComponent(applicationId)}`;

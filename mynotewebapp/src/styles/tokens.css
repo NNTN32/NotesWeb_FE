@@ -17,6 +17,14 @@
   --color-priority-medium: #c9962f;
   --color-priority-low: #8aa478;
 
+  /* Ambient backdrop tints ("ink on paper"). Kept low-contrast on purpose. */
+  --tint-sage: #9fbf8a;
+  --tint-amber: #f0c98b;
+  --tint-lavender: #c7b8e6;
+  --tint-sky: #a9cfd8;
+  --backdrop-pattern: rgb(36 34 30 / 0.07);
+  --backdrop-grain-opacity: 0.05;
+
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
   --font-serif: "Iowan Old Style", Georgia, "Times New Roman", serif;
@@ -51,6 +59,7 @@
   --duration-fast: 160ms;
   --duration-base: 220ms;
   --duration-slow: 300ms;
+  --duration-ambient: 48s;
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -74,6 +83,12 @@
   --color-accent-contrast: #171715;
   --color-accent-soft: #2b3326;
   --color-danger: #e07a6c;
+  --tint-sage: #3f5a35;
+  --tint-amber: #5a4526;
+  --tint-lavender: #43395c;
+  --tint-sky: #2f4a52;
+  --backdrop-pattern: rgb(236 235 230 / 0.06);
+  --backdrop-grain-opacity: 0.08;
   --shadow-overlay: 0 16px 48px rgb(0 0 0 / 0.5);
 
   color-scheme: dark;

@@ -3,6 +3,7 @@ import { FiCalendar, FiCheckSquare, FiEdit3 } from "react-icons/fi";
 import Logo from "../components/ui/Logo";
 import ThemeToggle from "../components/ui/ThemeToggle";
 import Animate from "../components/ui/Animate";
+import Backdrop from "../components/layout/Backdrop";
 import { useAuth } from "../features/auth/AuthContext";
 import { useAuthModal } from "../features/auth/AuthModalContext";
 import { ROUTES } from "../app/routes";
@@ -35,6 +36,7 @@ export default function HomePage() {
 
   return (
     <div className="home">
+      <Backdrop variant="home" />
       <header className="home__header">
         <Logo />
         <div className="home__header-actions">

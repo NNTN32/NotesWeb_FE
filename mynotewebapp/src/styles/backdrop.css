@@ -1,0 +1,118 @@
+/*
+ * Ambient backdrop — how it LOOKS. How it MOVES lives in motion.css ("Ambient").
+ *
+ * Three layers, back to front:
+ *   1. blobs   soft ink washes (radial gradients, no blur filter = cheap)
+ *   2. pattern page-specific stationery: dots (home, auth, tasks) or ruled lines (notes)
+ *   3. grain   static paper noise
+ *
+ * A variant only sets custom properties; add a new page by adding one block.
+ */
+
+/* Registered so the palette can transition when moving between pages. */
+@property --blob-1 { syntax: "<color>"; inherits: true; initial-value: transparent; }
+@property --blob-2 { syntax: "<color>"; inherits: true; initial-value: transparent; }
+@property --blob-3 { syntax: "<color>"; inherits: true; initial-value: transparent; }
+@property --backdrop-intensity { syntax: "<number>"; inherits: true; initial-value: 0.5; }
+
+.backdrop {
+  --blob-1: var(--tint-sage);
+  --blob-2: var(--tint-amber);
+  --blob-3: var(--tint-lavender);
+  --backdrop-intensity: 0.55;
+  --pattern-image: radial-gradient(var(--backdrop-pattern) 1px, transparent 1.5px);
+  --pattern-size: 24px 24px;
+  --pattern-mask: radial-gradient(ellipse 70% 60% at 50% 30%, #000 30%, transparent 75%);
+
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+}
+
+.backdrop__blob,
+.backdrop__pattern,
+.backdrop__grain {
+  position: absolute;
+}
+
+/* 1. Blobs */
+.backdrop__blob {
+  width: 70vmax;
+  height: 70vmax;
+  border-radius: 50%;
+  opacity: var(--backdrop-intensity);
+  will-change: transform;
+}
+
+.backdrop__blob--1 {
+  top: -35vmax;
+  left: -20vmax;
+  background: radial-gradient(closest-side, var(--blob-1), transparent);
+}
+
+.backdrop__blob--2 {
+  top: -25vmax;
+  right: -30vmax;
+  background: radial-gradient(closest-side, var(--blob-2), transparent);
+}
+
+.backdrop__blob--3 {
+  bottom: -45vmax;
+  left: 15vw;
+  background: radial-gradient(closest-side, var(--blob-3), transparent);
+}
+
+/* 2. Pattern */
+.backdrop__pattern {
+  inset: 0;
+  background-image: var(--pattern-image);
+  background-size: var(--pattern-size);
+  mask-image: var(--pattern-mask);
+}
+
+/* 3. Grain (static SVG noise) */
+.backdrop__grain {
+  inset: 0;
+  opacity: var(--backdrop-grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Variants — each page gets its own character */
+.backdrop--home {
+  --backdrop-intensity: 0.7;
+}
+
+.backdrop--auth {
+  --blob-3: var(--tint-sage);
+  --backdrop-intensity: 0.6;
+  --pattern-mask: radial-gradient(ellipse 50% 50% at 50% 45%, #000 20%, transparent 70%);
+}
+
+/* Notes: warm and almost still — a page to write on, with ruled lines. */
+.backdrop--notes {
+  --blob-1: var(--tint-amber);
+  --blob-2: var(--tint-amber);
+  --blob-3: var(--tint-sage);
+  --backdrop-intensity: 0.32;
+  --pattern-image: linear-gradient(var(--backdrop-pattern) 1px, transparent 1px);
+  --pattern-size: 100% 32px;
+  --pattern-mask: linear-gradient(#000, transparent 70%);
+}
+
+/* Tasks: cool and fresh — a planner dot grid. */
+.backdrop--tasks {
+  --blob-1: var(--tint-sage);
+  --blob-2: var(--tint-sky);
+  --blob-3: var(--tint-sage);
+  --backdrop-intensity: 0.45;
+}
+
+@media (max-width: 860px) {
+  .backdrop__blob {
+    width: 110vmax;
+    height: 110vmax;
+  }
+}

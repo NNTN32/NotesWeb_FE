@@ -18,3 +18,4 @@
 - UI and code in English. Keep the interface minimal: one title per page, no decorative copy.
 - Motion: use tokens + `styles/motion.css` utilities via `<Animate>`, `ENTER`/`EXIT` from `lib/motion.js`, `useExitAnimation`, `useNewItems`. `@keyframes` only in `motion.css`; animate transform/opacity only; respect reduced motion (see README "Motion").
 - Every new UI must work at 360px width and in dark mode.
+- Backdrop: page look in `styles/backdrop.css` (variants set custom properties only), movement in `motion.css`; choose a variant via `backdrop` in `app/navigation.js`. Content surfaces stay opaque for legibility.

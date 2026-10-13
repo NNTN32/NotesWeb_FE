@@ -1,6 +1,7 @@
-/* Global stylesheet entry. Order matters: tokens → base → primitives → layout → motion. */
+/* Global stylesheet entry. Order matters: tokens → base → primitives → layout → backdrop → motion. */
 @import "./tokens.css";
 @import "./base.css";
 @import "./components.css";
 @import "./layout.css";
+@import "./backdrop.css";
 @import "./motion.css";

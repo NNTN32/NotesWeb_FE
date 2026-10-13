@@ -7,6 +7,9 @@ import {
   currentSlot,
   filterTasks,
   taskStats,
+  createTask,
+  groupBySlot,
+  formatWeekRange,
   validTasks,
   validDate,
 } from "../src/features/tasks/taskModel.js";
@@ -111,4 +114,28 @@ test("stored data validation rejects invalid fields and impossible dates", () =>
   assert.equal(validTasks([{ ...tasks[0], slot: "invalid" }]), false);
   assert.equal(validDate("2024-02-29"), true);
   assert.equal(validDate("2025-02-29"), false);
+});
+
+test("createTask trims text and applies defaults", () => {
+  assert.deepEqual(createTask({ text: "  Gọi điện ", date: "2026-10-13", slot: "noon" }), {
+    text: "Gọi điện",
+    date: "2026-10-13",
+    slot: "noon",
+    priority: "medium",
+  });
+});
+test("groupBySlot keeps time-of-day order and skips empty slots", () => {
+  const groups = groupBySlot(tasks);
+  assert.deepEqual(
+    groups.map((group) => [group.slot.id, group.tasks.length]),
+    [["morning", 1], ["afternoon", 2]],
+  );
+});
+test("week ranges are compact and span years", () => {
+  const normalize = (text) => text.replace(/\s/g, " ");
+  assert.equal(normalize(formatWeekRange(weekDates("2026-10-13"))), "Oct 12 – 18, 2026");
+  assert.equal(
+    normalize(formatWeekRange(weekDates("2027-01-03"))),
+    "Dec 28, 2026 – Jan 3, 2027",
+  );
 });

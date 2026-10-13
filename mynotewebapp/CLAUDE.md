@@ -1,21 +1,19 @@
-# Project: MyNoteWebApp (React + Vite + Tailwind)
+# Project: MyNote (React 19 + Vite, plain CSS)
 
-## Build & Development Commands
-- Dev server: `npm run dev` or `yarn dev`
-- Build project: `npm run build`
-- Linting: `npm run lint`
+## Commands
+- Dev: `yarn dev` · Lint: `yarn lint` · Test: `yarn test` · Build: `yarn build`
+- Run lint, test and build before every commit.
 
-## Code Style & Guidelines
-- **Framework**: React (Functional Components).
-- **Styling**: Shared design tokens in `src/styles/tokens.css`; feature styles in `src/styles`; Home uses a CSS Module. Reuse existing styles before adding utilities.
-- **Icons**: Use Lucide React or React Icons (if available).
-- **Language**: 
-    - Code (variables, functions): English.
-    - Comments and UI: English.
-- **Project Structure**: 
-    - New components are placed in `src/components`.
-    - New pages are placed in `src/pages`.
+## Structure (see README for details)
+- `src/features/<domain>/`: state, pure model, components and CSS for one domain (auth, notes, tasks, theme).
+- `src/pages/`: thin route components that compose features. `src/app/routes.js` is the single source of route paths.
+- `src/components/ui/`: shared primitives. Reuse `IconButton`, `Modal`, `PageHeader`, `SegmentedControl`, `Alert`, `EmptyState` before adding new ones.
+- `src/lib/`: helpers without React. `src/hooks/`: shared hooks.
 
-## Specific Logic
-- Always use `useState` and `useEffect` according to React 18+ standards.
-- When creating a new UI, ensure it's responsive for both mobile and desktop.
+## Guidelines
+- Functional components and hooks only. Keep business rules in pure `*Model.js` files with tests in `tests/`.
+- Context: `XContext.js` (context + hook) and `XProvider.jsx` (provider) are separate files.
+- Styling: plain CSS. Use tokens from `src/styles/tokens.css`; never hard-code colors. Global primitives live in `styles/components.css`; feature CSS lives beside the feature. BEM-style class names.
+- Icons: `react-icons/fi` (Feather). Icon-only buttons must use `IconButton` with a `label`.
+- UI and code in English. Keep the interface minimal: one title per page, no decorative copy or animation.
+- Every new UI must work at 360px width and in dark mode.

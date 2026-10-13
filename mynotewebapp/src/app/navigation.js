@@ -1,7 +1,7 @@
-import { FiEdit3, FiCheckSquare, FiCalendar } from "react-icons/fi";
+import { FiCheckSquare, FiEdit3 } from "react-icons/fi";
+import { ROUTES } from "./routes";
 
 export const WORKSPACE_NAVIGATION = [
-  { to: "/create", label: "Notebook", icon: FiEdit3 },
-  { to: "/todo", label: "Today’s tasks", icon: FiCheckSquare },
-  { to: "/weekly-plan", label: "Weekly plan", icon: FiCalendar },
+  { to: ROUTES.notes, label: "Notes", icon: FiEdit3 },
+  { to: ROUTES.tasks, label: "Tasks", icon: FiCheckSquare },
 ];

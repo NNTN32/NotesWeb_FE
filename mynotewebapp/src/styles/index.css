@@ -1,0 +1,5 @@
+/* Global stylesheet entry. Order matters: tokens → base → primitives → layout. */
+@import "./tokens.css";
+@import "./base.css";
+@import "./components.css";
+@import "./layout.css";

@@ -1,0 +1,141 @@
+/* App shell: fixed sidebar on desktop, drawer on mobile. */
+.shell {
+  min-height: 100vh;
+}
+
+.shell__main {
+  min-width: 0;
+  padding: var(--space-6) var(--space-6) var(--space-7);
+  margin-left: var(--sidebar-width);
+}
+
+.mobile-bar {
+  display: none;
+}
+
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  width: var(--sidebar-width);
+  padding: var(--space-5) var(--space-3);
+  border-right: 1px solid var(--color-line);
+  background: var(--color-bg);
+  overflow-y: auto;
+}
+
+.sidebar__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-2);
+}
+
+.sidebar__nav,
+.sidebar__bottom {
+  display: grid;
+  gap: 2px;
+}
+
+.sidebar__bottom {
+  margin-top: auto;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  height: var(--control-height);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  text-align: left;
+  text-decoration: none;
+}
+
+.nav-link:hover {
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+}
+
+.nav-link--active {
+  background: var(--color-accent-soft);
+  color: var(--color-text);
+}
+
+.sidebar__user {
+  overflow: hidden;
+  padding: var(--space-2) var(--space-3) 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar__backdrop {
+  display: none;
+}
+
+.logo {
+  font-family: var(--font-serif);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.logo span {
+  color: var(--color-accent);
+}
+
+@media (max-width: 860px) {
+  .shell__main {
+    margin-left: 0;
+    padding: var(--space-5) var(--space-4) var(--space-6);
+  }
+
+  .mobile-bar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    height: 52px;
+    padding: 0 var(--space-3);
+    border-bottom: 1px solid var(--color-line);
+    background: var(--color-bg);
+  }
+
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform var(--transition);
+  }
+
+  .sidebar--open {
+    transform: none;
+    box-shadow: var(--shadow-overlay);
+  }
+
+  .sidebar__backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 25;
+    display: block;
+    border: 0;
+    background: rgb(0 0 0 / 0.3);
+  }
+}
+
+@media (min-width: 861px) {
+  .sidebar__close {
+    display: none;
+  }
+}

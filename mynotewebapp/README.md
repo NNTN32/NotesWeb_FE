@@ -1,101 +1,75 @@
 # MyNote
 
-A calm place for notes, daily tasks, and weekly plans. Built with React 19 and Vite, with an English interface and warm paper, sage, and lavender palettes.
+Notes, daily tasks and a weekly plan in one quiet place. React 19 + Vite, plain CSS with design tokens, no UI framework.
 
 ## Development
 
 ```sh
-npm install
-npm run dev
-npm run lint
-npm test
-npm run build
+yarn install
+yarn dev        # http://localhost:5173, proxies /api to http://localhost:8081
+yarn lint
+yarn test
+yarn build
 ```
 
-The dev server proxies `/api` to `http://localhost:8081` (`vite.config.js`). Set `API_PROXY_TARGET` in the shell to override the development upstream (for example a separate local test server). Account flows require that backend; the frontend does not simulate successful authentication.
+Set `API_PROXY_TARGET` to point the dev proxy at another backend. Account flows need that backend; the frontend never fakes a successful sign-in.
 
 ## Production deployment
 
-See [Dokploy configuration and operating checks](deploy/DOKPLOY.md). The Dockerfile builds with the Yarn lockfile and serves the bundle through Nginx. Set the runtime `API_UPSTREAM` and attach the backend network. Production follows the repository's `main` branch.
+See [Dokploy configuration and operating checks](deploy/DOKPLOY.md). The Dockerfile builds with the Yarn lockfile and serves the bundle through Nginx. Production follows `main`.
+
+## Routes
+
+| Path | Page |
+| --- | --- |
+| `/` | Home |
+| `/auth/login`, `/auth/register` | Account |
+| `/notes` | Notes (list + editor) |
+| `/tasks?view=day\|week&date=YYYY-MM-DD` | Tasks; view and date live in the URL |
+
+Old paths (`/create`, `/todo`, `/weekly-plan`, `/login`, `/register`) redirect to the new ones. All paths are defined in `app/routes.js`.
 
 ## Structure
 
 ```text
 src/
-  app/                     Providers, lazy routes, shared navigation, scroll reset
+  main.jsx                 Entry: global CSS + <App />
+  app/                     App, providers, routes, navigation
   components/
-    home/                  Landing sections, interactive preview, FAQ
-    layout/                Workspace shell and breadcrumb/date bar
-    workspace/             PageSurface, PageHeader, dialog, empty state, ambient canvas
-    motion/                Reveal: isolated scroll entrance enhancement
-    ui/                    Shared decorative connection illustration
-    notes/                 Notebook library and writing canvas
-    tasks/                 Schedule, cards, filters, editor, weekly board, summary
-    auth/                  Shared account form for page and modal
-  features/
-    notes/                 Pure note model and editor hook
-    tasks/                 Pure date/filter/statistics model and view hook
-    auth/                  Authentication submission and errors
-  context/                 Shared tasks, authentication, theme, motion preferences, auth modal
-  hooks/                   Local storage persistence and cross-tab updates
-  pages/                   Compose components and feature state for each route
-  pages/home/              Landing content data and scoped CSS Module
-  styles/
-    tokens.css             Shared radius, shadow, and motion timing
-    workspace.css          Ordered entry point for workspace styles
-    workspace-base.css     Shared controls and layout
-    notes.css              Notebook palette and editor layout
-    tasks.css              Daily schedule and lavender weekly calendar
-    auth.css               Warm account page and form
-    ambient.css            Grid, light washes, and page palette variants
-    flow.css               Decorative paths and floating icon nodes
-    interactions.css       Hover/press feedback
-    page-motion.css        One-time workspace and dialog entrances
-    responsive.css         Workspace breakpoints and reduced motion
-  utils/api/               Existing authentication API integration
-
-tests/                     Node test runner; no extra test dependency
+    layout/                AppShell (sidebar + outlet), Sidebar
+    ui/                    Reusable primitives: IconButton, Modal, PageHeader,
+                           SegmentedControl, ThemeToggle, Alert, EmptyState, Logo, undoToast
+  features/                One folder per domain; owns its state, logic, UI and CSS
+    auth/                  API client, session, providers, AuthForm/AuthModal
+    notes/                 noteModel (pure), useNotes, NoteList, NoteEditor, notes.css
+    tasks/                 taskModel (pure), TasksProvider, useTaskActions, Day/Week views, tasks.css
+    theme/                 ThemeProvider (light/dark)
+  hooks/                   useLocalStore: validated localStorage + cross-tab sync
+  lib/                     Framework-free helpers (httpClient, download)
+  pages/                   Thin route components that compose features
+  styles/                  tokens → base → components → layout (imported once in main.jsx)
+tests/                     node:test, no extra dependencies
 ```
 
-Pages compose the interface. Data transformations stay in pure feature models. Shared task state lives in `TasksProvider`, so the daily and weekly views remain consistent. Navigation labels and routes are defined once in `app/navigation.js`.
+### Conventions
 
-## Design and motion
+- **Pages compose, features own.** A page wires feature components together; business rules live in the feature's pure `*Model.js` and are unit-tested.
+- **Pure models.** `noteModel.js` and `taskModel.js` have no React or browser APIs, so they are tested directly with `node --test`.
+- **Context files.** `XContext.js` holds `createContext` + `useX()`; `XProvider.jsx` holds the provider. This keeps React Fast Refresh happy.
+- **Styling.** Every color, size and radius is a token in `styles/tokens.css`; dark mode only redefines colors under `:root.dark`. Global primitives (`.btn`, `.input`, `.icon-btn`, `.modal`…) are in `styles/components.css`. Feature CSS sits next to the feature and is imported by the page or component that needs it. Class names follow `block__element--modifier`.
+- **Accessibility.** Icon-only buttons go through `IconButton`, which requires a `label`. Dialogs use the native `<dialog>` (`Modal`). Motion is limited to short transitions and is disabled by `prefers-reduced-motion`.
+- **Copy.** One title per page, no decorative eyebrows or quotes. Say "stored in this browser" once per screen at most.
 
-The layout takes cues from the reference at https://explee-staging.nudgen.net/: a centered serif hero, faint grid, connected icon nodes, a product preview, bento cards, and guided steps. MyNote keeps its own copy, local-first behavior, warm paper surfaces, and feature colors.
+## Data
 
-- Use `PageSurface` for a workspace page and its ambient variant. Keep functional controls outside decorative layers.
-- Change shared geometry in `tokens.css`; keep feature colors in their feature stylesheet. Home uses a CSS Module.
-- Use `Reveal` for independent landing sections. It observes once, animates with the Web Animations API, and cleans up observers and listeners. Content remains available without animation support.
-- Workspace backgrounds stay still while writing or planning. Entrances last 280ms without staggered delays; landing reveals last 420ms. Successful saves and task completion get a single 260ms acknowledgement, never on initial render. Text feedback remains available with motion off.
-- Workspace entrances use CSS. Hover effects are limited to devices with a fine pointer; press feedback also works on touch.
-- Quiet mode is available on Home, workspace navigation, and account pages; its local preference persists between visits. Device reduced-motion preferences always take priority. Both stop decorative loops, entrances, and movement. Focus outlines remain visible. No animation library or scroll listener is required.
-- Decorative SVGs and backgrounds are hidden from assistive technology and cannot intercept pointer events.
-- Native dialogs isolate the background, focus the first form field, close on Escape, and restore focus to the trigger.
-- The home preview is a demonstration; only workspace pages write to storage.
-
-## Data and limits
-
-- `mynote.tasks.v1`: tasks shared by the daily and weekly views.
-- `mynote.notes.v1`: current draft and saved notebook pages. Typing saves the draft; **Save to notebook** creates or updates a page. Download `.txt` to keep a copy.
-- Notes and tasks live in this browser’s local storage. They do not sync to another device or an account. Signing out does not erase them.
-- Success is reported only after a successful storage write. Invalid stored data is not overwritten on startup. Back up unreadable data before editing.
-- Deletion supports undo for the most recently deleted item while its page remains open.
-- Account auth follows the real asynchronous backend contract: username login, bounded result polling, register then sign in, HttpOnly-cookie refresh, and server logout. Access tokens remain in memory. Google/Apple are unavailable until BE adds OAuth. See [API contract and sync prerequisites](docs/API_CONTRACT.md).
+- `mynote.notes.v1`: `{ draft, notes[] }`. The open note is saved on every keystroke; a note emptied of all text is removed. Download a note as `.txt` from the editor.
+- `mynote.tasks.v1`: tasks shared by the Day and Week views.
+- Data stays in this browser's local storage; it does not sync between devices or accounts and signing out does not erase it. Unreadable stored data is never overwritten on startup.
+- Deleting a note or task shows an Undo toast.
+- Auth follows [the API contract](docs/API_CONTRACT.md): username login, register then sign in, HttpOnly-cookie refresh, server logout. Access tokens stay in memory.
 
 ## Verification
 
-`npm test` covers asynchronous auth, cancellation, session metadata, date boundaries, English date labels, time slots, filters, priority sorting, statistics, storage validation, and note mutations.
+`yarn test` covers auth (async flow, cancellation, session refresh), note editing/removal/restore/search, task dates, week ranges, time slots, filters, statistics, storage validation and file names.
 
-For visual or interaction changes, check Home, Notes, To-dos, Weekly Plan, Sign in, and Sign up at desktop and mobile widths. Verify note save/reload, tasks shared between views, dialog focus/Escape, mobile navigation, dark mode, and reduced motion. Weekly overflow must stay inside the calendar region.
-
-## Motion review rationale
-
-Motion helps users recognize an action and see real progress. It does not guarantee repeat use; validate that with usability sessions and returning-user data. Avoid streak penalties, artificial urgency, repeated celebrations, and moving calls to action. Keep tasks reversible and the next step optional.
-
-References: [NN/g — purpose of animation](https://www.nngroup.com/articles/animation-purpose-ux/), [NN/g — duration](https://www.nngroup.com/articles/animation-duration/), [W3C — Pause, Stop, Hide](https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide).
-
-## Brand interaction
-
-`BrandLogo` is shared by Home, workspace navigation, the mobile bar, and account pages. Its antique book and gold quill with inkwell are inline SVG. The book button replays one 900ms cover/page gesture and a 620ms masked wordmark reveal. Initially only the book is visible. Clicking it reveals the wordmark as a separate Home link; a second click retracts it toward the book with a 480ms curved mask and a subtle book compression. Its width is reserved to prevent navigation shifts; until revealed it is hidden from assistive technology and keyboard focus. Without animation support the reveal happens immediately. Quiet mode keeps only the book visible, hides any revealed wordmark, and ignores book activation. Device reduced motion skips the animation but still allows an immediate wordmark reveal when Quiet mode is off. Rapid toggles capture the current wordmark frame before cancelling the previous sequence; unmount and preference changes clean up active animations. Change the artwork in `components/ui/AntiqueBook.jsx` and its palette/geometry in `styles/brand.css`.
-
-The account dialog and dedicated account pages share a compact sage form, antique-book emblem, mode selector, and 220ms form entrance. Mode switches focus the first field inside an open dialog; native Escape and focus restoration remain in `Modal`. Users can start a local notebook directly from either form. Authentication follows the contract in `docs/API_CONTRACT.md`; sign-in uses username instead of email.
+For UI changes, check Home, Notes, Tasks (Day and Week), Sign in and Sign up at 360px and desktop widths, in light and dark mode: no horizontal page scroll, dialog focus and Escape, mobile menu, and undo after delete.

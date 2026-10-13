@@ -39,6 +39,10 @@
   text-align: left;
 }
 
+.note-list__item {
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
 .note-list__item:hover {
   background: var(--color-surface-muted);
 }

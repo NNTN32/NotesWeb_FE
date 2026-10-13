@@ -5,6 +5,7 @@ import PageHeader from "../components/ui/PageHeader";
 import SegmentedControl from "../components/ui/SegmentedControl";
 import IconButton from "../components/ui/IconButton";
 import Alert from "../components/ui/Alert";
+import Animate from "../components/ui/Animate";
 import DayView from "../features/tasks/components/DayView";
 import WeekView from "../features/tasks/components/WeekView";
 import TaskEditor from "../features/tasks/components/TaskEditor";
@@ -57,6 +58,12 @@ export default function TasksPage() {
   const actions = useTaskActions();
   const [query, setQuery] = useState("");
   const [hideCompleted, setHideCompleted] = useState(false);
+  // Which way the last date change went, so content slides in from that side.
+  const [direction, setDirection] = useState(null);
+  const goTo = (next) => {
+    setDirection(next > date ? "forward" : "back");
+    setDate(next);
+  };
 
   const isWeek = view === "week";
   const dates = isWeek ? weekDates(date) : [date];
@@ -74,7 +81,10 @@ export default function TasksPage() {
           label="View"
           options={VIEWS}
           value={view}
-          onChange={setView}
+          onChange={(next) => {
+            setDirection(null);
+            setView(next);
+          }}
         />
         <button
           type="button"
@@ -92,20 +102,28 @@ export default function TasksPage() {
           <IconButton
             label={isWeek ? "Previous week" : "Previous day"}
             icon={FiChevronLeft}
-            onClick={() => setDate(shiftDate(date, isWeek ? -7 : -1))}
+            onClick={() => goTo(shiftDate(date, isWeek ? -7 : -1))}
           />
           <h2 className="date-nav__label" aria-live="polite">
             {isWeek
               ? formatWeekRange(dates)
-              : formatDate(date, { weekday: "long", month: "long", day: "numeric" })}
+              : formatDate(date, {
+                  weekday: "long",
+                  month: "long",
+                  day: "numeric",
+                })}
           </h2>
           <IconButton
             label={isWeek ? "Next week" : "Next day"}
             icon={FiChevronRight}
-            onClick={() => setDate(shiftDate(date, isWeek ? 7 : 1))}
+            onClick={() => goTo(shiftDate(date, isWeek ? 7 : 1))}
           />
           {!showsToday && (
-            <button type="button" className="btn btn--ghost" onClick={() => setDate(dateKey())}>
+            <button
+              type="button"
+              className="btn btn--ghost"
+              onClick={() => goTo(dateKey())}
+            >
               Today
             </button>
           )}
@@ -133,16 +151,28 @@ export default function TasksPage() {
         </div>
       </div>
 
-      {isWeek ? (
-        <WeekView dates={dates} tasks={visibleTasks} actions={actions} />
-      ) : (
-        <DayView
-          date={date}
-          dayTasks={rangeTasks}
-          visibleTasks={visibleTasks}
-          actions={actions}
-        />
-      )}
+      {/* Re-keyed per view and period: slides in the navigation direction. */}
+      <Animate
+        key={`${view}-${dates[0]}`}
+        name={
+          direction === "forward"
+            ? "fromRight"
+            : direction === "back"
+              ? "fromLeft"
+              : "fade"
+        }
+      >
+        {isWeek ? (
+          <WeekView dates={dates} tasks={visibleTasks} actions={actions} />
+        ) : (
+          <DayView
+            date={date}
+            dayTasks={rangeTasks}
+            visibleTasks={visibleTasks}
+            actions={actions}
+          />
+        )}
+      </Animate>
 
       {actions.editor && (
         <TaskEditor

@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { FiCalendar, FiCheckSquare, FiEdit3 } from "react-icons/fi";
 import Logo from "../components/ui/Logo";
 import ThemeToggle from "../components/ui/ThemeToggle";
+import Animate from "../components/ui/Animate";
 import { useAuth } from "../features/auth/AuthContext";
 import { useAuthModal } from "../features/auth/AuthModalContext";
 import { ROUTES } from "../app/routes";
@@ -51,30 +52,35 @@ export default function HomePage() {
       </header>
 
       <main className="home__hero">
-        <h1>Notes and tasks, in one quiet place.</h1>
-        <p className="home__lead">
+        <Animate as="h1" name="rise" index={0}>
+          Notes and tasks, in one quiet place.
+        </Animate>
+        <Animate as="p" name="rise" index={1} className="home__lead">
           Capture ideas, plan your day and see your week. No account needed to
           start.
-        </p>
-        <Link className="btn btn--primary home__cta" to={ROUTES.notes}>
-          Start writing
-        </Link>
+        </Animate>
+        <Animate name="rise" index={2}>
+          <Link className="btn btn--primary home__cta" to={ROUTES.notes}>
+            Start writing
+          </Link>
+        </Animate>
 
         <ul className="home__features">
-          {FEATURES.map(({ icon: Icon, title, text, to }) => (
-            <li key={title}>
+          {FEATURES.map(({ icon: Icon, title, text, to }, index) => (
+            <Animate as="li" key={title} name="rise" index={index + 3}>
               <Link to={to} className="home__feature">
                 <Icon aria-hidden="true" />
                 <strong>{title}</strong>
                 <span>{text}</span>
               </Link>
-            </li>
+            </Animate>
           ))}
         </ul>
       </main>
 
       <footer className="home__footer muted">
-        Your notes and tasks are stored in this browser. © {new Date().getFullYear()} MyNote
+        Your notes and tasks are stored in this browser. ©{" "}
+        {new Date().getFullYear()} MyNote
       </footer>
     </div>
   );

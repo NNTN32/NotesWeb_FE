@@ -1,11 +1,20 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { FiX } from "react-icons/fi";
 import IconButton from "./IconButton";
+import { useExitAnimation } from "../../hooks/useExitAnimation";
 
-/** Native <dialog>: traps focus, closes on Escape/backdrop, restores focus. */
+/**
+ * Native <dialog>: traps focus, closes on Escape/backdrop, restores focus.
+ * Enter/exit animations live in styles/motion.css (.modal[open], [data-exiting]).
+ *
+ * `children` may be a function receiving `close`, so forms can close the
+ * dialog with its exit animation after a successful submit.
+ */
 export default function Modal({ children, titleId, onClose, className = "" }) {
-  const ref = useRef(null);
+  const { ref, exit, exitProps } = useExitAnimation();
+  const close = () => exit(onClose);
+
   useEffect(() => {
     const dialog = ref.current;
     const previous = document.activeElement;
@@ -23,36 +32,36 @@ export default function Modal({ children, titleId, onClose, className = "" }) {
       if (previous instanceof HTMLElement && previous.isConnected)
         previous.focus();
     };
-  }, []);
+  }, [ref]);
+
   return createPortal(
     <dialog
       ref={ref}
       className={`modal ${className}`}
       aria-labelledby={titleId}
+      {...exitProps}
       onCancel={(event) => {
         event.preventDefault();
-        onClose();
+        close();
       }}
       onClick={(event) => {
-        if (event.target === event.currentTarget) {
-          const rect = event.currentTarget.getBoundingClientRect();
-          if (
-            event.clientX < rect.left ||
-            event.clientX > rect.right ||
-            event.clientY < rect.top ||
-            event.clientY > rect.bottom
-          )
-            onClose();
-        }
+        if (event.target !== event.currentTarget) return;
+        const rect = event.currentTarget.getBoundingClientRect();
+        const outside =
+          event.clientX < rect.left ||
+          event.clientX > rect.right ||
+          event.clientY < rect.top ||
+          event.clientY > rect.bottom;
+        if (outside) close();
       }}
     >
       <IconButton
         label="Close dialog"
         icon={FiX}
         className="modal__close"
-        onClick={onClose}
+        onClick={close}
       />
-      {children}
+      {typeof children === "function" ? children(close) : children}
     </dialog>,
     document.body,
   );

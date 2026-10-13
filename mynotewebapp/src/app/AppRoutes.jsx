@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import HomePage from "../pages/HomePage";
 import AppShell from "../components/layout/AppShell";
+import PageLoader from "../components/ui/PageLoader";
 import { ROUTES } from "./routes";
 
 const AuthPage = lazy(() => import("../pages/AuthPage"));
@@ -19,13 +20,7 @@ const LEGACY_REDIRECTS = [
 
 export default function AppRoutes() {
   return (
-    <Suspense
-      fallback={
-        <p role="status" className="empty">
-          Loading…
-        </p>
-      }
-    >
+    <Suspense fallback={<PageLoader />}>
       <Routes>
         <Route path={ROUTES.home} element={<HomePage />} />
         <Route path="/auth/:mode" element={<AuthPage />} />
@@ -34,7 +29,11 @@ export default function AppRoutes() {
           <Route path={ROUTES.tasks} element={<TasksPage />} />
         </Route>
         {LEGACY_REDIRECTS.map(([from, to]) => (
-          <Route key={from} path={from} element={<Navigate to={to} replace />} />
+          <Route
+            key={from}
+            path={from}
+            element={<Navigate to={to} replace />}
+          />
         ))}
         <Route path="*" element={<Navigate to={ROUTES.home} replace />} />
       </Routes>

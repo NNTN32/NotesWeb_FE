@@ -1,12 +1,14 @@
 import { useRef, useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { FiMenu } from "react-icons/fi";
 import Sidebar from "./Sidebar";
 import Logo from "../ui/Logo";
 import IconButton from "../ui/IconButton";
+import Animate from "../ui/Animate";
 
 /** Layout for workspace pages: sidebar navigation + routed page content. */
 export default function AppShell() {
+  const { pathname } = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuButton = useRef(null);
   const closeMenu = () => setMenuOpen(false);
@@ -37,7 +39,10 @@ export default function AppShell() {
       </header>
       <Sidebar open={menuOpen} onClose={closeMenu} />
       <main id="main-content" className="shell__main">
-        <Outlet />
+        {/* Keyed by path so each page plays its entrance once. */}
+        <Animate key={pathname} name="rise">
+          <Outlet />
+        </Animate>
       </main>
     </div>
   );

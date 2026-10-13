@@ -47,7 +47,7 @@ src/
   hooks/                   useLocalStore: validated localStorage + cross-tab sync
   lib/                     Framework-free helpers (httpClient, download)
   pages/                   Thin route components that compose features
-  styles/                  tokens → base → components → layout (imported once in main.jsx)
+  styles/                  tokens → base → components → layout → motion (imported once in main.jsx)
 tests/                     node:test, no extra dependencies
 ```
 
@@ -59,6 +59,39 @@ tests/                     node:test, no extra dependencies
 - **Styling.** Every color, size and radius is a token in `styles/tokens.css`; dark mode only redefines colors under `:root.dark`. Global primitives (`.btn`, `.input`, `.icon-btn`, `.modal`…) are in `styles/components.css`. Feature CSS sits next to the feature and is imported by the page or component that needs it. Class names follow `block__element--modifier`.
 - **Accessibility.** Icon-only buttons go through `IconButton`, which requires a `label`. Dialogs use the native `<dialog>` (`Modal`). Motion is limited to short transitions and is disabled by `prefers-reduced-motion`.
 - **Copy.** One title per page, no decorative eyebrows or quotes. Say "stored in this browser" once per screen at most.
+
+## Motion
+
+Motion confirms what just happened and where things went; it never decorates. Everything is CSS-driven except exit timing.
+
+| Where | Effect |
+| --- | --- |
+| Route change | page rises in (`AppShell` keys `<Animate>` by path) |
+| Day ↔ Week, ‹ › | content slides in from the navigation side, week columns stagger |
+| Add task / note | only the new item rises in (`useNewItems`), never the initial list |
+| Complete task | round checkbox fills with a springy tick, strike-through draws left→right |
+| Delete task | row slides out, then is removed (`useExitAnimation`); Undo toast slides up |
+| Dialogs | scale + fade in, faster ease-in out, backdrop fades |
+| Segmented control | thumb slides to the active option |
+| Theme | View Transitions cross-fade, icon turns in |
+| Buttons | press scale 0.97; hover colors ease |
+| Loading | skeleton appears only after 200ms |
+
+**Where things live**
+
+- `styles/tokens.css`: durations (`--duration-instant/fast/base/slow`), easings (`--ease-out/in/spring`), distances (`--motion-distance`, `--motion-scale`, `--motion-rotate`).
+- `styles/motion.css`: the only file with `@keyframes`; enter (`motion-*`) and exit (`motion-exit-*`) utilities, dialog, toast and press feedback.
+- `lib/motion.js`: `ENTER` / `EXIT` class maps, `staggerStyle()`, `withViewTransition()`, `prefersReducedMotion()`.
+- `components/ui/Animate.jsx`: `<Animate name="rise" index={i}>`; change its `key` to replay.
+- `hooks/useExitAnimation.js`: play an exit, then run a callback (always finishes via animationend, a fallback timeout, or immediately).
+- `hooks/useNewItems.js`: animate only items added after mount.
+
+**Rules**
+
+- Animate `transform` and `opacity` only. Enter 160–300ms ease-out; exit shorter, ease-in. Stagger ≤ 6 items × 50ms.
+- State changes use `transition`; mount/unmount uses the utilities. Never add `@keyframes` outside `motion.css`.
+- Never remount an input while the user types (e.g. Notes keys the editor by an open counter, not by note id).
+- `prefers-reduced-motion` sets distances/scales to zero and shortens durations, so everything becomes a short fade; the skeleton shimmer stops.
 
 ## Data
 

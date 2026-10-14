@@ -1,7 +1,7 @@
 import { toast } from "react-toastify";
 
-/** Shows a short confirmation with an Undo action (used after deletions). */
-export function undoToast(message, onUndo) {
+/** A short confirmation with one action button (e.g. Undo, View). */
+export function actionToast(message, actionLabel, onAction) {
   toast(({ closeToast }) => (
     <div className="toast-undo" role="status">
       <span>{message}</span>
@@ -9,12 +9,17 @@ export function undoToast(message, onUndo) {
         type="button"
         className="link-btn"
         onClick={() => {
-          onUndo();
+          onAction();
           closeToast();
         }}
       >
-        Undo
+        {actionLabel}
       </button>
     </div>
   ));
+}
+
+/** Confirmation after a deletion, with Undo. */
+export function undoToast(message, onUndo) {
+  actionToast(message, "Undo", onUndo);
 }

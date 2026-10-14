@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import PageHeader from "../components/ui/PageHeader";
 import Alert from "../components/ui/Alert";
 import Animate from "../components/ui/Animate";
@@ -6,6 +7,10 @@ import NoteList from "../features/notes/components/NoteList";
 import NoteEditor from "../features/notes/components/NoteEditor";
 import { useNotes } from "../features/notes/useNotes";
 import { noteTitle } from "../features/notes/noteModel";
+import { useTasks } from "../features/tasks/TasksContext";
+import { createTask } from "../features/tasks/taskModel";
+import { actionToast } from "../components/ui/undoToast";
+import { ROUTES } from "../app/routes";
 import { downloadText, safeFileName } from "../lib/download";
 import "../features/notes/notes.css";
 
@@ -13,6 +18,16 @@ export default function NotesPage() {
   const notes = useNotes();
   const [focus, setFocus] = useState(false);
   const { active } = notes;
+  const { saveTask } = useTasks();
+  const navigate = useNavigate();
+
+  // Notes → Tasks: the page connects the two features; neither imports the other.
+  const addTask = (text) => {
+    if (!saveTask(createTask({ text }))) return;
+    actionToast(`Added “${text}” to today`, "View", () =>
+      navigate(`${ROUTES.tasks}?view=day`),
+    );
+  };
   // Bumped only when the user opens or creates a note, never while typing,
   // so the editor fades in on switch without losing focus mid-edit.
   const [openCount, setOpenCount] = useState(0);
@@ -64,6 +79,7 @@ export default function NotesPage() {
             focus={focus}
             onChange={notes.edit}
             onToggleFocus={() => setFocus(!focus)}
+            onAddTask={addTask}
             onDelete={() => notes.remove(active)}
             onDownload={() =>
               downloadText(

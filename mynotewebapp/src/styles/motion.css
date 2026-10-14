@@ -51,6 +51,23 @@
   to { opacity: 0; transform: translateX(calc(var(--motion-distance) * -2)); }
 }
 
+@keyframes motion-pop-in {
+  from { opacity: 0; transform: scale(var(--motion-pop-scale)); }
+}
+
+@keyframes motion-drop-in {
+  from { opacity: 0; transform: translateY(calc(var(--motion-distance) * -3)) scale(var(--motion-scale)); }
+}
+
+@keyframes motion-highlight-sweep {
+  from { background-size: 0% 100%; }
+}
+
+@keyframes motion-progress-fill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
 @keyframes motion-turn-in {
   from { opacity: 0; transform: rotate(var(--motion-rotate)) scale(var(--motion-scale)); }
 }
@@ -74,11 +91,6 @@
 }
 
 /* Enter utilities (one per keyframe, all share the same timing contract) */
-[class*="motion-"] {
-  animation-delay: var(--motion-delay, 0ms);
-  animation-fill-mode: both;
-}
-
 .motion-fade { animation: motion-fade-in var(--duration-base) var(--ease-out); }
 .motion-rise { animation: motion-rise var(--duration-slow) var(--ease-out); }
 .motion-scale { animation: motion-scale-in var(--duration-base) var(--ease-out); }
@@ -86,6 +98,35 @@
 .motion-from-left { animation: motion-slide-from-left var(--duration-base) var(--ease-out); }
 .motion-slide-up { animation: motion-slide-up-in var(--duration-base) var(--ease-out); }
 .motion-turn { animation: motion-turn-in var(--duration-slow) var(--ease-spring); }
+.motion-pop { animation: motion-pop-in var(--duration-slow) var(--ease-spring); }
+.motion-drop { animation: motion-drop-in var(--duration-slow) var(--ease-spring); }
+
+/* Marker-pen highlight that sweeps left → right (inline text) */
+.motion-highlight {
+  background: linear-gradient(var(--color-highlight), var(--color-highlight))
+    no-repeat 0 0 / 100% 100%;
+  animation: motion-highlight-sweep calc(var(--duration-slow) * 2) var(--ease-out);
+}
+
+/* Timed fill bar (autoplay progress). Duration via --progress-duration. */
+.motion-progress {
+  transform-origin: left center;
+  animation: motion-progress-fill var(--progress-duration, 4s) linear;
+}
+
+[data-paused] .motion-progress {
+  animation-play-state: paused;
+}
+
+/*
+ * Shared timing contract for every enter utility above. Declared after them
+ * so their `animation` shorthand does not reset the stagger delay.
+ */
+[class*="motion-"]:not([data-exiting]) {
+  animation-delay: var(--motion-delay, 0ms);
+  animation-fill-mode: both;
+}
+
 
 /* Exit utilities (shorter, ease-in). Applied together with [data-exiting]. */
 [data-exiting].motion-exit-fade { animation: motion-fade-out var(--duration-fast) var(--ease-in) forwards; }

@@ -1,33 +1,19 @@
 import { Link } from "react-router-dom";
-import { FiCalendar, FiCheckSquare, FiEdit3 } from "react-icons/fi";
+import { FiArrowDown, FiHardDrive, FiMoon, FiUnlock } from "react-icons/fi";
 import Logo from "../components/ui/Logo";
 import ThemeToggle from "../components/ui/ThemeToggle";
 import Animate from "../components/ui/Animate";
 import Backdrop from "../components/layout/Backdrop";
+import FeatureFlow from "../features/home/components/FeatureFlow";
 import { useAuth } from "../features/auth/AuthContext";
 import { useAuthModal } from "../features/auth/AuthModalContext";
 import { ROUTES } from "../app/routes";
 import "./home.css";
 
-const FEATURES = [
-  {
-    icon: FiEdit3,
-    title: "Notes",
-    text: "Write freely. Every change is saved as you type.",
-    to: ROUTES.notes,
-  },
-  {
-    icon: FiCheckSquare,
-    title: "Today",
-    text: "Add a task, press Enter, check it off.",
-    to: `${ROUTES.tasks}?view=day`,
-  },
-  {
-    icon: FiCalendar,
-    title: "This week",
-    text: "See all seven days and move at your own pace.",
-    to: `${ROUTES.tasks}?view=week`,
-  },
+const FACTS = [
+  { icon: FiUnlock, text: "No account needed" },
+  { icon: FiHardDrive, text: "Stored in your browser" },
+  { icon: FiMoon, text: "Light and dark" },
 ];
 
 export default function HomePage() {
@@ -53,36 +39,46 @@ export default function HomePage() {
         </div>
       </header>
 
-      <main className="home__hero">
-        <Animate as="h1" name="rise" index={0}>
-          Notes and tasks, in one quiet place.
-        </Animate>
-        <Animate as="p" name="rise" index={1} className="home__lead">
-          Capture ideas, plan your day and see your week. No account needed to
-          start.
-        </Animate>
-        <Animate name="rise" index={2}>
-          <Link className="btn btn--primary home__cta" to={ROUTES.notes}>
-            Start writing
-          </Link>
+      <main>
+        <section className="home__hero" aria-labelledby="home-title">
+          <Animate as="h1" id="home-title" name="rise" index={0}>
+            Notes and tasks, in one quiet place.
+          </Animate>
+          <Animate as="p" name="rise" index={1} className="home__lead">
+            Write a thought, turn it into a task, see it in your week.
+          </Animate>
+          <Animate name="rise" index={2} className="home__actions">
+            <Link className="btn btn--primary home__cta" to={ROUTES.notes}>
+              Start writing
+            </Link>
+            <a className="btn btn--ghost" href="#how-it-works">
+              See how it works <FiArrowDown aria-hidden="true" />
+            </a>
+          </Animate>
+        </section>
+
+        <Animate name="rise" index={3}>
+          <FeatureFlow id="how-it-works" />
         </Animate>
 
-        <ul className="home__features">
-          {FEATURES.map(({ icon: Icon, title, text, to }, index) => (
-            <Animate as="li" key={title} name="rise" index={index + 3}>
-              <Link to={to} className="home__feature">
+        <section className="home__closing" aria-labelledby="closing-title">
+          <h2 id="closing-title">Start with one note.</h2>
+          <ul className="home__facts">
+            {FACTS.map(({ icon: Icon, text }) => (
+              <li key={text}>
                 <Icon aria-hidden="true" />
-                <strong>{title}</strong>
-                <span>{text}</span>
-              </Link>
-            </Animate>
-          ))}
-        </ul>
+                {text}
+              </li>
+            ))}
+          </ul>
+          <Link className="btn btn--primary home__cta" to={ROUTES.notes}>
+            Open Notes
+          </Link>
+        </section>
       </main>
 
       <footer className="home__footer muted">
-        Your notes and tasks are stored in this browser. ©{" "}
-        {new Date().getFullYear()} MyNote
+        © {new Date().getFullYear()} MyNote
       </footer>
     </div>
   );

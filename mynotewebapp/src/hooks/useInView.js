@@ -4,7 +4,11 @@ import { useEffect, useState } from "react";
  * Tracks whether an element is on screen. Returns [ref callback, inView].
  * Falls back to "visible" where IntersectionObserver is unavailable.
  */
-export function useInView({ threshold = 0.25, rootMargin = "0px" } = {}) {
+export function useInView({
+  threshold = 0.25,
+  rootMargin = "0px",
+  once = false,
+} = {}) {
   const [node, setNode] = useState(null);
   const [inView, setInView] = useState(false);
 
@@ -15,12 +19,16 @@ export function useInView({ threshold = 0.25, rootMargin = "0px" } = {}) {
       return;
     }
     const observer = new IntersectionObserver(
-      ([entry]) => setInView(entry.isIntersecting),
+      ([entry]) => {
+        setInView(entry.isIntersecting);
+        // `once`: stop watching after the first appearance (scroll reveals).
+        if (once && entry.isIntersecting) observer.disconnect();
+      },
       { threshold, rootMargin },
     );
     observer.observe(node);
     return () => observer.disconnect();
-  }, [node, threshold, rootMargin]);
+  }, [node, threshold, rootMargin, once]);
 
   return [setNode, inView];
 }

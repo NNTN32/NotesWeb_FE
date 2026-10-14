@@ -12,6 +12,7 @@ import { createTask } from "../features/tasks/taskModel";
 import { actionToast } from "../components/ui/undoToast";
 import { ROUTES } from "../app/routes";
 import { downloadText, safeFileName } from "../lib/download";
+import { withViewTransition } from "../lib/motion";
 import "../features/notes/notes.css";
 
 export default function NotesPage() {
@@ -43,7 +44,8 @@ export default function NotesPage() {
 
   useEffect(() => {
     if (!focus) return;
-    const exitOnEscape = (event) => event.key === "Escape" && setFocus(false);
+    const exitOnEscape = (event) =>
+      event.key === "Escape" && withViewTransition(() => setFocus(false));
     window.addEventListener("keydown", exitOnEscape);
     return () => window.removeEventListener("keydown", exitOnEscape);
   }, [focus]);
@@ -78,7 +80,7 @@ export default function NotesPage() {
             saveFailed={!!notes.storageError}
             focus={focus}
             onChange={notes.edit}
-            onToggleFocus={() => setFocus(!focus)}
+            onToggleFocus={() => withViewTransition(() => setFocus(!focus))}
             onAddTask={addTask}
             onDelete={() => notes.remove(active)}
             onDownload={() =>

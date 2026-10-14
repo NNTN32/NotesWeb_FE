@@ -70,6 +70,8 @@
 
 /* Editor */
 .note-editor {
+  /* Morphs between normal and focus layout via the View Transitions API */
+  view-transition-name: note-editor;
   display: flex;
   flex-direction: column;
   min-height: calc(100vh - 160px);

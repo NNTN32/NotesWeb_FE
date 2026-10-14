@@ -3,6 +3,7 @@ import { FiSearch } from "react-icons/fi";
 import EmptyState from "../../../components/ui/EmptyState";
 import { useNewItems } from "../../../hooks/useNewItems";
 import { ENTER } from "../../../lib/motion";
+import { useFlip } from "../../../hooks/useFlip";
 import { noteTitle, searchNotes } from "../noteModel";
 
 const dateFormat = new Intl.DateTimeFormat("en-US", {
@@ -14,6 +15,7 @@ export default function NoteList({ notes, activeId, onOpen }) {
   const [query, setQuery] = useState("");
   const results = searchNotes(notes, query);
   const isNew = useNewItems(notes.map((note) => note.id));
+  const flipRef = useFlip();
 
   return (
     <aside className="note-list" aria-label="All notes">
@@ -29,10 +31,11 @@ export default function NoteList({ notes, activeId, onOpen }) {
         />
       </label>
       {results.length ? (
-        <ul className="note-list__items">
+        <ul ref={flipRef} className="note-list__items flip-root">
           {results.map((note) => (
             <li
               key={note.id}
+              data-flip-id={note.id}
               className={isNew(note.id) ? ENTER.rise : undefined}
             >
               <button

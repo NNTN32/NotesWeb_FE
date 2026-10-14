@@ -2,14 +2,22 @@ import { FiPlus } from "react-icons/fi";
 import IconButton from "../../../components/ui/IconButton";
 import { dateKey, formatDate } from "../taskModel";
 import TaskItem from "./TaskItem";
+import { useFlip } from "../../../hooks/useFlip";
 import { useNewItems } from "../../../hooks/useNewItems";
 import { staggerStyle } from "../../../lib/motion";
 
 export default function WeekView({ dates, tasks, actions }) {
+  const flipRef = useFlip();
   const today = dateKey();
   const isNew = useNewItems(tasks.map((task) => task.id));
   return (
-    <div className="week-view" role="region" aria-label="Week" tabIndex={0}>
+    <div
+      ref={flipRef}
+      className="week-view flip-root"
+      role="region"
+      aria-label="Week"
+      tabIndex={0}
+    >
       {dates.map((date, index) => {
         const items = tasks.filter((task) => task.date === date);
         const done = items.filter((task) => task.completed).length;

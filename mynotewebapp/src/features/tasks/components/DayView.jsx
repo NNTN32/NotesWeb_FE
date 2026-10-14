@@ -2,16 +2,22 @@ import { currentSlot, dateKey, groupBySlot, taskStats } from "../taskModel";
 import EmptyState from "../../../components/ui/EmptyState";
 import QuickAdd from "./QuickAdd";
 import TaskItem from "./TaskItem";
+import { useFlip } from "../../../hooks/useFlip";
 import { useNewItems } from "../../../hooks/useNewItems";
 
 export default function DayView({ date, dayTasks, visibleTasks, actions }) {
+  const flipRef = useFlip();
   const stats = taskStats(dayTasks);
   const isToday = date === dateKey();
   const groups = groupBySlot(visibleTasks);
   const isNew = useNewItems(dayTasks.map((task) => task.id));
 
   return (
-    <section className="day-view" aria-label="Tasks for the day">
+    <section
+      ref={flipRef}
+      className="day-view flip-root"
+      aria-label="Tasks for the day"
+    >
       {stats.total > 0 && (
         <div className="day-view__progress" aria-live="polite">
           <span className="muted">

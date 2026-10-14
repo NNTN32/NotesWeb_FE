@@ -69,6 +69,8 @@ Home tells one story with the three connected features: **Notes → Today → We
 - `features/home/components/FeatureFlow.jsx`: ARIA tabs (arrow keys, Home/End) + panel. Autoplay is driven by the CSS progress bar (`.motion-progress`): when it ends, the next step shows. It pauses off screen (`useInView`), in background tabs (`usePageVisible`), on hover/focus, stops for good once the user picks a step, and never runs with reduced motion (`usePrefersReducedMotion`).
 - `features/home/components/FlowPreview.jsx`: decorative mini app (`aria-hidden`) where the same example task is highlighted in a note, drops into Today and lands in the week.
 - `features/home/home-flow.css`: layout and look; motion comes from `motion.css` utilities (`highlight`, `pop`, `drop`, `progress`).
+- `features/home/components/LayoutShowcase.jsx`: "Day or week, same tasks" — the same chips re-flow between a list and a 7-day grid with `useFlip`; switches once by itself on first view, then the user is in control.
+- `features/home/components/Shortcuts.jsx`: the real keyboard shortcuts; keycaps press once when revealed. Copy and demo data live in `features/home/homeContent.js`.
 
 The story is real: in Notes, **Add as task** (or Ctrl/⌘ + Enter) turns the selected text, or the line under the caret, into a task for today (`taskTextAt` in `noteModel.js` strips list markers). The page wires Notes to Tasks; neither feature imports the other.
 
@@ -104,6 +106,13 @@ Motion confirms what just happened and where things went; it never decorates. Ev
 - State changes use `transition`; mount/unmount uses the utilities. Never add `@keyframes` outside `motion.css`.
 - Never remount an input while the user types (e.g. Notes keys the editor by an open counter, not by note id).
 - `prefers-reduced-motion` sets distances/scales to zero and shortens durations, so everything becomes a short fade; the skeleton shimmer stops.
+
+### Layout animation
+
+- **FLIP lists** (`hooks/useFlip.js`): give a container `ref={useFlip()}` + class `flip-root`, and each item `data-flip-id`. After any render that moves items, they glide from their old position (individual `translate`, so it never fights enter/exit `transform` animations). Used by the day view (completed tasks sink to the bottom, siblings close the gap after a delete), the week board and the note list (an edited note rises to the top). Duration/easing are read from the CSS tokens via `motionDuration()` / `motionToken()`.
+- **Shared-element morph**: Notes focus mode toggles inside `withViewTransition()` (which `flushSync`s the React update) and the editor has `view-transition-name: note-editor`.
+- **Scroll reveal** (`components/ui/Reveal.jsx`): sections rise in once when first seen (`useInView({ once: true })`); children can key off `[data-revealed]` (e.g. the keycap press on Home).
+- All of it is skipped under `prefers-reduced-motion`.
 
 ### Ambient backdrop
 

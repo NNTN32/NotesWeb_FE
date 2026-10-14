@@ -215,6 +215,17 @@ body:has(input:focus, textarea:focus) .backdrop__blob {
   }
 }
 
+/* FLIP containers (hooks/useFlip.js): items measure positions against this box */
+.flip-root {
+  position: relative;
+}
+
+/* Shared-element morph for the note editor in/out of focus mode */
+::view-transition-group(note-editor) {
+  animation-duration: var(--duration-slow);
+  animation-timing-function: var(--ease-out);
+}
+
 /* Theme switch cross-fade (View Transitions API, progressive enhancement) */
 ::view-transition-old(root),
 ::view-transition-new(root) {

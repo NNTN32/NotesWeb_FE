@@ -15,7 +15,12 @@ export default function TaskItem({ task, isNew, onToggle, onEdit, onDelete }) {
   ].filter(Boolean);
 
   return (
-    <li ref={ref} className={classes.join(" ")} {...exitProps}>
+    <li
+      ref={ref}
+      className={classes.join(" ")}
+      data-flip-id={task.id}
+      {...exitProps}
+    >
       <input
         type="checkbox"
         className="checkbox-input"

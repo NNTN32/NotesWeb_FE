@@ -1,3 +1,5 @@
+import { flushSync } from "react-dom";
+
 /**
  * Motion helpers. Animation names map 1:1 to classes in styles/motion.css,
  * so components never hard-code class strings.
@@ -42,7 +44,23 @@ export function withViewTransition(update) {
     update();
     return;
   }
-  document.startViewTransition(update);
+  // flushSync so React commits inside the transition's "new" snapshot.
+  document.startViewTransition(() => flushSync(update));
+}
+
+/** Reads a motion token from CSS so JS animations share the same timing. */
+export function motionToken(name) {
+  return getComputedStyle(document.documentElement)
+    .getPropertyValue(name)
+    .trim();
+}
+
+/** A duration token ("220ms" / "0.3s") in milliseconds. */
+export function motionDuration(name, fallback = 220) {
+  const value = motionToken(name);
+  const number = parseFloat(value);
+  if (Number.isNaN(number)) return fallback;
+  return value.endsWith("ms") ? number : number * 1000;
 }
 
 /** Inline style for the n-th item of a staggered group. */

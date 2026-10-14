@@ -3,7 +3,12 @@ import { FiPlus } from "react-icons/fi";
 import { createTask } from "../taskModel";
 
 /** Type a task and press Enter. Details can be edited afterwards. */
-export default function QuickAdd({ date, slot, onAdd }) {
+export default function QuickAdd({
+  date,
+  slot,
+  onAdd,
+  placeholder = "Add a task and press Enter",
+}) {
   const [text, setText] = useState("");
   return (
     <form
@@ -21,7 +26,7 @@ export default function QuickAdd({ date, slot, onAdd }) {
       <input
         id="quick-add"
         className="quick-add__input"
-        placeholder="Add a task and press Enter"
+        placeholder={placeholder}
         value={text}
         maxLength={240}
         autoComplete="off"

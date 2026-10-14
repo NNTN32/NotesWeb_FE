@@ -4,7 +4,7 @@ import { staggerStyle } from "../../lib/motion";
 /**
  * Rises its content in the first time it scrolls into view (styles in
  * motion.css, ".reveal"). Children can react to `[data-revealed]` too,
- * e.g. to play a one-off animation once the section is visible.
+ * e.g. to start a one-off animation once the section is visible.
  */
 export default function Reveal({
   as: Tag = "div",

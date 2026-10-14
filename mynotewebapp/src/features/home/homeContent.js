@@ -1,4 +1,4 @@
-/** Copy and demo data for the Home sections below the feature flow. */
+/** Copy and demo data for the Home sections below the feature flow (Day ↔ Week showcase). */
 
 /** Day ↔ Week showcase: `day` is the Monday-based column in the week layout. */
 export const SHOWCASE_TASKS = [
@@ -12,10 +12,3 @@ export const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 /** How long the showcase waits on first view before demonstrating the switch. */
 export const SHOWCASE_HINT_MS = 1400;
-
-/** Real shortcuts in the app — keep in sync with the features. */
-export const SHORTCUTS = [
-  { keys: ["Enter"], text: "Add a task from the quick-add field" },
-  { keys: ["Ctrl / ⌘", "Enter"], text: "Turn the line in a note into a task" },
-  { keys: ["Esc"], text: "Leave focus mode or close a dialog" },
-];

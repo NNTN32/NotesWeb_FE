@@ -85,11 +85,6 @@
   to { transform: translate3d(8vw, -10vh, 0) scale(1.1); }
 }
 
-@keyframes motion-keypress {
-  0%, 100% { transform: none; box-shadow: 0 2px 0 var(--color-line); }
-  45% { transform: translateY(2px); box-shadow: 0 0 0 var(--color-line); }
-}
-
 @keyframes motion-shimmer {
   from { background-position: 100% 0; }
   to { background-position: -100% 0; }
@@ -236,12 +231,6 @@ body:has(input:focus, textarea:focus) .backdrop__blob {
 .reveal:not([data-revealed]) {
   opacity: 0;
   transform: translateY(calc(var(--motion-distance) * 3));
-}
-
-/* Keycap press, played once when its section is revealed */
-[data-revealed] .keycap {
-  animation: motion-keypress var(--duration-slow) var(--ease-out) both;
-  animation-delay: var(--motion-delay, 0ms);
 }
 
 /* Shared-element morph for the note editor in/out of focus mode */

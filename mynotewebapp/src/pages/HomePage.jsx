@@ -4,7 +4,10 @@ import Logo from "../components/ui/Logo";
 import ThemeToggle from "../components/ui/ThemeToggle";
 import Animate from "../components/ui/Animate";
 import Backdrop from "../components/layout/Backdrop";
+import Reveal from "../components/ui/Reveal";
 import FeatureFlow from "../features/home/components/FeatureFlow";
+import LayoutShowcase from "../features/home/components/LayoutShowcase";
+import Shortcuts from "../features/home/components/Shortcuts";
 import { useAuth } from "../features/auth/AuthContext";
 import { useAuthModal } from "../features/auth/AuthModalContext";
 import { ROUTES } from "../app/routes";
@@ -57,11 +60,22 @@ export default function HomePage() {
           </Animate>
         </section>
 
-        <Animate name="rise" index={3}>
+        {/* Sections below the hero rise in once as they scroll into view. */}
+        <Reveal>
           <FeatureFlow id="how-it-works" />
-        </Animate>
+        </Reveal>
 
-        <section className="home__closing" aria-labelledby="closing-title">
+        <Reveal>
+          <LayoutShowcase />
+        </Reveal>
+
+        <Shortcuts />
+
+        <Reveal
+          as="section"
+          className="home__closing"
+          aria-labelledby="closing-title"
+        >
           <h2 id="closing-title">Start with one note.</h2>
           <ul className="home__facts">
             {FACTS.map(({ icon: Icon, text }) => (
@@ -74,7 +88,7 @@ export default function HomePage() {
           <Link className="btn btn--primary home__cta" to={ROUTES.notes}>
             Open Notes
           </Link>
-        </section>
+        </Reveal>
       </main>
 
       <footer className="home__footer muted">

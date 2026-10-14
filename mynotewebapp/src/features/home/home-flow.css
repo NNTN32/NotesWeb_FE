@@ -38,8 +38,9 @@
   left: calc(var(--space-4) + var(--index-size) / 2);
   width: 2px;
   margin-left: -1px;
-  background: linear-gradient(var(--color-accent), var(--color-accent)) no-repeat
-      0 0 / 100% 0%,
+  background:
+    linear-gradient(var(--color-accent), var(--color-accent)) no-repeat 0 0 /
+      100% 0%,
     var(--color-line);
   transition: background-size var(--duration-slow) var(--ease-out);
 }

@@ -65,12 +65,19 @@ tests/                     node:test, no extra dependencies
 
 Home tells one story with the three connected features: **Notes → Today → Week**.
 
+**Hero quick start** (`features/home/components/QuickStart.jsx`) — the first action happens on Home, not after a tour:
+
+- New visitor: one input ("What’s one thing you want to do today?"). Enter saves a real task for today.
+- Then, or for a returning visitor: a "Today" card with progress, the next 4 tasks (tick them right there), quick add and a link into the day view. All-done gets a small celebration; no streaks or guilt.
+- Returning visitors (any saved tasks) see "Welcome back." instead of the pitch; this is decided once per visit so the headline never flips under a new user.
+- It reuses `QuickAdd`, `TaskItem`, `useFlip` and `useNewItems` from Tasks and the same `TasksProvider`, so everything appears in Tasks too.
+
 - `features/home/flowSteps.js`: copy, links and timing for the three steps (edit content here only).
 - `features/home/components/FeatureFlow.jsx`: ARIA tabs (arrow keys, Home/End) + panel. Autoplay is driven by the CSS progress bar (`.motion-progress`): when it ends, the next step shows. It pauses off screen (`useInView`), in background tabs (`usePageVisible`), on hover/focus, stops for good once the user picks a step, and never runs with reduced motion (`usePrefersReducedMotion`).
 - `features/home/components/FlowPreview.jsx`: decorative mini app (`aria-hidden`) where the same example task is highlighted in a note, drops into Today and lands in the week.
 - `features/home/home-flow.css`: layout and look; motion comes from `motion.css` utilities (`highlight`, `pop`, `drop`, `progress`).
 - `features/home/components/LayoutShowcase.jsx`: "Day or week, same tasks" — the same chips re-flow between a list and a 7-day grid with `useFlip`; switches once by itself on first view, then the user is in control.
-- `features/home/components/Shortcuts.jsx`: the real keyboard shortcuts; keycaps press once when revealed. Copy and demo data live in `features/home/homeContent.js`.
+- Showcase demo data lives in `features/home/homeContent.js`.
 
 The story is real: in Notes, **Add as task** (or Ctrl/⌘ + Enter) turns the selected text, or the line under the caret, into a task for today (`taskTextAt` in `noteModel.js` strips list markers). The page wires Notes to Tasks; neither feature imports the other.
 
@@ -111,7 +118,7 @@ Motion confirms what just happened and where things went; it never decorates. Ev
 
 - **FLIP lists** (`hooks/useFlip.js`): give a container `ref={useFlip()}` + class `flip-root`, and each item `data-flip-id`. After any render that moves items, they glide from their old position (individual `translate`, so it never fights enter/exit `transform` animations). Used by the day view (completed tasks sink to the bottom, siblings close the gap after a delete), the week board and the note list (an edited note rises to the top). Duration/easing are read from the CSS tokens via `motionDuration()` / `motionToken()`.
 - **Shared-element morph**: Notes focus mode toggles inside `withViewTransition()` (which `flushSync`s the React update) and the editor has `view-transition-name: note-editor`.
-- **Scroll reveal** (`components/ui/Reveal.jsx`): sections rise in once when first seen (`useInView({ once: true })`); children can key off `[data-revealed]` (e.g. the keycap press on Home).
+- **Scroll reveal** (`components/ui/Reveal.jsx`): sections rise in once when first seen (`useInView({ once: true })`); children can key off `[data-revealed]`.
 - All of it is skipped under `prefers-reduced-motion`.
 
 ### Ambient backdrop

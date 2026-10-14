@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FiArrowDown, FiHardDrive, FiMoon, FiUnlock } from "react-icons/fi";
 import Logo from "../components/ui/Logo";
@@ -7,7 +8,8 @@ import Backdrop from "../components/layout/Backdrop";
 import Reveal from "../components/ui/Reveal";
 import FeatureFlow from "../features/home/components/FeatureFlow";
 import LayoutShowcase from "../features/home/components/LayoutShowcase";
-import Shortcuts from "../features/home/components/Shortcuts";
+import QuickStart from "../features/home/components/QuickStart";
+import { useTasks } from "../features/tasks/TasksContext";
 import { useAuth } from "../features/auth/AuthContext";
 import { useAuthModal } from "../features/auth/AuthModalContext";
 import { ROUTES } from "../app/routes";
@@ -22,6 +24,10 @@ const FACTS = [
 export default function HomePage() {
   const { user } = useAuth();
   const { openLogin } = useAuthModal();
+  // Anyone with saved tasks has used MyNote before: greet them, skip the pitch.
+  // Decided once per visit so the headline never changes under a new user.
+  const { tasks } = useTasks();
+  const [returning] = useState(() => tasks.length > 0);
 
   return (
     <div className="home">
@@ -45,14 +51,21 @@ export default function HomePage() {
       <main>
         <section className="home__hero" aria-labelledby="home-title">
           <Animate as="h1" id="home-title" name="rise" index={0}>
-            Notes and tasks, in one quiet place.
+            {returning
+              ? "Welcome back."
+              : "Notes and tasks, in one quiet place."}
           </Animate>
           <Animate as="p" name="rise" index={1} className="home__lead">
-            Write a thought, turn it into a task, see it in your week.
+            {returning
+              ? "Pick up where you left off."
+              : "Write a thought, turn it into a task, see it in your week."}
           </Animate>
-          <Animate name="rise" index={2} className="home__actions">
-            <Link className="btn btn--primary home__cta" to={ROUTES.notes}>
-              Start writing
+          <Animate name="rise" index={2}>
+            <QuickStart />
+          </Animate>
+          <Animate name="rise" index={3} className="home__actions">
+            <Link className="btn btn--ghost" to={ROUTES.notes}>
+              Start writing a note
             </Link>
             <a className="btn btn--ghost" href="#how-it-works">
               See how it works <FiArrowDown aria-hidden="true" />
@@ -68,8 +81,6 @@ export default function HomePage() {
         <Reveal>
           <LayoutShowcase />
         </Reveal>
-
-        <Shortcuts />
 
         <Reveal
           as="section"

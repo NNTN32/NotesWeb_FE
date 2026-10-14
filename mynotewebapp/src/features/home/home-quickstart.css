@@ -1,0 +1,74 @@
+/* Hero quick start — layout and look only (motion from motion.css / useFlip). */
+.quickstart {
+  display: grid;
+  gap: var(--space-3);
+  width: min(480px, 100%);
+  margin: 0 auto;
+  text-align: left;
+}
+
+.quickstart .quick-add {
+  height: 52px;
+  border-style: solid;
+  background: var(--color-surface);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.05);
+  color: var(--color-accent);
+}
+
+.quickstart__hint {
+  font-size: var(--text-xs);
+  text-align: center;
+}
+
+.quickstart--card {
+  padding: var(--space-4);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.06);
+}
+
+.quickstart--card .quick-add {
+  height: 44px;
+  border-style: dashed;
+  box-shadow: none;
+  color: var(--color-text-muted);
+}
+
+.quickstart__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.quickstart__header strong {
+  font-family: var(--font-serif);
+  font-size: var(--text-lg);
+  font-weight: 500;
+}
+
+.quickstart__done {
+  color: var(--color-accent);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-align: center;
+}
+
+.quickstart__link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  justify-self: end;
+  color: var(--color-accent);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.quickstart__link svg {
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.quickstart__link:hover svg {
+  transform: translateX(calc(var(--motion-distance) * 0.5));
+}

@@ -15,8 +15,7 @@
   justify-items: start;
 }
 
-.showcase__copy h2,
-.shortcuts h2 {
+.showcase__copy h2 {
   font-family: var(--font-serif);
   font-size: var(--text-xl);
   font-weight: 500;
@@ -93,56 +92,6 @@
   font-size: var(--text-xs);
 }
 
-/* Shortcuts */
-.shortcuts {
-  display: grid;
-  justify-items: center;
-  gap: var(--space-5);
-  padding: var(--space-6) 0;
-}
-
-.shortcuts__list {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-3);
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.shortcuts__list li {
-  display: grid;
-  gap: var(--space-3);
-  justify-items: start;
-  padding: var(--space-4);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-  color: var(--color-text-muted);
-  font-size: var(--text-sm);
-}
-
-.shortcuts__keys {
-  display: flex;
-  gap: var(--space-1);
-}
-
-.keycap {
-  display: inline-block;
-  min-width: 2.25em;
-  padding: 3px 8px;
-  border: 1px solid var(--color-line);
-  border-radius: 6px;
-  background: var(--color-bg);
-  box-shadow: 0 2px 0 var(--color-line);
-  color: var(--color-text);
-  font-family: var(--font-sans);
-  font-size: var(--text-xs);
-  font-weight: 600;
-  text-align: center;
-}
-
 @media (max-width: 720px) {
   .showcase {
     grid-template-columns: 1fr;
@@ -164,9 +113,5 @@
 
   .showcase__board--week .showcase__chip i {
     display: none;
-  }
-
-  .shortcuts__list {
-    grid-template-columns: 1fr;
   }
 }

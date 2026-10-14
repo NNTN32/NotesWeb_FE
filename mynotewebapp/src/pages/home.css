@@ -21,8 +21,7 @@
 }
 
 .home__hero {
-  flex: 1;
-  padding: var(--space-7) 0;
+  padding: var(--space-7) 0 var(--space-6);
   text-align: center;
 }
 
@@ -46,47 +45,48 @@
   font-size: var(--text-md);
 }
 
-.home__features {
+.home__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+/* Closing call to action */
+.home__closing {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-3);
-  margin: var(--space-7) 0 0;
+  justify-items: center;
+  gap: var(--space-4);
+  padding: var(--space-7) 0;
+  text-align: center;
+}
+
+.home__closing h2 {
+  font-family: var(--font-serif);
+  font-size: var(--text-xl);
+  font-weight: 500;
+}
+
+.home__facts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2) var(--space-5);
+  margin: 0;
   padding: 0;
-  list-style: none;
-  text-align: left;
-}
-
-.home__feature {
-  display: grid;
-  align-content: start;
-  gap: var(--space-1);
-  height: 100%;
-  padding: var(--space-5);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-  text-decoration: none;
-  transition:
-    border-color var(--duration-base) var(--ease-out),
-    transform var(--duration-base) var(--ease-out);
-}
-
-@media (hover: hover) {
-  .home__feature:hover {
-    border-color: var(--color-accent);
-    transform: translateY(calc(var(--motion-distance) * -0.25));
-  }
-}
-
-.home__feature svg {
-  margin-bottom: var(--space-2);
-  color: var(--color-accent);
-  font-size: var(--text-lg);
-}
-
-.home__feature span {
   color: var(--color-text-muted);
   font-size: var(--text-sm);
+  list-style: none;
+}
+
+.home__facts li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.home__facts svg {
+  color: var(--color-accent);
 }
 
 .home__footer {
@@ -105,7 +105,11 @@
     padding: var(--space-6) 0;
   }
 
-  .home__features {
-    grid-template-columns: 1fr;
+  .home__closing {
+    padding: var(--space-6) 0;
   }
+}
+
+.home > main {
+  flex: 1;
 }

@@ -74,3 +74,30 @@ export function wordCount(text) {
   const trimmed = text.trim();
   return trimmed ? trimmed.split(/\s+/u).length : 0;
 }
+
+// "- ", "* ", "• ", "1. ", "2) ", "[ ] ", "[x] " at the start of a line.
+const LIST_MARKER = /^(?:[-*•]|\d+[.)]|\[[ xX]?\])\s+/u;
+
+/**
+ * Text to turn into a task: the selection if there is one, otherwise the line
+ * under the caret. Uses the first non-empty line, strips list/checkbox
+ * markers and caps the length at 240 characters. Returns "" when empty.
+ */
+export function taskTextAt(content, start, end = start) {
+  let text;
+  if (end > start) {
+    text = content.slice(start, end);
+  } else {
+    const lineStart =
+      start === 0 ? 0 : content.lastIndexOf("\n", start - 1) + 1;
+    const lineEnd = content.indexOf("\n", start);
+    text = content.slice(lineStart, lineEnd === -1 ? undefined : lineEnd);
+  }
+  let line =
+    text
+      .split("\n")
+      .map((part) => part.trim())
+      .find(Boolean) ?? "";
+  while (LIST_MARKER.test(line)) line = line.replace(LIST_MARKER, "");
+  return line.trim().slice(0, 240);
+}

@@ -10,6 +10,9 @@ export const ENTER = {
   fromLeft: "motion-from-left",
   slideUp: "motion-slide-up",
   turn: "motion-turn",
+  pop: "motion-pop",
+  drop: "motion-drop",
+  highlight: "motion-highlight",
 };
 
 export const EXIT = {

@@ -67,6 +67,8 @@
   --motion-scale: 0.96;
   --motion-rotate: -90deg;
   --motion-press-scale: 0.97;
+  --motion-pop-scale: 0.8;
+  --color-highlight: rgb(240 201 139 / 0.55);
   --transition: var(--duration-fast) var(--ease-out);
 
   color-scheme: light;
@@ -89,6 +91,7 @@
   --tint-sky: #2f4a52;
   --backdrop-pattern: rgb(236 235 230 / 0.06);
   --backdrop-grain-opacity: 0.08;
+  --color-highlight: rgb(201 150 47 / 0.35);
   --shadow-overlay: 0 16px 48px rgb(0 0 0 / 0.5);
 
   color-scheme: dark;
@@ -103,5 +106,6 @@
     --motion-scale: 1;
     --motion-rotate: 0deg;
     --motion-press-scale: 1;
+    --motion-pop-scale: 1;
   }
 }

@@ -63,3 +63,20 @@ test("helpers: search, title fallback, word count and validation", () => {
   assert.equal(validNotes({ notes: [null], draft: {} }), false);
   assert.equal(validNotes(null), false);
 });
+
+test("taskTextAt uses the selection, or the line under the caret", async () => {
+  const { taskTextAt } = await import("../src/features/notes/noteModel.js");
+  const content = "Weekend plan\n- [ ] Book dentist\n\n2) Call the bank\n";
+  const at = (needle) => content.indexOf(needle);
+  assert.equal(taskTextAt(content, at("dentist")), "Book dentist");
+  assert.equal(taskTextAt(content, 0), "Weekend plan");
+  assert.equal(taskTextAt(content, at("Call") + 2), "Call the bank");
+  assert.equal(taskTextAt(content, at("Book"), at("Book") + 4), "Book");
+  assert.equal(
+    taskTextAt(content, at("\n\n"), at("Call") + 4),
+    "Call",
+    "multi-line selection uses its first non-empty line",
+  );
+  assert.equal(taskTextAt(content, at("\n\n") + 1), "", "empty line gives nothing");
+  assert.equal(taskTextAt("x".repeat(300), 0).length, 240);
+});

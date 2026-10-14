@@ -44,6 +44,7 @@ src/
     notes/                 noteModel (pure), useNotes, NoteList, NoteEditor, notes.css
     tasks/                 taskModel (pure), TasksProvider, useTaskActions, Day/Week views, tasks.css
     theme/                 ThemeProvider (light/dark)
+    home/                  FeatureFlow story (steps data, tabs, preview)
   hooks/                   useLocalStore: validated localStorage + cross-tab sync
   lib/                     Framework-free helpers (httpClient, download)
   pages/                   Thin route components that compose features
@@ -59,6 +60,17 @@ tests/                     node:test, no extra dependencies
 - **Styling.** Every color, size and radius is a token in `styles/tokens.css`; dark mode only redefines colors under `:root.dark`. Global primitives (`.btn`, `.input`, `.icon-btn`, `.modal`…) are in `styles/components.css`. Feature CSS sits next to the feature and is imported by the page or component that needs it. Class names follow `block__element--modifier`.
 - **Accessibility.** Icon-only buttons go through `IconButton`, which requires a `label`. Dialogs use the native `<dialog>` (`Modal`). Motion is limited to short transitions and is disabled by `prefers-reduced-motion`.
 - **Copy.** One title per page, no decorative eyebrows or quotes. Say "stored in this browser" once per screen at most.
+
+## Home: "From a thought to a planned week"
+
+Home tells one story with the three connected features: **Notes → Today → Week**.
+
+- `features/home/flowSteps.js`: copy, links and timing for the three steps (edit content here only).
+- `features/home/components/FeatureFlow.jsx`: ARIA tabs (arrow keys, Home/End) + panel. Autoplay is driven by the CSS progress bar (`.motion-progress`): when it ends, the next step shows. It pauses off screen (`useInView`), in background tabs (`usePageVisible`), on hover/focus, stops for good once the user picks a step, and never runs with reduced motion (`usePrefersReducedMotion`).
+- `features/home/components/FlowPreview.jsx`: decorative mini app (`aria-hidden`) where the same example task is highlighted in a note, drops into Today and lands in the week.
+- `features/home/home-flow.css`: layout and look; motion comes from `motion.css` utilities (`highlight`, `pop`, `drop`, `progress`).
+
+The story is real: in Notes, **Add as task** (or Ctrl/⌘ + Enter) turns the selected text, or the line under the caret, into a task for today (`taskTextAt` in `noteModel.js` strips list markers). The page wires Notes to Tasks; neither feature imports the other.
 
 ## Motion
 

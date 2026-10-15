@@ -4,6 +4,12 @@
  */
 .flow {
   padding: var(--space-6) 0;
+  scroll-margin-top: var(--space-5);
+}
+
+/* Programmatic focus target (from "See how it works"); no ring on mouse. */
+.flow:focus:not(:focus-visible) {
+  outline: none;
 }
 
 .flow__title {

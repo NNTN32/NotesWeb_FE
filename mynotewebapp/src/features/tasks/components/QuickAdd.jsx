@@ -30,6 +30,8 @@ export default function QuickAdd({
         value={text}
         maxLength={240}
         autoComplete="off"
+        autoCapitalize="sentences"
+        enterKeyHint="done"
         onChange={(event) => setText(event.target.value)}
       />
     </form>

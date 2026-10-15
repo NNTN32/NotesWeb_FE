@@ -8,10 +8,33 @@
       name="description"
       content="MyNote — notes, daily tasks and a weekly plan in one quiet place."
     />
+    <!-- Browser chrome follows the app palette (tokens.css --color-bg) -->
+    <meta name="color-scheme" content="light dark" />
+    <meta
+      name="theme-color"
+      content="#faf8f3"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#171715"
+      media="(prefers-color-scheme: dark)"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="MyNote" />
+    <meta
+      property="og:description"
+      content="Notes, daily tasks and a weekly plan in one quiet place. No account needed."
+    />
     <title>MyNote</title>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <p style="margin: 2rem; font-family: sans-serif">
+        MyNote needs JavaScript to run. Please enable it and reload.
+      </p>
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

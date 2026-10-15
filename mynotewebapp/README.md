@@ -72,6 +72,14 @@ Home tells one story with the three connected features: **Notes → Today → We
 - Returning visitors (any saved tasks) see "Welcome back." instead of the pitch; this is decided once per visit so the headline never flips under a new user.
 - It reuses `QuickAdd`, `TaskItem`, `useFlip` and `useNewItems` from Tasks and the same `TasksProvider`, so everything appears in Tasks too.
 
+**Page polish**
+
+- Sections below the hero are `React.lazy` so the hero is interactive before their code loads; `<Suspense fallback={null}>` keeps the layout quiet.
+- "See how it works" scrolls to the section and moves keyboard focus there (`tabIndex={-1}` on the section).
+- Every page sets its tab title with `hooks/usePageTitle.js` ("Today · MyNote").
+- `index.html` declares `color-scheme`, `theme-color` for light and dark, Open Graph tags and a `<noscript>` message.
+- Headings use `text-wrap: balance`, paragraphs `text-wrap: pretty` (base.css).
+
 - `features/home/flowSteps.js`: copy, links and timing for the three steps (edit content here only).
 - `features/home/components/FeatureFlow.jsx`: ARIA tabs (arrow keys, Home/End) + panel. Autoplay is driven by the CSS progress bar (`.motion-progress`): when it ends, the next step shows. It pauses off screen (`useInView`), in background tabs (`usePageVisible`), on hover/focus, stops for good once the user picks a step, and never runs with reduced motion (`usePrefersReducedMotion`).
 - `features/home/components/FlowPreview.jsx`: decorative mini app (`aria-hidden`) where the same example task is highlighted in a note, drops into Today and lands in the week.

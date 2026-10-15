@@ -5,6 +5,7 @@ import Animate from "../components/ui/Animate";
 import Backdrop from "../components/layout/Backdrop";
 import AuthForm from "../features/auth/components/AuthForm";
 import { ROUTES } from "../app/routes";
+import { usePageTitle } from "../hooks/usePageTitle";
 
 const MODES = ["login", "register"];
 
@@ -12,6 +13,7 @@ export default function AuthPage() {
   const { mode } = useParams();
   const navigate = useNavigate();
   const titleId = useId();
+  usePageTitle(mode === "register" ? "Create account" : "Sign in");
   if (!MODES.includes(mode)) return <Navigate to={ROUTES.home} replace />;
 
   return (

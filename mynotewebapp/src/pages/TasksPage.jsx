@@ -20,6 +20,7 @@ import {
   validDate,
   weekDates,
 } from "../features/tasks/taskModel";
+import { usePageTitle } from "../hooks/usePageTitle";
 import "../features/tasks/tasks.css";
 
 const VIEWS = [
@@ -66,6 +67,7 @@ export default function TasksPage() {
   };
 
   const isWeek = view === "week";
+  usePageTitle(isWeek ? "This week" : "Today");
   const dates = isWeek ? weekDates(date) : [date];
   const rangeTasks = tasks.filter((task) => dates.includes(task.date));
   const visibleTasks = filterTasks(rangeTasks, {

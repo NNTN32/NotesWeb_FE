@@ -27,6 +27,15 @@ p {
   margin: 0;
 }
 
+h1,
+h2 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
 h1 {
   font-family: var(--font-serif);
   font-weight: 500;

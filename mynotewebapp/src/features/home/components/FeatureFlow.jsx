@@ -56,6 +56,7 @@ export default function FeatureFlow({ id: anchorId }) {
     <section
       ref={sectionRef}
       id={anchorId}
+      tabIndex={-1}
       className="flow"
       aria-labelledby={`${id}-title`}
       data-paused={paused ? "" : undefined}

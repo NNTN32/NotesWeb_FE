@@ -42,9 +42,19 @@
 }
 
 .quickstart__header strong {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
   font-family: var(--font-serif);
   font-size: var(--text-lg);
   font-weight: 500;
+}
+
+.quickstart__header time {
+  color: var(--color-text-muted);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
 }
 
 .quickstart__done {

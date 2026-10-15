@@ -20,3 +20,4 @@
 - Every new UI must work at 360px width and in dark mode.
 - Backdrop: page look in `styles/backdrop.css` (variants set custom properties only), movement in `motion.css`; choose a variant via `backdrop` in `app/navigation.js`. Content surfaces stay opaque for legibility.
 - Layout animation: lists that reorder use `useFlip` (+ `flip-root`, `data-flip-id`); sections below the fold use `<Reveal>`; layout toggles of a single element use `withViewTransition`.
+- Every page calls `usePageTitle("…")`. Keep `theme-color` in index.html in sync with `--color-bg` in tokens.css.

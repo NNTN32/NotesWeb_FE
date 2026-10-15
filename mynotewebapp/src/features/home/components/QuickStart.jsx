@@ -9,6 +9,7 @@ import {
   currentSlot,
   dateKey,
   filterTasks,
+  formatDate,
   taskStats,
 } from "../../tasks/taskModel";
 import QuickAdd from "../../tasks/components/QuickAdd";
@@ -56,7 +57,16 @@ export default function QuickStart() {
   return (
     <Animate key="today" name="scale" className="quickstart quickstart--card">
       <div className="quickstart__header">
-        <strong>Today</strong>
+        <strong>
+          Today
+          <time dateTime={today}>
+            {formatDate(today, {
+              weekday: "long",
+              month: "short",
+              day: "numeric",
+            })}
+          </time>
+        </strong>
         <span className="muted" aria-live="polite">
           {stats.completed} of {stats.total} done
         </span>

@@ -13,10 +13,12 @@ import { actionToast } from "../components/ui/undoToast";
 import { ROUTES } from "../app/routes";
 import { downloadText, safeFileName } from "../lib/download";
 import { withViewTransition } from "../lib/motion";
+import { usePageTitle } from "../hooks/usePageTitle";
 import "../features/notes/notes.css";
 
 export default function NotesPage() {
   const notes = useNotes();
+  usePageTitle("Notes");
   const [focus, setFocus] = useState(false);
   const { active } = notes;
   const { saveTask } = useTasks();

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { Link } from "react-router-dom";
 import { FiArrowDown, FiHardDrive, FiMoon, FiUnlock } from "react-icons/fi";
 import Logo from "../components/ui/Logo";
@@ -6,14 +6,23 @@ import ThemeToggle from "../components/ui/ThemeToggle";
 import Animate from "../components/ui/Animate";
 import Backdrop from "../components/layout/Backdrop";
 import Reveal from "../components/ui/Reveal";
-import FeatureFlow from "../features/home/components/FeatureFlow";
-import LayoutShowcase from "../features/home/components/LayoutShowcase";
 import QuickStart from "../features/home/components/QuickStart";
+import { usePageTitle } from "../hooks/usePageTitle";
 import { useTasks } from "../features/tasks/TasksContext";
 import { useAuth } from "../features/auth/AuthContext";
 import { useAuthModal } from "../features/auth/AuthModalContext";
 import { ROUTES } from "../app/routes";
 import "./home.css";
+
+// Below-the-fold sections load after the hero is interactive.
+const FeatureFlow = lazy(
+  () => import("../features/home/components/FeatureFlow"),
+);
+const LayoutShowcase = lazy(
+  () => import("../features/home/components/LayoutShowcase"),
+);
+
+const HOW_IT_WORKS = "how-it-works";
 
 const FACTS = [
   { icon: FiUnlock, text: "No account needed" },
@@ -28,6 +37,7 @@ export default function HomePage() {
   // Decided once per visit so the headline never changes under a new user.
   const { tasks } = useTasks();
   const [returning] = useState(() => tasks.length > 0);
+  usePageTitle();
 
   return (
     <div className="home">
@@ -67,27 +77,42 @@ export default function HomePage() {
             <Link className="btn btn--ghost" to={ROUTES.notes}>
               Start writing a note
             </Link>
-            <a className="btn btn--ghost" href="#how-it-works">
+            <a
+              className="btn btn--ghost"
+              href={`#${HOW_IT_WORKS}`}
+              onClick={() =>
+                // Move keyboard focus with the scroll, so Tab continues there.
+                document
+                  .getElementById(HOW_IT_WORKS)
+                  ?.focus({ preventScroll: true })
+              }
+            >
               See how it works <FiArrowDown aria-hidden="true" />
             </a>
           </Animate>
         </section>
 
         {/* Sections below the hero rise in once as they scroll into view. */}
-        <Reveal>
-          <FeatureFlow id="how-it-works" />
-        </Reveal>
+        <Suspense fallback={null}>
+          <Reveal>
+            <FeatureFlow id={HOW_IT_WORKS} />
+          </Reveal>
 
-        <Reveal>
-          <LayoutShowcase />
-        </Reveal>
+          <Reveal>
+            <LayoutShowcase />
+          </Reveal>
+        </Suspense>
 
         <Reveal
           as="section"
           className="home__closing"
           aria-labelledby="closing-title"
         >
-          <h2 id="closing-title">Start with one note.</h2>
+          <h2 id="closing-title">
+            {returning
+              ? "Your notes are a click away."
+              : "Start with one note."}
+          </h2>
           <ul className="home__facts">
             {FACTS.map(({ icon: Icon, text }) => (
               <li key={text}>

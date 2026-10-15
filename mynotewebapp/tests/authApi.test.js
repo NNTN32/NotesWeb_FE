@@ -42,11 +42,11 @@ test("closing a form cancels polling", async () => {
   assert.equal(polls, 1);
   await assert.rejects(abortableDelay(1000, controller.signal), { name: "AbortError" });
 });
-test("registration sends USER role and accepts a text response", async () => {
+test("registration leaves role assignment to the server and accepts a text response", async () => {
   let payload;
   const api = createAuthApi({ post: async (path, body) => { payload = { path, body }; return { data: "User registered successfully" }; } });
   await api.register({ username: "writer", email: "writer@example.com", password: "test", role: "ADMIN" });
-  assert.deepEqual(payload, { path: "/auth/register", body: { username: "writer", email: "writer@example.com", password: "test", role: "USER" } });
+  assert.deepEqual(payload, { path: "/auth/register", body: { username: "writer", email: "writer@example.com", password: "test" } });
 });
 test("session metadata rejects expired/rotation/malformed tokens and supports Unicode", () => {
   const token = (claims) => `header.${Buffer.from(JSON.stringify(claims)).toString("base64url")}.signature`;

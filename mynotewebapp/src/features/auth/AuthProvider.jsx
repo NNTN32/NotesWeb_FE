@@ -6,7 +6,9 @@ import {
   useSyncExternalStore,
 } from "react";
 import { AuthContext } from "./AuthContext";
-import { authApi, invalidateSession, refreshSession } from "./authService.js";
+import { authApi, invalidateSession, scheduleSessionRenewal } from "./authService.js";
+import { useRetryCountdown } from "./useRetryCountdown.js";
+import { formatRetryWait, retryDeadline } from "../../lib/rateLimit.js";
 import {
   getSession,
   subscribeSession,
@@ -17,57 +19,50 @@ import {
 export const AuthProvider = ({ children }) => {
   const session = useSyncExternalStore(subscribeSession, getSession, () => null);
   const [restoring, setRestoring] = useState(true);
-  const [sessionError, setSessionError] = useState("");
+  const [sessionError, setSessionError] = useState(null);
+  const waitSeconds = useRetryCountdown(sessionError?.retryAt || 0);
+  const sessionMessage = sessionError ? sessionError.message + (waitSeconds ? ` Try again in ${formatRetryWait(waitSeconds)}.` : "") : "";
   const [signingOut, setSigningOut] = useState(false);
 
   useEffect(() => {
-    let active = true;
     // Legacy access tokens are no longer persisted in browser storage.
     try {
       localStorage.removeItem("token");
     } catch {
       /* Storage may be unavailable; cookie restoration still works. */
     }
-    refreshSession()
-      .catch(() => {})
-      .finally(() => {
-        if (active) setRestoring(false);
-      });
-    return () => { active = false; };
+    return scheduleSessionRenewal(getSession(), (error) => {
+      setSessionError(error);
+      setRestoring(false);
+    }, 0);
   }, []);
 
   useEffect(() => {
     if (!session) return;
-    const refresh = () => refreshSession().catch((error) => {
-      // An old renewal cannot clear a newer login or a completed logout.
-      if (getSession() !== session) return;
-      setSessionError([401, 403].includes(error.response?.status)
-        ? "Your session has ended. Please sign in again."
-        : "Could not renew your session. Please sign in again.");
-      invalidateSession();
-    });
     // BE Redis sessions expire after five minutes, even with a longer access JWT.
     const delay = Math.max(5000, Math.min(120000, session.expiresAt - Date.now() - 30000));
-    const timer = setTimeout(refresh, delay);
-    return () => clearTimeout(timer);
+    return scheduleSessionRenewal(session, setSessionError, delay);
   }, [session]);
 
   const login = useCallback((accessToken) => {
     const next = sessionFromToken(accessToken);
     invalidateSession();
     setSession(next);
-    setSessionError("");
+    setSessionError(null);
+    setRestoring(false);
   }, []);
 
   const logout = useCallback(async () => {
     if (signingOut) return;
     setSigningOut(true);
-    setSessionError("");
+    setSessionError(null);
     try {
       await authApi.logout();
       invalidateSession();
-    } catch {
-      setSessionError("Could not sign out on the server. Please try again.");
+    } catch (error) {
+      setSessionError(error.response?.status === 429
+        ? { message: "Sign-out is temporarily limited. You are still signed in.", retryAt: error.retryAt ?? retryDeadline(error.response.headers) }
+        : { message: "Could not sign out on the server. Please try again." });
     } finally {
       setSigningOut(false);
     }
@@ -80,9 +75,9 @@ export const AuthProvider = ({ children }) => {
       logout,
       restoring,
       signingOut,
-      sessionError,
+      sessionError: sessionMessage,
     }),
-    [session, login, logout, restoring, signingOut, sessionError],
+    [session, login, logout, restoring, signingOut, sessionMessage],
   );
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

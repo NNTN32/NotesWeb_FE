@@ -8,7 +8,7 @@ All paths below use the same-origin `/api` proxy. Cookies are sent by the browse
 
 | Action | Method and path | Request | Response / FE behavior |
 | --- | --- | --- | --- |
-| Register | POST `/api/auth/register` | `{username, email, password, role: "USER"}` | HTTP 200 text, no token. FE then signs in with the same username/password. If sign-in fails, tell the user the account was created and offer the Sign in selector. Do not retry registration. |
+| Register | POST `/api/auth/register` | `{username, email, password}` | HTTP 200 text, no token. FE then signs in with the same username/password. If sign-in fails, tell the user the account was created and offer the Sign in selector. Do not retry registration. |
 | Queue login | POST `/api/auth/login` | `{username, password}` | `{sessionId, status: "PENDING"}`. Email is not the login identifier. |
 | Complete login | GET `/api/auth/login/result/{sessionId}` | No body | HTTP 202/PENDING: poll once per second. HTTP 200 `{status:"success", accessToken, userID}`: establish session. Server sets HttpOnly `rotation_secret` cookie and consumes the result once. |
 | Restore / renew | POST `/api/auth/refresh` | HttpOnly cookie | `{accessToken, status:"SUCCESS"}`. Share one in-flight refresh within a tab. An obsolete response must not restore a session after logout or a new login. |
@@ -37,10 +37,39 @@ These views remain local. Do not silently upload an existing notebook or overwri
 | GET `/notes/listNotes`, GET `/notes/{noteID}`, DELETE `/notes/delete/{noteID}` | Root `/notes` prefix differs from auth proxy. Agree a dedicated proxy mapping that does not intercept the FE `/todo` page route. Scope caches to account. |
 | POST `/todo/createList`, PUT `/todo/listUpdate/{idList}` | Payload only `{heading, purport}`. FE requires text, date, slot, priority and completion. Agree lossless schema before replacing local data. |
 | PUT `/todo/update/{todoID}` | Review whether markDone can restore incomplete state; FE supports toggling both ways. |
-| GET `/todo/listUser/{userId}`, DELETE `/todo/delete/{idList}?idUser=...` | BE must validate authenticated ownership; do not rely on a user-supplied ID for access control. |
+| GET `/todo/listUser/{userId}`, DELETE `/todo/delete/{idList}?idUser=...` | PR #50 validates authenticated ownership; supplied owner IDs must match the principal. |
 
 Do not change the BE from this FE chat. Once the missing contracts are implemented and deployed by BE, update this document and add contract tests before enabling cloud sync.
 
 ## Validation
 
 Node tests cover queue-to-result flow, bounded polling, malformed/failed result, abort, registration without token, JWT display metadata and existing note/task models. Lint and production build are required before deploy. Live authentication with a real account, cookie renewal and logout still need an end-to-end check; no production test account is created automatically.
+
+## Rate limiting (BE PR #53/#54, 2026-10-16)
+
+- HTTP 429 is not an authentication failure. The shared Axios interceptor attaches a local retry deadline and rejects the original error; it never clears a session, redirects, refreshes credentials or replays any request.
+- Retry-After supports delta seconds and HTTP dates, using the response Date header when available to tolerate clock skew. Missing/malformed headers (including a Cloudflare HTML response) use a 30-second local wait. This fallback is a UI cooldown, not a server-provided duration.
+- The shared auth form displays a live countdown, preserves entered values, blocks both clicks and programmatic duplicate submits, and re-enables manual submission after the deadline. Login/register have separate in-memory cooldowns, retained across mode changes and closing/reopening the form. A page reload resets local cooldown state; the backend remains authoritative.
+- Registration followed by sign-in throttling records the login cooldown and explains that the account was created. The current registration form cannot send registration again; users explicitly switch to Sign in. Timers never submit credentials.
+- A 429 during login-result polling ends that attempt; it does not repeat POST login or automatically consume a one-time result later.
+- Cookie restoration/renewal is the only request automatically retried after a transient failure, with one in-flight refresh and at least the Retry-After wait. Existing sessions are retained on 429/network/5xx errors. Only definitive refresh 401/403 invalidates the session. Cancelled/stale renewals cannot replace a new login or revive a completed logout.
+- A throttled logout keeps the existing session and reports its wait. No automatic logout retry is introduced.
+
+`tests/rateLimit.test.js` exercises the shipped Axios interceptor, auth transport and session-renewal scheduler. `tests/authRateLimit.browser.test.js` runs the real React auth form in an isolated headless Chrome profile against an Axios mock, checking countdown expiry, manual-only retry, remount/mode changes, preserved input and successful-register/limited-login behavior. Chrome (or CHROME_BIN) is required in CI; no browser package or production API is used. Countdown updates do not announce every second to assistive technology; readiness is announced once.
+
+
+## Compatibility review: BE PR #50 (2026-10-15)
+
+Reviewed against BE branch `codex/be-security-pr1`, commit `2ecd1bd69015b085a7181fcd68dc47bfa3acb7ca`, and FE main `df23166`. PR: https://github.com/NNTN32/NotesWebApp/pull/50. Neither deployment nor production traffic is part of this review.
+
+The current frontend has no STOMP/SockJS dependency, WebSocket connection or login-result subscription. Authentication already uses HTTP polling, including when anonymous STOMP is denied. Notes, tasks and weekly planning still store data locally. This change does not introduce realtime connections or upload existing local data.
+
+- Registration sends only username, email and password; the server assigns USER. Client-provided role/status/session metadata are not forwarded.
+- Login posts credentials once, polls the opaque session ID and establishes an in-memory session only from the terminal HTTP success. There is no anonymous WebSocket fallback. Pending responses remain bounded and cancellation remains supported.
+- Refresh/logout use the same-origin HttpOnly cookie endpoints without an Authorization header. Business requests use the current in-memory Access token. Rotation tokens are rejected by session parsing and cannot replace that Access token.
+- Cookie behavior is enforced by the browser and existing Nginx proxy; adapter tests do not claim to exercise browser cookie delivery. Invalid credentials may still time out because the legacy BE consumer does not persist terminal failures for HTTP polling; this pre-existing BE gap remains open.
+- CORS allowlist defaults in PR #50 include `http://localhost:5173` and `https://nhannotes.id.vn`. Other frontend origins require explicit BE configuration. Current FE auth uses the same-origin `/api` proxy.
+
+When realtime notification integration is implemented, connect only after login, send `Authorization: Bearer <Access token>` in the STOMP CONNECT native headers (never a query parameter), and subscribe only to `/user/queue/reminder` and `/user/queue/note-updates`. Do not subscribe to `/queue/**`, `/topic/**`, `/user/<another-user>/**` or `/user/queue/login-result`; client SEND frames are denied. Reconnect with a fresh token after renewal and disconnect on logout/account change. A same-origin `/ws` proxy and a user-visible notification contract must be added before enabling that feature; they are absent today.
+
+`tests/pr50Compatibility.test.js` exercises the real Axios client/interceptor plus auth API/session functions against an isolated adapter matching PR #50's HTTP response shapes. It checks login without WebSocket, minimal registration, current Access headers across refresh/logout, rejected Rotation tokens and denied/pending HTTP results. It is a transport contract regression suite, not a browser end-to-end or live broker test.

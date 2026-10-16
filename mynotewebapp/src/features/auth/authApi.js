@@ -36,7 +36,7 @@ export function createAuthApi(client, { delay = abortableDelay, attempts = 30 } 
       throw new Error("Sign-in could not be confirmed. Check your credentials and try again.");
     },
     async register({ username, email, password }, { signal } = {}) {
-      await client.post("/auth/register", { username, email, password, role: "USER" }, { signal });
+      await client.post("/auth/register", { username, email, password }, { signal });
     },
     async refresh() {
       const result = await client.post("/auth/refresh");

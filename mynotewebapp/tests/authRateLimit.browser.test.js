@@ -9,14 +9,16 @@ import { promisify } from "node:util";
 import { createServer } from "vite";
 
 test("browser: auth countdown, remount and manual-only retry", { timeout: 45000 }, async (t) => {
+  const firefox = process.env.AUTH_TEST_BROWSER === "firefox";
   const candidates = [process.env.CHROME_BIN, "/usr/bin/google-chrome", "/usr/bin/chromium", "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"].filter(Boolean);
   let chrome;
   for (const candidate of candidates) {
     try { await access(candidate);chrome = candidate;break; } catch { /* Try the next installed browser. */ }
   }
-  if (!chrome && !process.env.CI) return t.skip("Install Chrome or set CHROME_BIN for browser regression tests");
-  assert.ok(chrome, "CI requires Chrome; browser coverage must not silently skip");
+  if (!firefox && !chrome && !process.env.CI) return t.skip("Install Chrome or set CHROME_BIN for browser regression tests");
+  assert.ok(firefox || chrome, "CI requires a browser; browser coverage must not silently skip");
   const profile = await mkdtemp(join(tmpdir(), "notes-fe-rate-"));
+  let browser;
   const server = await createServer({ root: fileURLToPath(new URL("..", import.meta.url)),
     server: { host: "127.0.0.1", port: 0 },
     plugins: [{ name: "auth-test-page", configureServer(vite) {
@@ -30,15 +32,28 @@ test("browser: auth countdown, remount and manual-only retry", { timeout: 45000 
   try {
     await server.listen();
     const port = server.httpServer.address().port;
+    if (firefox) {
+      const { firefox } = await import("playwright");
+      browser = await firefox.launch();
+      const page = await browser.newPage();
+      await page.goto(`http://127.0.0.1:${port}/__test-rate-limit`);
+      await page.waitForSelector("#rate-test-result", { timeout: 30000 });
+      const report = JSON.parse(await page.locator("#rate-test-result").textContent());
+      assert.equal(report.passed, true, JSON.stringify(report));
+      assert.ok(report.checks.length >= 20);
+      t.diagnostic(`Firefox ${browser.version()}: ${report.checks.length} auth assertions passed`);
+      return;
+    }
     const { stdout } = await promisify(execFile)(chrome, ["--headless=new", "--no-first-run", "--no-default-browser-check",
       "--disable-background-networking", "--disable-extensions", `--user-data-dir=${profile}`,
-      "--virtual-time-budget=15000", "--dump-dom", `http://127.0.0.1:${port}/__test-rate-limit`], { timeout: 35000, maxBuffer: 2 * 1024 * 1024 });
+      "--virtual-time-budget=30000", "--dump-dom", `http://127.0.0.1:${port}/__test-rate-limit`], { timeout: 35000, maxBuffer: 2 * 1024 * 1024 });
     const result = stdout.match(/<pre id="rate-test-result">([^<]+)<\/pre>/)?.[1];
     assert.ok(result, "Browser fixture did not complete: " + stdout.slice(-3000));
     const report = JSON.parse(result.replaceAll("&quot;", '"').replaceAll("&amp;", "&"));
     assert.equal(report.passed, true, JSON.stringify(report));
-    assert.ok(report.checks.length >= 12);
+    assert.ok(report.checks.length >= 20);
   } finally {
+    await browser?.close();
     await server.close();
     await rm(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   }

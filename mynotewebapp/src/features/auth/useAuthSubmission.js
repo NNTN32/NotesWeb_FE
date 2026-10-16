@@ -1,16 +1,24 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useAuth } from "./AuthContext";
 import { authApi } from "./authService";
+import { getAuthDeadline, setAuthDeadline, subscribeAuthDeadline } from "./authCooldown.js";
+import { retryDeadline } from "../../lib/rateLimit.js";
+import { useRetryCountdown } from "./useRetryCountdown.js";
 
 export function useAuthSubmission({ mode, onAuthenticated }) {
   const { login } = useAuth();
   const [pending, setPending] = useState(null);
   const [error, setError] = useState("");
+  const [accountCreated, setAccountCreated] = useState(false);
+  const scope = accountCreated ? "login" : mode;
+  const retryAt = useSyncExternalStore(subscribeAuthDeadline, () => getAuthDeadline(scope), () => 0);
+  const waitSeconds = useRetryCountdown(retryAt);
   const request = useRef(null);
   useEffect(() => () => request.current?.abort(), []);
   const submit = async (data) => {
-    if (request.current) return;
+    if (request.current || (mode === "register" && accountCreated) || getAuthDeadline(scope) > Date.now()) return;
     setError("");
+    setAuthDeadline(scope, 0);
     if (mode === "register" && data.password !== data.confirmPassword) {
       setError("Passwords do not match. Please try again.");
       return;
@@ -28,6 +36,7 @@ export function useAuthSubmission({ mode, onAuthenticated }) {
       if (mode === "register") {
         await authApi.register({ ...credentials, email: data.email.trim() }, { signal: controller.signal });
         registered = true;
+        setAccountCreated(true);
       }
       const response = await authApi.login(credentials, { signal: controller.signal });
       if (controller.signal.aborted) return;
@@ -35,6 +44,13 @@ export function useAuthSubmission({ mode, onAuthenticated }) {
       onAuthenticated?.();
     } catch (err) {
       if (controller.signal.aborted) return;
+      if (err.response?.status === 429) {
+        setAuthDeadline(registered ? "login" : mode, err.retryAt ?? retryDeadline(err.response.headers));
+        setError(registered
+          ? "Your account was created. Sign-in is temporarily limited. Switch to Sign in after the wait."
+          : "Too many requests. Your details have been kept. Wait before trying again.");
+        return;
+      }
       const message = err.response?.data?.message || err.response?.data?.error;
       setError(registered
         ? "Your account was created, but sign-in could not be confirmed. Switch to Sign in to try again."
@@ -47,5 +63,5 @@ export function useAuthSubmission({ mode, onAuthenticated }) {
       if (!controller.signal.aborted) { request.current = null; setPending(null); }
     }
   };
-  return { submit, pending, error };
+  return { submit, pending, error, retryAt, waitSeconds, accountCreated };
 }

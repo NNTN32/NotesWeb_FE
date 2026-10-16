@@ -45,6 +45,18 @@ Do not change the BE from this FE chat. Once the missing contracts are implement
 
 Node tests cover queue-to-result flow, bounded polling, malformed/failed result, abort, registration without token, JWT display metadata and existing note/task models. Lint and production build are required before deploy. Live authentication with a real account, cookie renewal and logout still need an end-to-end check; no production test account is created automatically.
 
+## Rate limiting (BE PR #53/#54, 2026-10-16)
+
+- HTTP 429 is not an authentication failure. The shared Axios interceptor attaches a local retry deadline and rejects the original error; it never clears a session, redirects, refreshes credentials or replays any request.
+- Retry-After supports delta seconds and HTTP dates, using the response Date header when available to tolerate clock skew. Missing/malformed headers (including a Cloudflare HTML response) use a 30-second local wait. This fallback is a UI cooldown, not a server-provided duration.
+- The shared auth form displays a live countdown, preserves entered values, blocks both clicks and programmatic duplicate submits, and re-enables manual submission after the deadline. Login/register have separate in-memory cooldowns, retained across mode changes and closing/reopening the form. A page reload resets local cooldown state; the backend remains authoritative.
+- Registration followed by sign-in throttling records the login cooldown and explains that the account was created. The current registration form cannot send registration again; users explicitly switch to Sign in. Timers never submit credentials.
+- A 429 during login-result polling ends that attempt; it does not repeat POST login or automatically consume a one-time result later.
+- Cookie restoration/renewal is the only request automatically retried after a transient failure, with one in-flight refresh and at least the Retry-After wait. Existing sessions are retained on 429/network/5xx errors. Only definitive refresh 401/403 invalidates the session. Cancelled/stale renewals cannot replace a new login or revive a completed logout.
+- A throttled logout keeps the existing session and reports its wait. No automatic logout retry is introduced.
+
+`tests/rateLimit.test.js` exercises the shipped Axios interceptor, auth transport and session-renewal scheduler. `tests/authRateLimit.browser.test.js` runs the real React auth form in an isolated headless Chrome profile against an Axios mock, checking countdown expiry, manual-only retry, remount/mode changes, preserved input and successful-register/limited-login behavior. Chrome (or CHROME_BIN) is required in CI; no browser package or production API is used. Countdown updates do not announce every second to assistive technology; readiness is announced once.
+
 
 ## Compatibility review: BE PR #50 (2026-10-15)
 

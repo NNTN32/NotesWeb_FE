@@ -5,6 +5,7 @@ import { useAuthSubmission } from "../useAuthSubmission";
 import AuthField from "./AuthField";
 import { ENTER } from "../../../lib/motion";
 import "../auth.css";
+import { formatRetryWait } from "../../../lib/rateLimit.js";
 
 const COPY = {
   login: {
@@ -33,7 +34,7 @@ export default function AuthForm({
   const root = useRef(null);
   const isRegister = mode === "register";
   const copy = COPY[mode];
-  const { submit, pending, error } = useAuthSubmission({
+  const { submit, pending, error, retryAt, waitSeconds, accountCreated } = useAuthSubmission({
     mode,
     onAuthenticated,
   });
@@ -53,7 +54,7 @@ export default function AuthForm({
       <form
         className="form"
         aria-busy={!!pending}
-        aria-describedby={error ? `${id}-error` : undefined}
+        aria-describedby={[error && `${id}-error`, retryAt && `${id}-retry`].filter(Boolean).join(" ") || undefined}
         onSubmit={(event) => {
           event.preventDefault();
           submit(Object.fromEntries(new FormData(event.currentTarget)));
@@ -99,12 +100,20 @@ export default function AuthForm({
           </p>
         )}
 
+        {!!retryAt && (
+          <p id={`${id}-retry`} className="alert" role={waitSeconds ? "timer" : "status"} aria-live={waitSeconds ? "off" : "polite"}>
+            {waitSeconds ? `Try again in ${formatRetryWait(waitSeconds)}.`
+              : accountCreated ? "Switch to Sign in to continue." : "You can try again now."}
+          </p>
+        )}
+
         <button
           className="btn btn--primary btn--block"
           type="submit"
-          disabled={!!pending}
+          disabled={!!pending || waitSeconds > 0 || accountCreated}
         >
-          {pending ? "Please wait…" : copy.submit}
+          {pending ? "Please wait…" : waitSeconds ? `Wait ${formatRetryWait(waitSeconds)}`
+            : accountCreated ? "Account created" : copy.submit}
         </button>
       </form>
 

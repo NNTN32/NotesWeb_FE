@@ -169,4 +169,6 @@ AUTH_TEST_BROWSER=firefox node --test tests/authRateLimit.browser.test.js
 
 The Firefox command fails if the browser is missing; CI uploads its TAP report as `firefox-reports` even on failure. Chrome uses an installed browser (or `CHROME_BIN`) and is mandatory in CI.
 
+On macOS, the fixture gives Firefox a temporary `CFFIXED_USER_HOME` so it never uses personal Firefox app data ([Playwright #42768](https://github.com/microsoft/playwright/issues/42768)). Cleanup removes macOS-created ACLs only inside that temporary directory before deleting it. No Full Disk Access or browser sandbox changes are needed. Launch, navigation and fixture waits have explicit timeouts; Linux CI keeps the default Firefox environment.
+
 For UI changes, check Home, Notes, Tasks (Day and Week), Sign in and Sign up at 360px and desktop widths, in light and dark mode: no horizontal page scroll, dialog focus and Escape, mobile menu, and undo after delete.

@@ -34,10 +34,14 @@ test("browser: auth countdown, remount and manual-only retry", { timeout: 45000 
     const port = server.httpServer.address().port;
     if (firefox) {
       const { firefox } = await import("playwright");
-      browser = await firefox.launch();
+      browser = await firefox.launch({
+        timeout: 10000,
+        // macOS 27 protects Firefox's shared app data; keep test data isolated (playwright#42768).
+        ...(process.platform === "darwin" ? { env: { ...process.env, CFFIXED_USER_HOME: profile } } : {}),
+      });
       const page = await browser.newPage();
-      await page.goto(`http://127.0.0.1:${port}/__test-rate-limit`);
-      await page.waitForSelector("#rate-test-result", { timeout: 30000 });
+      await page.goto(`http://127.0.0.1:${port}/__test-rate-limit`, { timeout: 10000 });
+      await page.waitForSelector("#rate-test-result", { timeout: 20000 });
       const report = JSON.parse(await page.locator("#rate-test-result").textContent());
       assert.equal(report.passed, true, JSON.stringify(report));
       assert.ok(report.checks.length >= 20);
@@ -55,6 +59,8 @@ test("browser: auth countdown, remount and manual-only retry", { timeout: 45000 
   } finally {
     await browser?.close();
     await server.close();
+    // CoreFoundation adds deny-delete ACLs to folders inside this temporary macOS test home.
+    if (firefox && process.platform === "darwin") await promisify(execFile)("chmod", ["-RN", profile]);
     await rm(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   }
 });

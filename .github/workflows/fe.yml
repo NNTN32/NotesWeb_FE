@@ -62,8 +62,37 @@ jobs:
           path: mynotewebapp/reports/
           retention-days: 14
 
+  firefox:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: mynotewebapp
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22.15.1'
+      - run: corepack enable && corepack prepare yarn@1.22.22 --activate
+      - run: yarn install --frozen-lockfile --non-interactive
+      - run: yarn playwright install --with-deps firefox
+      - name: Firefox auth regression (missing browser or assertions fail CI)
+        env:
+          AUTH_TEST_BROWSER: firefox
+        run: |
+          mkdir -p reports
+          node --test --test-reporter=tap tests/authRateLimit.browser.test.js | tee reports/firefox.tap
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: firefox-reports
+          path: mynotewebapp/reports/
+          retention-days: 14
+
   publish:
-    needs: validate
+    needs: [validate, firefox]
     if: >-
       github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04

@@ -49,7 +49,7 @@ src/
   lib/                     Framework-free helpers (httpClient, download)
   pages/                   Thin route components that compose features
   styles/                  tokens → base → components → layout → backdrop → motion (imported once in main.jsx)
-tests/                     node:test, no extra dependencies
+tests/                     node:test, React browser fixtures; Playwright for Firefox
 ```
 
 ### Conventions
@@ -157,5 +157,16 @@ Every page sits on a "paper and ink" backdrop: slow-drifting ink washes, a stati
 ## Verification
 
 `yarn test` covers auth (async flow, cancellation, session refresh), note editing/removal/restore/search, task dates, week ranges, time slots, filters, statistics, storage validation and file names.
+
+CI runs the auth browser fixture in both Chrome and Firefox. It checks 429 countdown ticks/expiry, retained form values and cooldowns, manual-only login/register retries, session retention on refresh/logout 429, and logout on definitive refresh 401. Requests use a mock Axios adapter; no production account or secret is needed. Firefox failures block image publication and deployment.
+
+To run Firefox locally after `yarn install`:
+
+```bash
+yarn playwright install firefox # On Linux, add --with-deps if system libraries are missing.
+AUTH_TEST_BROWSER=firefox node --test tests/authRateLimit.browser.test.js
+```
+
+The Firefox command fails if the browser is missing; CI uploads its TAP report as `firefox-reports` even on failure. Chrome uses an installed browser (or `CHROME_BIN`) and is mandatory in CI.
 
 For UI changes, check Home, Notes, Tasks (Day and Week), Sign in and Sign up at 360px and desktop widths, in light and dark mode: no horizontal page scroll, dialog focus and Escape, mobile menu, and undo after delete.

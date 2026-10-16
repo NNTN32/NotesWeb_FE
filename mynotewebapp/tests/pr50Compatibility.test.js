@@ -59,6 +59,26 @@ test("PR50 registration excludes client-selected authorization and session field
   assert.equal(calls[0].url, "/auth/register");
 });
 
+test("BE main HTTP FAIL stops pending login without a session or credential replay", async (t) => {
+  let polls = 0;
+  let waits = 0;
+  const calls = transport(t, (call) => {
+    if (call.method === "post") return { data: { sessionId: "failed-login", status: "PENDING" } };
+    assert.equal(call.url, "/auth/login/result/failed-login");
+    polls++;
+    return polls === 1 ? { status: 202, data: { status: "PENDING", message: "Processing..." } }
+      : { data: { status: "FAIL", token: "", rotationSecret: "", id: "", role: "",
+        message: "Invalid credentials or too many attempts" } };
+  });
+  const api = createAuthApi(client, { delay: async () => { waits++; } });
+  await assert.rejects(api.login({ username: "alice", password: "test-only" }), /Sign-in was unsuccessful/);
+  assert.equal(polls, 2);
+  assert.equal(waits, 1);
+  assert.equal(calls.filter(({ method }) => method === "post").length, 1);
+  assert.ok(calls.every(({ authorization }) => authorization === undefined));
+  assert.equal(getSession(), null);
+});
+
 test("PR50 business requests use the renewed Access token; cookie endpoints receive no bearer", async (t) => {
   const first = accessToken("alice"), renewed = accessToken("alice", "renewed");
   const calls = transport(t, (call) => ({ data: call.url === "/auth/refresh"

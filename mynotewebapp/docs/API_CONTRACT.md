@@ -1,6 +1,6 @@
 # FE / BE API contract
 
-Reviewed on 2026-10-05 against local BE controllers in `NotesWebApp/notesWeb` and live OpenAPI at `https://server.nhannotes.id.vn/v3/api-docs`. Local source establishes behavior; OpenAPI confirms routes and request schemas, not successful authentication.
+Authentication rechecked on 2026-10-16 against BE main `e2c6d1aa33a756cd6156011b9f9ffd3429a4c977` (PR #57) and FE main `aeaf4d5a83a97b56732cc6d03932d56226b88c8f`. Both SHAs were verified against GitHub main. The login-result behavior below comes from that source, not a production-account test. Notes/Todo integration gaps retain their earlier review scope; they were not re-audited here.
 
 ## Authentication implemented by FE
 
@@ -10,7 +10,7 @@ All paths below use the same-origin `/api` proxy. Cookies are sent by the browse
 | --- | --- | --- | --- |
 | Register | POST `/api/auth/register` | `{username, email, password}` | HTTP 200 text, no token. FE then signs in with the same username/password. If sign-in fails, tell the user the account was created and offer the Sign in selector. Do not retry registration. |
 | Queue login | POST `/api/auth/login` | `{username, password}` | `{sessionId, status: "PENDING"}`. Email is not the login identifier. |
-| Complete login | GET `/api/auth/login/result/{sessionId}` | No body | HTTP 202/PENDING: poll once per second. HTTP 200 `{status:"success", accessToken, userID}`: establish session. Server sets HttpOnly `rotation_secret` cookie and consumes the result once. |
+| Complete login | GET `/api/auth/login/result/{sessionId}` | No body | HTTP 202/PENDING: bounded polling. HTTP 200 `{status:"success", accessToken, userID}`: establish session; server sets HttpOnly `rotation_secret` and deletes the result. HTTP 200 `{status:"FAIL", ...}`: stop immediately with a generic sign-in error; do not establish a session or repeat login. |
 | Restore / renew | POST `/api/auth/refresh` | HttpOnly cookie | `{accessToken, status:"SUCCESS"}`. Share one in-flight refresh within a tab. An obsolete response must not restore a session after logout or a new login. |
 | Logout | POST `/api/auth/logout` | HttpOnly cookie | Server revokes the session and expires the cookie. Clear FE session only after success; show retryable failure otherwise. Local notes/tasks remain. |
 
@@ -20,9 +20,18 @@ Google/Apple are not supported by the current BE controller/OpenAPI. Their butto
 
 The legacy persistent `token` storage entry is removed. A page reload uses refresh instead. A 403 must not cause a generic redirect/logout: it can mean denied permission rather than an expired session.
 
-## Backend gaps affecting authentication
+## Login-result contract verified against BE main (2026-10-16)
 
-- The login consumer publishes failed credentials/system failures only to WebSocket; it does not write a FAIL result for HTTP polling. FE therefore cannot distinguish wrong credentials from a missing/slow result; it reports an unconfirmed login after the bounded timeout. BE should persist terminal failures with a TTL for the existing result endpoint.
+- **The previous missing-FAIL gap is closed in BE source.** `AuthRedisConsumer` converts `FailedException` (invalid username/password or its internal consumer limiter) into `Status.FAIL`. `AuthResults.complete` atomically stores the result hash with a 120-second TTL and a separate 24-hour completed marker. HTTP polling needs no WebSocket subscription.
+- **FAIL wire shape:** HTTP 200 hash fields include `status: "FAIL"`, `message: "Invalid credentials or too many attempts"`, and empty strings for `token`, `rotationSecret`, `id`, `role`. This is a terminal application result, not HTTP 401 or 429. The controller returns the hash without setting a rotation cookie or deleting it; it expires by TTL. FE already rejects this result without consuming further polling attempts; it does not expose internal token fields or automatically resubmit credentials.
+- **SUCCESS:** Redis stores `status: "SUCCESS"`; the controller maps it to lowercase `status: "success"`, `accessToken`, `userID`, sets the cookie and deletes the result. FE normalizes status case and accepts the mapped `accessToken`, not the Redis `token` field.
+- **Still ambiguous:** a missing result key returns HTTP 202/PENDING, whether it is not ready, unknown, expired, or already consumed after success. There is no explicit EXPIRED/NOT_FOUND response. Unexpected runtime/infrastructure failures do not automatically become FAIL; they enter the Redis consumer failure-retention/recovery path and may still leave FE waiting until its bounded timeout. Do not label every timeout as wrong credentials or promise every failure is terminal.
+- **Separate throttles:** HTTP endpoint rate limiting can return 429 + Retry-After; FE ends that attempt and waits for manual retry. The consumer's internal limiter produces HTTP 200/FAIL instead, so FE cannot infer a retry deadline from that result.
+
+Source: [AuthRedisConsumer](https://github.com/NNTN32/NotesWebApp/blob/e2c6d1aa33a756cd6156011b9f9ffd3429a4c977/notesWeb/src/main/java/com/example/notesWeb/auth/messaging/AuthRedisConsumer.java), [AuthResults](https://github.com/NNTN32/NotesWebApp/blob/e2c6d1aa33a756cd6156011b9f9ffd3429a4c977/notesWeb/src/main/java/com/example/notesWeb/auth/messaging/AuthResults.java), [AuthController](https://github.com/NNTN32/NotesWebApp/blob/e2c6d1aa33a756cd6156011b9f9ffd3429a4c977/notesWeb/src/main/java/com/example/notesWeb/auth/api/AuthController.java), [RedisStreamConsume](https://github.com/NNTN32/NotesWebApp/blob/e2c6d1aa33a756cd6156011b9f9ffd3429a4c977/notesWeb/src/main/java/com/example/notesWeb/platform/redis/RedisStreamConsume.java).
+
+## Authentication limits and deployment requirements
+
 - The local Redis session expires after 300 seconds, independently of JWT expiry. FE renews at least every two minutes while mounted, or 30 seconds before access expiry (minimum delay five seconds). Browser suspension may still expire the server session, requiring a fresh login.
 - Production must set `app.secure-cookie=true` through BE configuration so the rotation cookie is Secure over HTTPS. The FE production Nginx proxy also enforces Secure, HttpOnly and SameSite=Lax on `rotation_secret`; direct BE clients still require the BE setting. See [Nginx proxy_cookie_flags](https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_cookie_flags).
 - Refresh/login identity currently comes from JWT claims `sub`, `userId`, `type: "Access"`, `exp`. There is no profile endpoint. BE remains the source of authority.
@@ -67,9 +76,11 @@ The current frontend has no STOMP/SockJS dependency, WebSocket connection or log
 - Registration sends only username, email and password; the server assigns USER. Client-provided role/status/session metadata are not forwarded.
 - Login posts credentials once, polls the opaque session ID and establishes an in-memory session only from the terminal HTTP success. There is no anonymous WebSocket fallback. Pending responses remain bounded and cancellation remains supported.
 - Refresh/logout use the same-origin HttpOnly cookie endpoints without an Authorization header. Business requests use the current in-memory Access token. Rotation tokens are rejected by session parsing and cannot replace that Access token.
-- Cookie behavior is enforced by the browser and existing Nginx proxy; adapter tests do not claim to exercise browser cookie delivery. Invalid credentials may still time out because the legacy BE consumer does not persist terminal failures for HTTP polling; this pre-existing BE gap remains open.
+- Cookie behavior is enforced by the browser and existing Nginx proxy; adapter tests do not claim to exercise browser cookie delivery. The missing HTTP FAIL result noted during PR #50 was superseded by BE main `e2c6d1a`; see the verified login-result contract above. Missing/expired results and infrastructure recovery can still time out.
 - CORS allowlist defaults in PR #50 include `http://localhost:5173` and `https://nhannotes.id.vn`. Other frontend origins require explicit BE configuration. Current FE auth uses the same-origin `/api` proxy.
 
 When realtime notification integration is implemented, connect only after login, send `Authorization: Bearer <Access token>` in the STOMP CONNECT native headers (never a query parameter), and subscribe only to `/user/queue/reminder` and `/user/queue/note-updates`. Do not subscribe to `/queue/**`, `/topic/**`, `/user/<another-user>/**` or `/user/queue/login-result`; client SEND frames are denied. Reconnect with a fresh token after renewal and disconnect on logout/account change. A same-origin `/ws` proxy and a user-visible notification contract must be added before enabling that feature; they are absent today.
 
 `tests/pr50Compatibility.test.js` exercises the real Axios client/interceptor plus auth API/session functions against an isolated adapter matching PR #50's HTTP response shapes. It checks login without WebSocket, minimal registration, current Access headers across refresh/logout, rejected Rotation tokens and denied/pending HTTP results. It is a transport contract regression suite, not a browser end-to-end or live broker test.
+
+The same suite now includes BE-main PENDING → HTTP 200/FAIL with the complete Redis hash response shape, asserting that polling stops immediately, credentials are posted once and no session is established. This verifies FE compatibility with the checked BE source; it does not execute the BE consumer or prove that revision is deployed.

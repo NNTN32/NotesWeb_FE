@@ -53,16 +53,18 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const logout = useCallback(async () => {
-    if (signingOut) return;
+    if (signingOut) return false;
     setSigningOut(true);
     setSessionError(null);
     try {
       await authApi.logout();
       invalidateSession();
+      return true;
     } catch (error) {
       setSessionError(error.response?.status === 429
         ? { message: "Sign-out is temporarily limited. You are still signed in.", retryAt: error.retryAt ?? retryDeadline(error.response.headers) }
         : { message: "Could not sign out on the server. Please try again." });
+      return false;
     } finally {
       setSigningOut(false);
     }

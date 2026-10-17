@@ -1,16 +1,18 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { FiLogIn, FiLogOut, FiX } from "react-icons/fi";
 import Logo from "../ui/Logo";
 import IconButton from "../ui/IconButton";
 import ThemeToggle from "../ui/ThemeToggle";
 import { ENTER } from "../../lib/motion";
 import { WORKSPACE_NAVIGATION } from "../../app/navigation";
+import { ROUTES } from "../../app/routes";
 import { useAuth } from "../../features/auth/AuthContext";
 import { useAuthModal } from "../../features/auth/AuthModalContext";
 
 export default function Sidebar({ open, onClose }) {
   const { user, logout, restoring, signingOut, sessionError } = useAuth();
   const { openLogin } = useAuthModal();
+  const navigate = useNavigate();
 
   return (
     <>
@@ -60,7 +62,13 @@ export default function Sidebar({ open, onClose }) {
               <button
                 type="button"
                 className="nav-link"
-                onClick={logout}
+                onClick={async () => {
+                  // Only leave the workspace once the server confirmed the sign-out.
+                  if (await logout()) {
+                    onClose();
+                    navigate(ROUTES.auth("login"), { replace: true });
+                  }
+                }}
                 disabled={signingOut}
               >
                 <FiLogOut aria-hidden="true" />

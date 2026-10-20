@@ -47,8 +47,10 @@
   --radius-sm: 8px;
   --radius-md: 12px;
   --control-height: 36px;
+  --control-height-lg: 44px;
   --sidebar-width: 220px;
   --shadow-overlay: 0 16px 48px rgb(0 0 0 / 0.16);
+  --shadow-paper: 0 1px 2px rgb(36 34 30 / 0.06), 0 12px 32px rgb(36 34 30 / 0.08);
 
   /*
    * Motion. Enter = ease-out, exit = ease-in (exits ~70% of the enter time).
@@ -93,6 +95,7 @@
   --backdrop-grain-opacity: 0.08;
   --color-highlight: rgb(201 150 47 / 0.35);
   --shadow-overlay: 0 16px 48px rgb(0 0 0 / 0.5);
+  --shadow-paper: 0 1px 2px rgb(0 0 0 / 0.3), 0 12px 32px rgb(0 0 0 / 0.35);
 
   color-scheme: dark;
 }

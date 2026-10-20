@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { ROUTES } from "../../../app/routes";
 import { useAuthSubmission } from "../useAuthSubmission";
 import AuthField from "./AuthField";
-import { ENTER } from "../../../lib/motion";
+import { ENTER, LOOP } from "../../../lib/motion";
 import "../auth.css";
 import { formatRetryWait } from "../../../lib/rateLimit.js";
 
@@ -46,10 +46,16 @@ export default function AuthForm({
   }, []);
 
   return (
-    <div className={`auth-form ${ENTER.fade}`} ref={root}>
+    <div
+      className={`auth-form ${isRegister ? ENTER.fromRight : ENTER.fromLeft}`}
+      ref={root}
+    >
       <h2 id={titleId} className="auth-form__title">
         {copy.title}
       </h2>
+      <div className="auth-form__rule" aria-hidden="true">
+        {pending && <span className={`auth-form__ink ${LOOP.ink}`} />}
+      </div>
 
       <form
         className="form"
@@ -65,6 +71,7 @@ export default function AuthForm({
             id={`${id}-username`}
             name="username"
             label="Username"
+            index={0}
             autoComplete="username"
           />
           {isRegister && (
@@ -72,6 +79,7 @@ export default function AuthForm({
               id={`${id}-email`}
               name="email"
               label="Email"
+              index={1}
               type="email"
               autoComplete="email"
             />
@@ -80,6 +88,7 @@ export default function AuthForm({
             id={`${id}-password`}
             name="password"
             label="Password"
+            index={isRegister ? 2 : 1}
             type="password"
             autoComplete={isRegister ? "new-password" : "current-password"}
           />
@@ -88,6 +97,7 @@ export default function AuthForm({
               id={`${id}-confirm`}
               name="confirmPassword"
               label="Confirm password"
+              index={3}
               type="password"
               autoComplete="new-password"
             />
@@ -95,13 +105,13 @@ export default function AuthForm({
         </fieldset>
 
         {error && (
-          <p id={`${id}-error`} className="alert" role="alert">
+          <p id={`${id}-error`} className={`alert ${ENTER.rise}`} role="alert">
             {error}
           </p>
         )}
 
         {!!retryAt && (
-          <p id={`${id}-retry`} className="alert" role={waitSeconds ? "timer" : "status"} aria-live={waitSeconds ? "off" : "polite"}>
+          <p id={`${id}-retry`} className={`alert ${ENTER.rise}`} role={waitSeconds ? "timer" : "status"} aria-live={waitSeconds ? "off" : "polite"}>
             {waitSeconds ? `Try again in ${formatRetryWait(waitSeconds)}.`
               : accountCreated ? "Switch to Sign in to continue." : "You can try again now."}
           </p>

@@ -17,6 +17,11 @@ export const ENTER = {
   highlight: "motion-highlight",
 };
 
+/** Looping feedback while work is in flight (never decorative). */
+export const LOOP = {
+  ink: "motion-ink",
+};
+
 export const EXIT = {
   fade: "motion-exit-fade",
   scale: "motion-exit-scale",

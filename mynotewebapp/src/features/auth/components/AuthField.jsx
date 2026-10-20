@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import IconButton from "../../../components/ui/IconButton";
+import { ENTER, staggerStyle } from "../../../lib/motion";
 
-export default function AuthField({ id, label, type = "text", ...inputProps }) {
+export default function AuthField({ id, label, type = "text", index = 0, ...inputProps }) {
   const [visible, setVisible] = useState(false);
   const isPassword = type === "password";
   return (
-    <div className="field">
+    <div className={`field ${ENTER.rise}`} style={staggerStyle(index + 1)}>
       <label htmlFor={id}>{label}</label>
       <span className="auth-input">
         <input

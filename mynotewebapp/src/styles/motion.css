@@ -63,6 +63,11 @@
   from { background-size: 0% 100%; }
 }
 
+@keyframes motion-ink {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(350%); }
+}
+
 @keyframes motion-progress-fill {
   from { transform: scaleX(0); }
   to { transform: scaleX(1); }
@@ -107,6 +112,9 @@
     no-repeat 0 0 / 100% 100%;
   animation: motion-highlight-sweep calc(var(--duration-slow) * 2) var(--ease-out);
 }
+
+/* Ink stroke that travels along a rule while something is loading */
+.motion-ink { animation: motion-ink 1.1s var(--ease-out) infinite; }
 
 /* Timed fill bar (autoplay progress). Duration via --progress-duration. */
 .motion-progress {
@@ -182,6 +190,13 @@
 @media (prefers-reduced-motion: reduce) {
   .skeleton {
     animation: none;
+  }
+
+  .motion-ink {
+    animation: none;
+    transform: none;
+    width: 100%;
+    opacity: 0.5;
   }
 }
 

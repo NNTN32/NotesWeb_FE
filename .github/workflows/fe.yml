@@ -99,9 +99,10 @@ jobs:
     timeout-minutes: 35
     environment: ProductFE
     env:
-      IMAGE: nntn/notesweb-fe
+      IMAGE: ghcr.io/nntn32/notesweb-fe
     permissions:
       contents: read
+      packages: write
       pull-requests: read
     outputs:
       digest: ${{ steps.build.outputs.digest }}
@@ -118,13 +119,6 @@ jobs:
           gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" > "$RUNNER_TEMP/prs.json"
           jq -e --arg sha "$GITHUB_SHA" --arg repo "$GITHUB_REPOSITORY" \
             'any(.[]; .merged_at != null and .base.ref == "main" and .base.repo.full_name == $repo and .merge_commit_sha == $sha)' "$RUNNER_TEMP/prs.json"
-      - name: Validate registry configuration
-        env:
-          USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-        run: |
-          test -n "$USERNAME" && test -n "$TOKEN"
-          test "$USERNAME" = "nntn"
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '22.15.1'
@@ -132,8 +126,9 @@ jobs:
       - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
       - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish candidate (never latest here)
         id: build
         uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
@@ -178,6 +173,11 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     environment: ProductFE
+    permissions:
+      contents: read
+      packages: write
+    env:
+      IMAGE: ghcr.io/nntn32/notesweb-fe
     concurrency:
       group: fe-production
       cancel-in-progress: false
@@ -192,23 +192,29 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: test "$(gh api "repos/$GITHUB_REPOSITORY/branches/main" --jq '.commit.sha')" = "$GITHUB_SHA"
-      - name: Deploy tested digest and verify public revision
-        env:
-          DOKPLOY_URL: ${{ vars.DOKPLOY_URL || 'https://dokploy.nhannotes.id.vn' }}
-          DOKPLOY_APPLICATION_ID: ${{ vars.DOKPLOY_APPLICATION_ID || '8fELziSraH6PTTo6FS2OB' }}
-          FE_PUBLIC_URL: ${{ vars.FE_PUBLIC_URL || 'https://nhannotes.id.vn' }}
-          DOKPLOY_API_KEY: ${{ secrets.DOKPLOY_API_KEY }}
-          RELEASE_IMAGE: nntn/notesweb-fe@${{ needs.publish.outputs.digest }}
-        run: node mynotewebapp/scripts/ci/deploy.mjs
       - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
       - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Resolve the last verified digest for rollback
+        id: previous
+        run: |
+          # latest only ever points at a digest that passed this job; absent on the first CapRover release.
+          if digest=$(docker buildx imagetools inspect "$IMAGE:latest" --format '{{ .Manifest.Digest }}' 2>/dev/null); then
+            echo "image=$IMAGE@$digest" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Deploy tested digest to CapRover and verify public revision
+        env:
+          CAPROVER_APP_TOKEN: ${{ secrets.CAPROVER_APP_TOKEN }}
+          RELEASE_IMAGE: ghcr.io/nntn32/notesweb-fe@${{ needs.publish.outputs.digest }}
+          PREVIOUS_IMAGE: ${{ steps.previous.outputs.image }}
+        run: node mynotewebapp/scripts/ci/deploy.mjs
       - name: Promote successful production digest to latest
         env:
-          RELEASE_IMAGE: nntn/notesweb-fe@${{ needs.publish.outputs.digest }}
-        run: docker buildx imagetools create --tag "${RELEASE_IMAGE%@*}:latest" "$RELEASE_IMAGE"
+          DIGEST: ${{ needs.publish.outputs.digest }}
+        run: docker buildx imagetools create --tag "$IMAGE:latest" "$IMAGE@$DIGEST"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:

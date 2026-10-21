@@ -16,11 +16,11 @@ Set `API_PROXY_TARGET` to point the dev proxy at another backend. Account flows 
 
 ## Production deployment
 
-Production uses **Dokploy on Lightsail Malaysia** (`notesweb-my-01`), behind Cloudflare DNS/proxy and origin TLS. OrbStack is retired and is never an automatic deploy destination.
+Production uses **CapRover on Lightsail Malaysia** (`notesweb-my-02-caprover`), behind Cloudflare DNS/proxy and origin TLS. OrbStack is retired and is never an automatic deploy destination.
 
-[CD and recovery](deploy/CI-CD.md) · [Runtime configuration](deploy/DOKPLOY.md) · [Working rules](CLAUDE.md)
+[CD and recovery](deploy/CI-CD.md) · [Runtime configuration](deploy/CAPROVER.md) · [Working rules](CLAUDE.md)
 
-Reviewed/current merged main → ProductFE → tested immutable image digest → Dokploy API → public revision/health/smoke for 120 seconds → latest promotion. PRs have no production credentials. Native Swarm health rollback is enabled; a public-smoke failure requires inspecting the artifact and explicitly redeploying the known-good digest. Keep volumes and current data intact.
+Reviewed/current merged main → ProductFE → tested immutable GHCR digest → CapRover deploy token → public revision/health/smoke for 120 seconds → latest promotion. PRs have no production credentials. A public-smoke failure redeploys the previous verified digest; the run stays red. Keep volumes and current data intact.
 
 The Dockerfile builds with the frozen Yarn lockfile and serves static assets through Nginx. `/api` proxies to BE on `notesweb-app`; PostgreSQL/Redis/RabbitMQ stay private. BE releases use their own ProductBE environment, readiness checks and guarded digest rollback.
 

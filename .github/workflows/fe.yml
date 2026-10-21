@@ -221,3 +221,23 @@ jobs:
           name: deployment-report
           path: deployment.json
           retention-days: 90
+
+  notify:
+    # One Discord message (#ci_fe-alert) per run, green or red. Fork/Dependabot runs get no secret and skip.
+    needs: [validate, firefox, publish, deploy]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+          sparse-checkout: mynotewebapp/scripts/ci
+      - name: Post CI result to Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_CI_WEBHOOK }}
+          RESULTS: ${{ toJSON(needs) }}
+          TITLE: ${{ github.event.pull_request.title || github.event.head_commit.message }}
+          REF: ${{ github.head_ref || github.ref_name }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: node mynotewebapp/scripts/ci/notify-discord.mjs

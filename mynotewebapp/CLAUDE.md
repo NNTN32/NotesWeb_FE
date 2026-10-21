@@ -23,8 +23,8 @@
 - Every page calls `usePageTitle("…")`. Keep `theme-color` in index.html in sync with `--color-bg` in tokens.css.
 
 ## Release and recovery
-- Production is Dokploy on **Lightsail Malaysia**, `notesweb-my-01` / `ip-172-26-24-177`; OrbStack is retired, never a CD fallback.
-- Current merged main → ProductFE environment → build/smoke published digest on amd64 + arm64 → Dokploy API → matching public revision + 120-second smoke → latest promotion. Keep ProductFE main-only and Git autodeploy disabled.
-- Preserve same-origin `/api` and `API_UPSTREAM=http://nnnoteswebapp-notesserver-oubfhi:8081` on `notesweb-app`. No secrets in browser bundles or VITE_*.
-- [CD runbook](deploy/CI-CD.md) and [runtime configuration](deploy/DOKPLOY.md) describe evidence and recovery. FE has native Swarm health rollback, but no automatic application rollback on a failed public smoke. Pin the recorded previous digest and verify before declaring recovery.
+- Production is CapRover on **Lightsail Malaysia**, `notesweb-my-02-caprover`, app `notesweb-fe`; OrbStack and Dokploy are retired, never a CD fallback.
+- Current merged main → ProductFE environment → build/smoke published digest on amd64 + arm64 → private GHCR → CapRover app deploy token → matching public revision + 120-second smoke → latest promotion. Keep ProductFE main-only.
+- Preserve same-origin `/api` and `API_UPSTREAM=http://server:8081` (CapRover BE app). No secrets in browser bundles or VITE_*.
+- [CD runbook](deploy/CI-CD.md) and [runtime configuration](deploy/CAPROVER.md) describe evidence and recovery. A failed public smoke redeploys the previous `latest` digest; verify its revision before declaring recovery.
 - BE has its own ProductBE environment and guarded API/digest health rollback; do not copy BE keys or webhook targets into FE. Keep data/env/networks intact during code rollback; never restore retired OrbStack data over new production writes.

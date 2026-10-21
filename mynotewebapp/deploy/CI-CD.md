@@ -20,6 +20,8 @@ Workflow: `.github/workflows/fe.yml` at the repository root. Commands run in `my
 
 Target, app and public URL are fixed in `scripts/ci/deploy.mjs`. CapRover pulls from GHCR with its own classic GitHub token limited to `read:packages` (CapRover → Cluster → Docker Registries). Do not mix FE and BE tokens.
 
+Repository secret `DISCORD_CI_WEBHOOK` (Discord `#ci_fe-alert`): the `notify` job posts one message per run, success, failure or cancelled, with each job's result and the run link (`scripts/ci/notify-discord.mjs`). Fork and Dependabot runs have no secret and skip. Rotate by regenerating the webhook in Discord and updating the secret.
+
 ## Evidence and recovery
 
 Artifacts retain unit/image reports for 14 days, release digest + architecture smoke for 30 days, and `deployment.json` (new/previous digest, status, rollback outcome) for 90 days. No tokens or CapRover responses are logged.

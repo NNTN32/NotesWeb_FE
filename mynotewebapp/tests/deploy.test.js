@@ -8,10 +8,10 @@ const revision = 'b'.repeat(40);
 const config = { appToken: 'test-only', image, revision, previousImage };
 
 function fixture({ status = 101, smokes = [], served = 'd'.repeat(40) } = {}) {
-  const posts = [], records = [];
+  const posts = [], records = [], logs = [];
   let probe = 0;
-  return { posts, records, deps: {
-    attempts: 3, pause: async () => {}, checkpoint: r => records.push(structuredClone(r)),
+  return { posts, records, logs, deps: {
+    attempts: 3, pause: async () => {}, checkpoint: r => records.push(structuredClone(r)), log: m => logs.push(m),
     smokeCheck: async (url, expected) => {
       assert.equal(url, target.publicUrl);
       if ((smokes[probe++] ?? 'ok') === 'fail') throw new Error('Wrong revision');
@@ -42,6 +42,7 @@ test('wrong live revision fails and rolls back to the previous digest', async ()
   await assert.rejects(deploy(config, f.deps), /rollback passed/);
   assert.deepEqual(f.posts.map(deployed), [image, previousImage]);
   assert.equal(f.records.at(-1).status, 'failed');
+  assert.equal(f.logs[0], 'Public smoke attempt 1/3 failed: Wrong revision');
 });
 test('rollback that still serves the failed revision needs manual recovery', async () => {
   const f = fixture({ smokes: ['fail', 'fail', 'fail'], served: revision });

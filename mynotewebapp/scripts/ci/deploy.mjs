@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { writeFileSync } from 'node:fs';
 import { setTimeout as delay } from 'node:timers/promises';
 import { pathToFileURL } from 'node:url';
-import { smoke } from './smoke-http.mjs';
+import { smoke, userAgent } from './smoke-http.mjs';
 
 // The only production target. A leaked workflow cannot point the app token elsewhere.
 export const target = Object.freeze({
@@ -11,13 +11,15 @@ export const target = Object.freeze({
 export const imagePattern = /^ghcr\.io\/nntn32\/notesweb-fe@sha256:[a-f0-9]{64}$/;
 
 const servedRevision = async (publicUrl, fetcher) => {
-  const response = await fetcher(new URL('/version.json', publicUrl), { redirect: 'error', signal: AbortSignal.timeout(15_000) });
+  const response = await fetcher(new URL('/version.json', publicUrl), { redirect: 'error', signal: AbortSignal.timeout(15_000),
+    headers: { 'User-Agent': userAgent } });
   assert.equal(response.status, 200, 'version.json');
   return (await response.json()).revision;
 };
 
 export async function deploy(config, {
   fetcher = fetch, pause = delay, smokeCheck = smoke, checkpoint = () => {}, attempts = 30, observationSamples = 12,
+  log = console.warn,
 } = {}) {
   const { appToken, image, revision, previousImage } = config;
   assert.ok(appToken, 'Missing CapRover app token');
@@ -55,7 +57,12 @@ export async function deploy(config, {
           await smokeCheck(target.publicUrl, live);
         }
         return live;
-      } catch { await pause(10_000); }
+      } catch (error) {
+        // First line of the check that failed (assert text or network code), never a response body.
+        const code = error?.cause?.code ? ` (${error.cause.code})` : '';
+        log(`Public smoke attempt ${attempt + 1}/${attempts} failed: ${String(error?.message).split('\n')[0]}${code}`);
+        await pause(10_000);
+      }
     }
     throw new Error(`Revision did not pass public smoke within ${attempts * 10} seconds`);
   };

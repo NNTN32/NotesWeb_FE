@@ -28,6 +28,7 @@ export default function NoteEditor({
       end: event.target.selectionEnd,
     });
 
+  const words = wordCount(note.content);
   const status = saveFailed
     ? "Not saved"
     : isBlank(note)
@@ -38,7 +39,7 @@ export default function NoteEditor({
     <section className="note-editor" aria-label="Editor">
       <div className="note-editor__toolbar">
         <span className="muted" role="status">
-          {status} · {wordCount(note.content)} words
+          {status} · {words} {words === 1 ? "word" : "words"}
         </span>
         <div className="note-editor__actions">
           <button

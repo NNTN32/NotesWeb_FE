@@ -1,9 +1,13 @@
 import assert from 'node:assert/strict';
 import { pathToFileURL } from 'node:url';
 
+// Cloudflare 403s some default client user agents; every CI request sends this fixed one.
+export const userAgent = 'NotesWeb-Actions-Smoke/1.0';
+
 export async function smoke(baseUrl, revision, { mock = false } = {}) {
   const request = (path, options = {}) => fetch(new URL(path, baseUrl), {
-    ...options, redirect: 'error', signal: AbortSignal.timeout(15_000),
+    ...options, headers: { 'User-Agent': userAgent, ...options.headers },
+    redirect: 'error', signal: AbortSignal.timeout(15_000),
   });
   const health = await request('/healthz');
   assert.equal(health.status, 200, 'FE health');

@@ -254,6 +254,21 @@ body:has(input:focus, textarea:focus) .backdrop__blob {
   animation-timing-function: var(--ease-out);
 }
 
+/* Focus mode: the note list folds into the notebook bubble (and back) */
+::view-transition-group(note-list) {
+  animation-duration: var(--duration-slow);
+  animation-timing-function: var(--ease-out);
+  border-radius: var(--radius-md);
+  overflow: clip;
+}
+
+::view-transition-old(note-list),
+::view-transition-new(note-list) {
+  height: 100%;
+  object-fit: cover;
+  object-position: left top;
+}
+
 /* Theme switch cross-fade (View Transitions API, progressive enhancement) */
 ::view-transition-old(root),
 ::view-transition-new(root) {

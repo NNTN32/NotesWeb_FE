@@ -5,6 +5,7 @@ import Alert from "../components/ui/Alert";
 import Animate from "../components/ui/Animate";
 import NoteList from "../features/notes/components/NoteList";
 import NoteEditor from "../features/notes/components/NoteEditor";
+import NotesBubble from "../features/notes/components/NotesBubble";
 import { useNotes } from "../features/notes/useNotes";
 import { noteTitle } from "../features/notes/noteModel";
 import { useTasks } from "../features/tasks/TasksContext";
@@ -94,6 +95,14 @@ export default function NotesPage() {
           />
         </Animate>
       </div>
+
+      {focus && (
+        <NotesBubble
+          notes={notes.notes}
+          activeId={active.id}
+          onOpen={openNote}
+        />
+      )}
     </div>
   );
 }

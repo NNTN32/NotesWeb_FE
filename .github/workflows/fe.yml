@@ -78,12 +78,12 @@ jobs:
       - run: corepack enable && corepack prepare yarn@1.22.22 --activate
       - run: yarn install --frozen-lockfile --non-interactive
       - run: yarn playwright install --with-deps firefox
-      - name: Firefox auth regression (missing browser or assertions fail CI)
+      - name: Firefox auth + notes focus regression (missing browser or assertions fail CI)
         env:
           AUTH_TEST_BROWSER: firefox
         run: |
           mkdir -p reports
-          node --test --test-reporter=tap tests/authRateLimit.browser.test.js | tee reports/firefox.tap
+          node --test --test-reporter=tap tests/authRateLimit.browser.test.js tests/notesFocus.browser.test.js | tee reports/firefox.tap
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:

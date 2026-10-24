@@ -1,3 +1,8 @@
+.notes-page,
+.notes-bubble {
+  --bubble-size: 52px;
+}
+
 .notes-layout {
   display: grid;
   grid-template-columns: 260px minmax(0, 1fr);
@@ -6,8 +11,14 @@
 }
 
 .notes-page--focus .notes-layout {
-  grid-template-columns: minmax(0, 720px);
-  justify-content: center;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* The docked list and the focus-mode bubble share one name, so the View
+   Transition folds the list into the bubble and unfolds it on exit. */
+.notes-layout > .note-list,
+.notes-bubble__toggle {
+  view-transition-name: note-list;
 }
 
 /* List */
@@ -129,7 +140,110 @@
   line-height: 1.75;
 }
 
+/* Focus mode: floating notebook bubble that shows/hides the note list */
+.notes-bubble {
+  position: fixed;
+  bottom: var(--space-5);
+  left: calc(var(--sidebar-width) + var(--space-5));
+  z-index: 20;
+}
+
+.notes-bubble__toggle {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--bubble-size);
+  height: var(--bubble-size);
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: var(--shadow-overlay);
+  color: var(--color-accent-contrast);
+  font-size: 1.3rem;
+  transition: transform var(--transition);
+}
+
+.notes-bubble__toggle:hover,
+.notes-bubble__toggle[aria-expanded="true"] {
+  transform: scale(1.06);
+}
+
+.notes-bubble__count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: var(--color-surface);
+  box-shadow: 0 0 0 1px var(--color-line);
+  color: var(--color-text);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.notes-bubble__panel {
+  position: absolute;
+  bottom: calc(100% + var(--space-3));
+  left: 0;
+  width: min(300px, calc(100vw - var(--space-4) * 2));
+  padding: var(--space-3);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-overlay);
+  opacity: 0;
+  transform: scale(var(--motion-pop-scale));
+  transform-origin: bottom left;
+  visibility: hidden;
+  /* Exit is faster (ease-in); visibility flips after the fade ends */
+  transition:
+    opacity var(--duration-fast) var(--ease-in),
+    transform var(--duration-fast) var(--ease-in),
+    visibility 0s linear var(--duration-fast);
+}
+
+.notes-bubble__panel[data-open] {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+  transition:
+    opacity var(--duration-base) var(--ease-out),
+    transform var(--duration-base) var(--ease-spring);
+}
+
+.notes-bubble .note-list {
+  position: static;
+}
+
+.notes-bubble .note-list__items {
+  max-height: min(50vh, 420px);
+}
+
+@media (min-width: 861px) {
+  /* Focus mode: the sheet grows to the sidebar edge; text stays a readable column */
+  .notes-page--focus {
+    margin: calc(var(--space-6) * -1) calc(var(--space-6) * -1)
+      calc(var(--space-7) * -1);
+  }
+
+  .notes-page--focus .note-editor {
+    min-height: 100vh;
+    padding: var(--space-5) max(var(--space-6), calc((100% - 760px) / 2))
+      calc(var(--bubble-size) + var(--space-6));
+    border: 0;
+    border-radius: 0;
+  }
+}
+
 @media (max-width: 860px) {
+  .notes-bubble {
+    bottom: var(--space-4);
+    left: var(--space-4);
+  }
+
   .notes-layout {
     grid-template-columns: 1fr;
   }

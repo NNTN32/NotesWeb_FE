@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { createServer } from "vite";
 
 // Focus mode on the Notes page: the list folds into the notebook bubble, the
-// sheet reaches the sidebar, and the bubble shows/hides the list.
+// sheet reaches the sidebar, the bubble shows/hides the list and can be dragged.
 // Runs in Firefox on CI (AUTH_TEST_BROWSER=firefox); locally set CHROME_BIN.
 test("browser: notes focus mode bubble", { timeout: 60000 }, async (t) => {
   const firefox = process.env.AUTH_TEST_BROWSER === "firefox";
@@ -62,6 +62,33 @@ test("browser: notes focus mode bubble", { timeout: 60000 }, async (t) => {
     await panel.getByRole("button", { name: /Alpha/ }).click();
     assert.equal(await page.inputValue("#note-title"), "Alpha");
     assert.equal(await panel.getAttribute("data-open"), null);
+
+    // Drag the bubble to the top right: it follows the pointer, the drag does
+    // not toggle the list, the list opens below-left, and the spot survives a reload.
+    const start = await toggle.boundingBox();
+    await page.mouse.move(start.x + 20, start.y + 20);
+    await page.mouse.down();
+    await page.mouse.move(900, 150, { steps: 8 });
+    await page.mouse.up();
+    await page.waitForTimeout(300); // hover scale settles
+    // Centres, because the hovered bubble is slightly scaled.
+    const centre = (box) => ({ x: box.x + box.width / 2, y: box.y + box.height / 2 });
+    const moved = await toggle.boundingBox();
+    const grabbed = { x: 900 - 20 + start.width / 2, y: 150 - 20 + start.height / 2 };
+    assert.ok(Math.abs(centre(moved).x - grabbed.x) <= 3 && Math.abs(centre(moved).y - grabbed.y) <= 3, "bubble follows the pointer");
+    assert.equal(await panel.getAttribute("data-open"), null, "ending a drag does not open the list");
+    await toggle.click();
+    await page.waitForTimeout(400);
+    const list = await panel.boundingBox();
+    assert.ok(list.y > moved.y + moved.height, "list opens below a bubble in the top half");
+    assert.ok(list.x + list.width <= moved.x + moved.width + 1, "list opens leftward on the right side");
+    await page.keyboard.press("Escape");
+    await page.reload();
+    await page.getByRole("button", { name: "Focus mode" }).click();
+    await toggle.waitFor({ timeout: 5000 });
+    await page.waitForTimeout(600);
+    const restored = centre(await toggle.boundingBox());
+    assert.ok(Math.abs(restored.x - grabbed.x) <= 3 && Math.abs(restored.y - grabbed.y) <= 3, "position is remembered");
 
     await page.keyboard.press("Escape");
     await page.locator(".notes-layout > .note-list").waitFor({ timeout: 5000 });

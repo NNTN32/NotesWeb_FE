@@ -5,10 +5,12 @@ import { createServer } from "vite";
 
 // Focus mode on the Notes page: the list folds into the notebook bubble, the
 // sheet reaches the sidebar, the bubble shows/hides the list and can be dragged.
-// Runs in Firefox on CI (AUTH_TEST_BROWSER=firefox); locally set CHROME_BIN.
+// Runs in the Firefox CI job (AUTH_TEST_BROWSER=firefox); locally set CHROME_BIN.
+// Skipped in other CI jobs: runners set CHROME_BIN, and running this beside the
+// headless-Chrome auth test there starves it past its 35 s budget.
 test("browser: notes focus mode bubble", { timeout: 60000 }, async (t) => {
   const firefox = process.env.AUTH_TEST_BROWSER === "firefox";
-  if (!firefox && !process.env.CHROME_BIN)
+  if (!firefox && (process.env.CI || !process.env.CHROME_BIN))
     return t.skip("Runs in the Firefox CI job, or locally with CHROME_BIN");
   const server = await createServer({
     root: fileURLToPath(new URL("..", import.meta.url)),

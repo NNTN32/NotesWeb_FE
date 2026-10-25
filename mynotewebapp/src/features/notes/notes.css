@@ -160,7 +160,15 @@
   box-shadow: var(--shadow-overlay);
   color: var(--color-accent-contrast);
   font-size: 1.3rem;
+  cursor: grab;
+  touch-action: none; /* pointer events drive the drag on touch screens too */
+  user-select: none;
   transition: transform var(--transition);
+}
+
+.notes-bubble[data-dragging] .notes-bubble__toggle {
+  cursor: grabbing;
+  transform: scale(1.1);
 }
 
 .notes-bubble__toggle:hover,
@@ -196,7 +204,7 @@
   box-shadow: var(--shadow-overlay);
   opacity: 0;
   transform: scale(var(--motion-pop-scale));
-  transform-origin: bottom left;
+  transform-origin: var(--panel-origin-x, left) var(--panel-origin-y, bottom);
   visibility: hidden;
   /* Exit is faster (ease-in); visibility flips after the fade ends */
   transition:
@@ -216,6 +224,19 @@
 
 .notes-bubble .note-list {
   position: static;
+}
+
+/* A dragged bubble opens its list toward the roomier side of the screen */
+.notes-bubble[data-below] .notes-bubble__panel {
+  --panel-origin-y: top;
+  top: calc(100% + var(--space-3));
+  bottom: auto;
+}
+
+.notes-bubble[data-end] .notes-bubble__panel {
+  --panel-origin-x: right;
+  right: 0;
+  left: auto;
 }
 
 .notes-bubble .note-list__items {
